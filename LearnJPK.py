@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.externals import joblib
 
 specialCharacters = re.compile("[^ a-z\-]")
 
@@ -54,11 +55,14 @@ clf = SGDClassifier(n_iter=100,shuffle=True).fit(X_train_tfidf, target)
 # Let's test
 X_test_tfidf, docs, target, count_vect, tf_transformer  = tfidfDirectory("output-test",count_vect = count_vect,tf_transformer=tf_transformer)
 
+joblib.dump(clf, "trainedModel.mod")
+joblib.dump(clf, "fittedCounter.cnt")
+joblib.dump(clf, "fittedTransformer.trf")
 predicted = clf.predict(X_test_tfidf)
 correct = 0
 for doc, category, t in zip(docs, predicted, target):
 	if category == t:
 		correct += 1
-	print("\t".join([str(s) for s in [doc.rjust(50),category.rjust(30), t.ljust(40), category == t]]))
+	print("\t".join([str(s) for s in [doc,category, t, int(category == t)]]))
 	
 print float(correct)/float(len(target)) * 100
