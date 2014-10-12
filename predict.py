@@ -15,11 +15,11 @@ def parseText(text):
 	contents = text.lower()
 	contents = specialCharacters.sub("", contents)
 	contents = " ".join(filter(lambda w: len(w) > 0 and w not in stopWords, contents.split(" ")))
-	
+
 	X_train_counts = counter.transform([contents])
 	X_train_tfidf  = transformer.transform(X_train_counts)
-	
-	
+
+
 	return X_train_tfidf
 
 text = """
@@ -38,51 +38,51 @@ Vervolgens heeft [appellant] de stukken voor het wijzen van arrest overgelegd en
 
 2.3
 De vordering van [appellant] luidt:
-"bij arrest, bij voorraad uitvoerbaar, te vernietigen het vonnis dat de Rechtbank Assen op 
+"bij arrest, bij voorraad uitvoerbaar, te vernietigen het vonnis dat de Rechtbank Assen op
 7 maart 2012 onder rolnummer 81519 tussen partijen heeft gewezen, en, opnieuw rechtdoende:
-Ad 1:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 450,= ter zake van het omwisselen van de ps kisten, te 
-vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de inleidende 
+Ad 1:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant
+te betalen een bedrag van € 450,= ter zake van het omwisselen van de ps kisten, te
+vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de inleidende
 dagvaarding tot de dag der algehele voldoening;
-Ad 2:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 3.250,= ter zake van de post extra wapening, te 
-vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de inleidende 
+Ad 2:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant
+te betalen een bedrag van € 3.250,= ter zake van de post extra wapening, te
+vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de inleidende
 dagvaarding tot de dag der algehele voldoening;
-Ad 3:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 25.134,47 ter zake van de herstelkosten aan de berg- en 
-kapschuur, te vermeerderen met de wettelijk rente over dit bedrag vanaf de dag van 
+Ad 3:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant
+te betalen een bedrag van € 25.134,47 ter zake van de herstelkosten aan de berg- en
+kapschuur, te vermeerderen met de wettelijk rente over dit bedrag vanaf de dag van
 de inleidende dagvaarding tot de dag der algehele voldoening;
-Ad 4: geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 1.038,43 ter zake van herstelkosten aan het stookhutje, 
-te vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de 
+Ad 4: geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant
+te betalen een bedrag van € 1.038,43 ter zake van herstelkosten aan het stookhutje,
+te vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de
 inleidende dagvaarding tot de dag der algehele voldoening;
-Ad 5:	geïntimeerde te veroordelen om aan appellant te betalen een bedrag van € 2.008,13 
-ter zake van het rapport van de heer ing. [deskundige], te vermeerderen met de 
-wettelijke rente over dit bedrag vanaf de dag van het nemen van de onderhavige 
+Ad 5:	geïntimeerde te veroordelen om aan appellant te betalen een bedrag van € 2.008,13
+ter zake van het rapport van de heer ing. [deskundige], te vermeerderen met de
+wettelijke rente over dit bedrag vanaf de dag van het nemen van de onderhavige
 memorie tot op de dag der algehele voldoening;
-Ad 6: geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 531,17 ter zake van de nota van de heer [betrokkene 1], te 
-vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van het nemen 
+Ad 6: geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant
+te betalen een bedrag van € 531,17 ter zake van de nota van de heer [betrokkene 1], te
+vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van het nemen
 van onderhavige memorie tot de dag der algehele voldoening;
 Ad 7:	geïntimeerde te veroordelen in de kosten van beide instanties."
 2.4
 In incidenteel appel heeft [geïntimeerde] gevorderd:
 "bij arrest, voor zover mogelijk uitvoerbaar bij voorraad:
 In appel
-1.	De vorderingen van [appellant] af te wijzen, dan wel hem deze te ontzeggen, dan wel 
-te bepalen dat op het bedrag dat aan [appellant] wordt toegewezen het reeds betaald 
-bedrag van € 7020,90 (vermeerder met rente vanaf 15 mei 2012 tot de datum der 
+1.	De vorderingen van [appellant] af te wijzen, dan wel hem deze te ontzeggen, dan wel
+te bepalen dat op het bedrag dat aan [appellant] wordt toegewezen het reeds betaald
+bedrag van € 7020,90 (vermeerder met rente vanaf 15 mei 2012 tot de datum der
 voldoening) in mindering wordt gebracht
 In zelfstandig appel
-2. Te verklaren voor recht dat [appellant] een vordering heeft op [appellant] Vastgoed 
-BV, tot een bedrag van € 7020,90 (vermeerderd met rente vanaf 15 mei 2012 tot de 
-datum der voldoening), dan wel tot een zodanig bedrag dat in deze juist wordt 
-geacht en daarbij te bepalen dat deze vordering rechtsgeldig is overgedragen en 
-verrekend met de schuld van [geïntimeerde] aan [appellant], waardoor deze vordering is 
+2. Te verklaren voor recht dat [appellant] een vordering heeft op [appellant] Vastgoed
+BV, tot een bedrag van € 7020,90 (vermeerderd met rente vanaf 15 mei 2012 tot de
+datum der voldoening), dan wel tot een zodanig bedrag dat in deze juist wordt
+geacht en daarbij te bepalen dat deze vordering rechtsgeldig is overgedragen en
+verrekend met de schuld van [geïntimeerde] aan [appellant], waardoor deze vordering is
 teniet gegaan tot het bedrag van € 7020,90.
 subsidiair
-[appellant] te veroordelen tot betaling aan [geïntimeerde] tot een bedrag van € 7020,90, 
-dan wel tot betaling van een zodanig bedrag dat in deze juist wordt geacht, te 
+[appellant] te veroordelen tot betaling aan [geïntimeerde] tot een bedrag van € 7020,90,
+dan wel tot betaling van een zodanig bedrag dat in deze juist wordt geacht, te
 vermeerderen met rente van 15 mei 2012 tot de datum der algehele voldoening.
 In appel en zelfstandig appel
 3.	[appellant] te veroordelen in de kosten van de procedure in eerste aanleg en appel."
@@ -93,7 +93,7 @@ In de appeldagvaarding wordt hoger beroep ingesteld tegen alle door de rechtbank
 De rechtbank heeft in haar vonnis van 7 september 2011 onder 2 (2.1 tot en met 2.3) feiten vastgesteld waartegen geen grieven zijn gericht en ook is niet anderszins van bezwaren is gebleken. Samen met hetgeen is komen vast te staan gaat het, voor zover in hoger beroep van belang, om het volgende.
 
 4.2
-Tussen partijen is een aannemingsovereenkomst tot stand gekomen op grond waarvan [geïntimeerde] in opdracht en voor rekening van [appellant] diens boerderij zou verbouwen alsmede een berg- en kapschuur en een stookhut zou bouwen. Daartoe hebben zij een opdrachtbevestiging d.d. 8 oktober 2009 ondertekend. De werkzaamheden zouden in regie worden uitgevoerd tegen een tarief van € 35,- per uur exclusief btw. Voorts vermeldt de overeenkomst onder meer: 
+Tussen partijen is een aannemingsovereenkomst tot stand gekomen op grond waarvan [geïntimeerde] in opdracht en voor rekening van [appellant] diens boerderij zou verbouwen alsmede een berg- en kapschuur en een stookhut zou bouwen. Daartoe hebben zij een opdrachtbevestiging d.d. 8 oktober 2009 ondertekend. De werkzaamheden zouden in regie worden uitgevoerd tegen een tarief van € 35,- per uur exclusief btw. Voorts vermeldt de overeenkomst onder meer:
 
 
 
@@ -115,26 +115,26 @@ In opdracht van [appellant] is door Bouw- Adviesbureau Ing. [deskundige] een rap
 Als productie 5 en 6 bij de inleidende dagvaarding zijn getallenoverzichten afkomstig van [deskundige] overgelegd met het opschrift “Calculatie van de herstelwerkzaamheden” .
 
 4.8
-Als productie 24 bij conclusie van repliek heeft [appellant] een tweede versie van een deel van het rapport [deskundige] overgelegd met het opschrift: 
+Als productie 24 bij conclusie van repliek heeft [appellant] een tweede versie van een deel van het rapport [deskundige] overgelegd met het opschrift:
 
-“ Bouwkundige inspectie van de voormalige boerderij met voorhuis 
+“ Bouwkundige inspectie van de voormalige boerderij met voorhuis
 Verkorte versie 7 maart 2011, geënt op de regelgeving en bouwkundige normen.”
 
 Deze versie wijkt inhoudelijk af van de hiervoor genoemde versie 3 juli 2010 van het rapport [deskundige] (zie 4.6). Zo wordt in de eerste versie over een gebrek van de panlatten geen melding gemaakt en in de tweede versie wel.
 5 De vordering in eerste aanleg
 5.1
-[appellant] vordert, verkort weergegeven, na twee vermeerderingen en een vermindering van eis: 
-a. ontbinding van de tussen partijen gesloten overeenkomst; 
-b. vergoeding door [geïntimeerde] van € 49.240,07 aan herstelkosten te vermeerderen met rente; 
-c. betaling door [geïntimeerde] van € 4.298,34 (ter zake van herstel van kozijnen); 
-d. betaling door [geïntimeerde] van € 2.665,60 (ter zake van een factuur van Adviesbureau [adviesbureau] B.V.); 
+[appellant] vordert, verkort weergegeven, na twee vermeerderingen en een vermindering van eis:
+a. ontbinding van de tussen partijen gesloten overeenkomst;
+b. vergoeding door [geïntimeerde] van € 49.240,07 aan herstelkosten te vermeerderen met rente;
+c. betaling door [geïntimeerde] van € 4.298,34 (ter zake van herstel van kozijnen);
+d. betaling door [geïntimeerde] van € 2.665,60 (ter zake van een factuur van Adviesbureau [adviesbureau] B.V.);
 e. betaling door [geïntimeerde] van € 1.258,- (ter zkae van een factuur van [bouwbedrijf] Bouwbedrijf B.V.
 
 5.2
 [appellant] stelt daartoe dat [geïntimeerde] de hem opgedragen werkzaamheden niet goed heeft uitgevoerd. De gevorderde herstelkosten van € 29.270,07 betreffen de voormalige boerderij met woonhuis voor € 24.105,60 en de bergschuur en kapschuur.
 
 5.3
-De rechtbank heeft in haar eindvonnis van 7 maart 2012 [geïntimeerde] veroordeeld tot betaling van € 5.594,63 vermeerderd met wettelijke rente over dat bedrag met ingang van 
+De rechtbank heeft in haar eindvonnis van 7 maart 2012 [geïntimeerde] veroordeeld tot betaling van € 5.594,63 vermeerderd met wettelijke rente over dat bedrag met ingang van
 5 augustus 2010.
 
 6 De grieven
@@ -150,22 +150,22 @@ Centraal staat in deze zaak de vraag of [geïntimeerde] zijn werkzaamheden ondeu
 6.2.2
 Over de volgende posten bestaat in hoger beroep discussie:
 
-de woonboerderij met voorhuis: 
-a. de panlatten (incidenteel appel); 
-b. de kozijnstijlen (incidenteel appel); 
+de woonboerderij met voorhuis:
+a. de panlatten (incidenteel appel);
+b. de kozijnstijlen (incidenteel appel);
 c. de fundering (de grieven 1 en 2 principaal appel/incidenteel appel);
-de berg- en kapschuur: 
+de berg- en kapschuur:
 
-d. de muren (grief 3 principaal appel); 
-e. de kapconstructie (punt 161 e.v. en punt 167 memorie van grieven); 
-f. de hoofddraagconstructie van de kapschuur (punt 169 memorie van grieven); 
-g. de deuren van de garage (punt 173 memorie van grieven); 
-h. boeiboorden en waterkering van de kapschuur (punt 174 memorie van grieven); 
-i. lood onder de ramen van de kapschuur (punt 175 memorie van grieven); 
+d. de muren (grief 3 principaal appel);
+e. de kapconstructie (punt 161 e.v. en punt 167 memorie van grieven);
+f. de hoofddraagconstructie van de kapschuur (punt 169 memorie van grieven);
+g. de deuren van de garage (punt 173 memorie van grieven);
+h. boeiboorden en waterkering van de kapschuur (punt 174 memorie van grieven);
+i. lood onder de ramen van de kapschuur (punt 175 memorie van grieven);
 afwerking dakpannen en dakgoten kapschuur (punt 176 memorie van grieven).
-de stookhut: 
+de stookhut:
 
-j. boeiboorden, afdekkers, plaatmateriaal onder de hoek (grief 3 principaal appel); 
+j. boeiboorden, afdekkers, plaatmateriaal onder de hoek (grief 3 principaal appel);
 k. onder de afdekkers geen waterkering (grief 3 principaal appel).
 6.2.3
 Het hof zal de grieven thematisch behandelen.
@@ -180,11 +180,11 @@ De rechtbank heeft in haar vonnis van 7 maart 2012 ten aanzien van de fundering 
 
 [geïntimeerde] heeft weliswaar gesteld dat hij met betrekking tot de fundering fouten heeft gemaakt maar hij heeft niet weersproken dat door hem onjuiste kisten voor de fundering zijn besteld.
 6.3.2
-Het gaat in hoger beroep dus uitsluitend nog om de omvang van de vordering. 
+Het gaat in hoger beroep dus uitsluitend nog om de omvang van de vordering.
 [appellant] vordert een bedrag van € 6.365,60 dat als volgt is gespecificeerd:
 
-- de factuur van [adviesbureau]	€ 2.665,60 
-- het omwisselen van de ps-kisten	€  450,- 
+- de factuur van [adviesbureau]	€ 2.665,60
+- het omwisselen van de ps-kisten	€  450,-
 - extra fundering € 3.250,-
 
 6.3.3
@@ -247,7 +247,7 @@ Bij conclusie van repliek (randnummer 78 en 79) concretiseert [appellant] voor h
 In het rapport [deskundige] van 7 maart 2011 is het volgende vermeld:
 
 
-“Gangbaar is dat de panlatten op de tengellatten liggen. De panlatten liggen horizontaal en de tengellatten lopen van de nok naar de voet van het dak, dus verticaal. De aannemer heeft onder elke panlat een klein latje geschroefd. Elke panlat was toen een scharnier de pannen gaan dan bewegen. 
+“Gangbaar is dat de panlatten op de tengellatten liggen. De panlatten liggen horizontaal en de tengellatten lopen van de nok naar de voet van het dak, dus verticaal. De aannemer heeft onder elke panlat een klein latje geschroefd. Elke panlat was toen een scharnier de pannen gaan dan bewegen.
 Ook de onderlinge verdeling was niet goed, de pannen pasten er niet op. Bouwbedrijf [bouwbedrijf] uit Tynaarlo heeft alle panlatten en tegellatten weer verwijderd.”
 6.6.4
 Het vorenstaande is een herhaling van de discussie die in eerste aanleg al is gevoerd. De rechtbank heeft ten aanzien van dit deel van de vordering onder 5.22. t/m 5.24 overwogen dat [geïntimeerde] onvoldoende heeft weersproken dat hij werkzaamheden aan het dak van het voorhuis heeft verricht en dat hij in dat licht bezien duidelijker had moeten weerleggen dat de door hem uitgevoerde werkzaamheden onjuist zijn verricht.
@@ -262,7 +262,7 @@ De kozijnen
 Voor wat betreft de kozijnen concretiseert [appellant] zijn vordering voor het eerst in zijn conclusie van repliek (randnummers 47 t/m 50 en 76). [appellant] stelt daar dat [geïntimeerde] is uitgegaan van het oude bouwbesluit dat een hoogte van 2011 mm voorschreef, terwijl dat op grond van het geldende bouwbesluit 2300 mm had moeten zijn. Bij deze wat cryptische omschrijving verwijst [appellant] naar het rapport [deskundige] (kennelijk doelend op versie 2), waar onder meer is vermeld:
 
 
-“Binnendeur kozijnen 
+“Binnendeur kozijnen
 Volgens het bouwbesluit is de deurhoogte nu 2300 mm Dhr. [geïntimeerde] is uitgegaan van de voorgaande eis van 2011 mm. Daarom zijn alle stijlen te kort afgezaagd. Als oplossing werden er neuten ondergezet om p de juiste hoogte te komen. De is niet met de opdrachtgever besproken. Ook de deuren wilden niet goed open en dicht omdat de neuten de draairichting belemmerden.”
 6.7.2
 [geïntimeerde] heeft bij dupliek aangevoerd dat de kozijnen minimaal 2190 mm dienen te zijn en de neuten 150 mm en dat dit in overeenstemming is met het bouwbesluit. [appellant] heeft daarop gereageerd met het betoog dat [geïntimeerde] het tegenover hem deed voorkomen dat de neuten geplaatst werden om esthetische redenen. Volgens [deskundige] is dat, aldus [appellant], niet het geval. [geïntimeerde] voert daarop weer aan dat [appellant] bij het uitzoeken van de kozijnen en neuten aanwezig was en zijn toestemming heeft gegeven (naar het hof aanneemt voor het toepassen van neuten). [geïntimeerde] verwijst hierbij naar de ter comparitie van 14 februari 2011 overgelegde verklaring van [betrokkene 2]. De vordering is, aldus [geïntimeerde], onvoldoende onderbouwd.
@@ -300,4 +300,5 @@ Dit arrest is gewezen door mr. M.W. Zandbergen, mr. G. van Rijssen en mr. B.J.H.
 
 """.decode(errors="ignore")
 
-print model.decision_function(parseText(text))
+#print model.decision_function(parseText(text))
+print model.predict(parseText(text))
