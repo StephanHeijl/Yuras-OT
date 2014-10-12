@@ -23,281 +23,272 @@ def parseText(text):
 	return X_train_tfidf
 
 text = """
-Het geding in eerste aanleg
-In eerste aanleg is geprocedeerd en beslist zoals weergegeven in de vonnissen van 1 december 2010, 7 september 2011 en 7 maart 2012 van de rechtbank Assen.
-2 Het geding in hoger beroep
-2.1
-Het verloop van de procedure is als volgt:
-- de dagvaarding in hoger beroep d.d. 6 juni 2012;
-- de memorie van grieven;
-- de memorie van antwoord tevens van grieven in incidenteel hoger beroep (met producties);
-- de memorie van antwoord in incidenteel hoger beroep.
-
-2.2
-Vervolgens heeft [appellant] de stukken voor het wijzen van arrest overgelegd en heeft het hof arrest bepaald.
-
-2.3
-De vordering van [appellant] luidt:
-"bij arrest, bij voorraad uitvoerbaar, te vernietigen het vonnis dat de Rechtbank Assen op 
-7 maart 2012 onder rolnummer 81519 tussen partijen heeft gewezen, en, opnieuw rechtdoende:
-Ad 1:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 450,= ter zake van het omwisselen van de ps kisten, te 
-vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de inleidende 
-dagvaarding tot de dag der algehele voldoening;
-Ad 2:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 3.250,= ter zake van de post extra wapening, te 
-vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de inleidende 
-dagvaarding tot de dag der algehele voldoening;
-Ad 3:	geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 25.134,47 ter zake van de herstelkosten aan de berg- en 
-kapschuur, te vermeerderen met de wettelijk rente over dit bedrag vanaf de dag van 
-de inleidende dagvaarding tot de dag der algehele voldoening;
-Ad 4: geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 1.038,43 ter zake van herstelkosten aan het stookhutje, 
-te vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van de 
-inleidende dagvaarding tot de dag der algehele voldoening;
-Ad 5:	geïntimeerde te veroordelen om aan appellant te betalen een bedrag van € 2.008,13 
-ter zake van het rapport van de heer ing. [deskundige], te vermeerderen met de 
-wettelijke rente over dit bedrag vanaf de dag van het nemen van de onderhavige 
-memorie tot op de dag der algehele voldoening;
-Ad 6: geïntimeerde te veroordelen om tegen behoorlijk bewijs van kwijting aan appellant 
-te betalen een bedrag van € 531,17 ter zake van de nota van de heer [betrokkene 1], te 
-vermeerderen met de wettelijke rente over dit bedrag vanaf de dag van het nemen 
-van onderhavige memorie tot de dag der algehele voldoening;
-Ad 7:	geïntimeerde te veroordelen in de kosten van beide instanties."
-2.4
-In incidenteel appel heeft [geïntimeerde] gevorderd:
-"bij arrest, voor zover mogelijk uitvoerbaar bij voorraad:
-In appel
-1.	De vorderingen van [appellant] af te wijzen, dan wel hem deze te ontzeggen, dan wel 
-te bepalen dat op het bedrag dat aan [appellant] wordt toegewezen het reeds betaald 
-bedrag van € 7020,90 (vermeerder met rente vanaf 15 mei 2012 tot de datum der 
-voldoening) in mindering wordt gebracht
-In zelfstandig appel
-2. Te verklaren voor recht dat [appellant] een vordering heeft op [appellant] Vastgoed 
-BV, tot een bedrag van € 7020,90 (vermeerderd met rente vanaf 15 mei 2012 tot de 
-datum der voldoening), dan wel tot een zodanig bedrag dat in deze juist wordt 
-geacht en daarbij te bepalen dat deze vordering rechtsgeldig is overgedragen en 
-verrekend met de schuld van [geïntimeerde] aan [appellant], waardoor deze vordering is 
-teniet gegaan tot het bedrag van € 7020,90.
-subsidiair
-[appellant] te veroordelen tot betaling aan [geïntimeerde] tot een bedrag van € 7020,90, 
-dan wel tot betaling van een zodanig bedrag dat in deze juist wordt geacht, te 
-vermeerderen met rente van 15 mei 2012 tot de datum der algehele voldoening.
-In appel en zelfstandig appel
-3.	[appellant] te veroordelen in de kosten van de procedure in eerste aanleg en appel."
-3 De ontvankelijkheid
-In de appeldagvaarding wordt hoger beroep ingesteld tegen alle door de rechtbank gewezen vonnissen. Tegen het vonnis van 1 december 2010 zijn echter geen grieven geformuleerd zodat [appellant] in zoverre niet-ontvankelijk is zijn hoger beroep.
-4 De feiten
-4.1
-De rechtbank heeft in haar vonnis van 7 september 2011 onder 2 (2.1 tot en met 2.3) feiten vastgesteld waartegen geen grieven zijn gericht en ook is niet anderszins van bezwaren is gebleken. Samen met hetgeen is komen vast te staan gaat het, voor zover in hoger beroep van belang, om het volgende.
-
-4.2
-Tussen partijen is een aannemingsovereenkomst tot stand gekomen op grond waarvan [geïntimeerde] in opdracht en voor rekening van [appellant] diens boerderij zou verbouwen alsmede een berg- en kapschuur en een stookhut zou bouwen. Daartoe hebben zij een opdrachtbevestiging d.d. 8 oktober 2009 ondertekend. De werkzaamheden zouden in regie worden uitgevoerd tegen een tarief van € 35,- per uur exclusief btw. Voorts vermeldt de overeenkomst onder meer: 
-
-
-
-“De verbouwing gaat conform de tekening en de constructie berekening van de architect Dhr [architect]. Wijzigingen en/of meerwerk worden alleen uitgevoerd na overleg met Dhr. [appellant] of diens partner. Verder dienen wij zorg voor de uitvoering van de werkzaamheden en in overleg zorgen wij ook voor de onderaanneming van de installateur, dakdekker, kraanwerkzaamheden, metselwerken het inhuren van specialisten en werklui.”.
-
-4.3
-[geïntimeerde] is op 19 oktober 2009 met de werkzaamheden begonnen. Van 16 december 2009 tot het voorjaar van 2010 is [geïntimeerde] tijdelijk gestopt met het werk vanwege de weersomstandigheden.
-
-4.4
-Op 25 december 2009 is door barre weersomstandigheden het achterhuis van de boerderij ingestort. [appellant] heeft daarop van zijn verzekeraar een uitkering ontvangen van € 98.000,-.
-
-4.5
-Op 7 mei 2010 is [geïntimeerde] gestopt met zijn werkzaamheden. Hij heeft daarna de sleutels ingeleverd en het bouwdepot verrekend.
-
-4.6
-In opdracht van [appellant] is door Bouw- Adviesbureau Ing. [deskundige] een rapport geschreven, bestaande uit drie delen waarbij afzonderlijk de “voormalige woonboerderij met voorhuis”, de “schuur- en kapschuur” en de “stookhut” zijn beoordeeld. Als producties 2 t/m 4 bij de inleidende dagvaarding zijn de drie volgende delen overgelegd, die steeds gebaseerd zijn op een inspectie die is gehouden op 8 juni 2010. Alle drie de delen zijn op het voorblad aangeduid als “ Versie 3 juli 2010” .
-
-4.7
-Als productie 5 en 6 bij de inleidende dagvaarding zijn getallenoverzichten afkomstig van [deskundige] overgelegd met het opschrift “Calculatie van de herstelwerkzaamheden” .
-
-4.8
-Als productie 24 bij conclusie van repliek heeft [appellant] een tweede versie van een deel van het rapport [deskundige] overgelegd met het opschrift: 
-
-“ Bouwkundige inspectie van de voormalige boerderij met voorhuis 
-Verkorte versie 7 maart 2011, geënt op de regelgeving en bouwkundige normen.”
-
-Deze versie wijkt inhoudelijk af van de hiervoor genoemde versie 3 juli 2010 van het rapport [deskundige] (zie 4.6). Zo wordt in de eerste versie over een gebrek van de panlatten geen melding gemaakt en in de tweede versie wel.
-5 De vordering in eerste aanleg
-5.1
-[appellant] vordert, verkort weergegeven, na twee vermeerderingen en een vermindering van eis: 
-a. ontbinding van de tussen partijen gesloten overeenkomst; 
-b. vergoeding door [geïntimeerde] van € 49.240,07 aan herstelkosten te vermeerderen met rente; 
-c. betaling door [geïntimeerde] van € 4.298,34 (ter zake van herstel van kozijnen); 
-d. betaling door [geïntimeerde] van € 2.665,60 (ter zake van een factuur van Adviesbureau [adviesbureau] B.V.); 
-e. betaling door [geïntimeerde] van € 1.258,- (ter zkae van een factuur van [bouwbedrijf] Bouwbedrijf B.V.
-
-5.2
-[appellant] stelt daartoe dat [geïntimeerde] de hem opgedragen werkzaamheden niet goed heeft uitgevoerd. De gevorderde herstelkosten van € 29.270,07 betreffen de voormalige boerderij met woonhuis voor € 24.105,60 en de bergschuur en kapschuur.
-
-5.3
-De rechtbank heeft in haar eindvonnis van 7 maart 2012 [geïntimeerde] veroordeeld tot betaling van € 5.594,63 vermeerderd met wettelijke rente over dat bedrag met ingang van 
-5 augustus 2010.
-
-6 De grieven
-6.1
-In het principaal appel zijn zes grieven geformuleerd. De grieven 1 en 2 betreffen de fundering van de woonboerderij en grief 3 betreft de berg- en kapschuur alsmede het stookhutje. In grief 4 verzet [appellant] zich tegen de afwijzing door de rechtbank van een door [appellant] gewenste eisvermeerdering. Grief 5 betreft de proceskostenveroordeling en grief 6 is een veeggrief die zelfstandige betekenis mist. Het incidenteel appel omvat een ongenummerde grief gericht tegen de toewijzing door de rechtbank van een vergoeding ter zake van de panlatten, de kozijnen en de fundering.
-
-6.2
-Inleidende overwegingen
-
-6.2.1
-Centraal staat in deze zaak de vraag of [geïntimeerde] zijn werkzaamheden ondeugdelijk heeft uitgevoerd.
-
-6.2.2
-Over de volgende posten bestaat in hoger beroep discussie:
-
-de woonboerderij met voorhuis: 
-a. de panlatten (incidenteel appel); 
-b. de kozijnstijlen (incidenteel appel); 
-c. de fundering (de grieven 1 en 2 principaal appel/incidenteel appel);
-de berg- en kapschuur: 
-
-d. de muren (grief 3 principaal appel); 
-e. de kapconstructie (punt 161 e.v. en punt 167 memorie van grieven); 
-f. de hoofddraagconstructie van de kapschuur (punt 169 memorie van grieven); 
-g. de deuren van de garage (punt 173 memorie van grieven); 
-h. boeiboorden en waterkering van de kapschuur (punt 174 memorie van grieven); 
-i. lood onder de ramen van de kapschuur (punt 175 memorie van grieven); 
-afwerking dakpannen en dakgoten kapschuur (punt 176 memorie van grieven).
-de stookhut: 
-
-j. boeiboorden, afdekkers, plaatmateriaal onder de hoek (grief 3 principaal appel); 
-k. onder de afdekkers geen waterkering (grief 3 principaal appel).
-6.2.3
-Het hof zal de grieven thematisch behandelen.
-
-6.3
-De fundering (de grieven 1 en 2 in het principaal appel en het incidenteel appel)
-
-6.3.1
-De rechtbank heeft in haar vonnis van 7 maart 2012 ten aanzien van de fundering overwogen:
-
-“Ten aanzien van de foutief bestelde kisten en de wijze van aanbrengen van de wapening had de rechtbank reeds overwogen dat gedaagde ondeugdelijk werk heeft verricht en de daaruit voortvloeiende schade voor eiser aan hem dient te vergoeden.”
-
-[geïntimeerde] heeft weliswaar gesteld dat hij met betrekking tot de fundering fouten heeft gemaakt maar hij heeft niet weersproken dat door hem onjuiste kisten voor de fundering zijn besteld.
-6.3.2
-Het gaat in hoger beroep dus uitsluitend nog om de omvang van de vordering. 
-[appellant] vordert een bedrag van € 6.365,60 dat als volgt is gespecificeerd:
-
-- de factuur van [adviesbureau]	€ 2.665,60 
-- het omwisselen van de ps-kisten	€  450,- 
-- extra fundering € 3.250,-
-
-6.3.3
-De rechtbank heeft de vordering voor wat betreft de factuur van [adviesbureau] toegewezen (daartegen is het incidenteel appel gericht) en heeft van de gevorderde omwisselingskosten alleen de door [geïntimeerde] erkende transportkosten van € 160,- toegewezen (daartegen is grief 1 in het principaal appel en het incidenteel appel gericht). De kosten voor extra fundering € 3.250,- heeft de rechtbank afgewezen (daartegen is grief 2 in het principaal appel gericht).
-
-6.3.4
-Ter onderbouwing van zijn vordering verwijst [appellant] herhaalde malen naar het rapport [deskundige]. In de aan het hof overgelegde versies van dit rapport zijn echter geen berekeningen of andere verklaringen van de genoemde bedragen gegeven. Als productie 5 bij de inleidende dagvaarding wordt weliswaar een opsomming van de bedragen met betrekking tot de woonboerderij gegeven, echter zonder onderbouwing. Ten aanzien van de kosten voor extra fundering heeft [appellant] (proces-verbaal tweede comparitie) verklaard: “Naast het bedrag van € 618,54 dat ik betaald heb, heb ik ook de extra gewerkte uren moeten betalen. Daar heb ik geen specificatie van.” De rechtbank heeft, in hoger beroep onbestreden, vastgesteld dat dit een contante betaling betrof. [appellant] heeft de factuur van [adviesbureau] overgelegd, evenals een factuur afkomstig van [geïntimeerde] waarin een bedrag van € 618,54 voor extra staal staat vermeld.
-
-6.3.5
-In incidenteel appel (memorie van antwoord/incidenteel appel, randnummers 33 t/m 37) betoogt [geïntimeerde] dat hij niet is gehouden de factuur van 8 mei 2010 van [adviesbureau] te vergoeden. Vóór 8 mei 2010 had [appellant] geen klachten over het funderingswerk. Volgens [geïntimeerde] hebben de werkzaamheden van [adviesbureau] geen betrekking op het herstel van door [geïntimeerde] gemaakte fouten. Bovendien heeft [appellant], aldus [geïntimeerde], van zijn verzekeraar € 6.000,- ontvangen voor de fundering, zodat zijn schade met dat bedrag dient te worden verminderd.
-
-6.3.6
-In zijn memorie van antwoord in incidenteel appel heeft [appellant] niet gereageerd op dit gemotiveerde verweer door [geïntimeerde]. Het hof overweegt het volgende.
-
-6.3.7
-De fout door [geïntimeerde] bestaat er volgens [appellant] in dat te lage funderingskisten zijn gebruikt. Dat daardoor meer materiaal nodig was, is ook zonder nadere toelichting begrijpelijk. Zonder nadere toelichting, die ontbreekt, is echter niet zonder meer begrijpelijk dat daardoor nieuwe sterkteberekeningen zijn vereist. De enkele opmerking in de factuur dat sprake is geweest van “herberekening van de wapening van alle funderingsbalken omdat de hoogte van de wapeningskorven sterk afweek van wat op de tekening was aangegeven”, is daartoe onvoldoende. Niet alleen was het pand van [appellant] recent buiten schuld van [geïntimeerde] ingestort maar bovendien is uit de geciteerde passage in de factuur niet te herleiden dat de te lage bekisting een herberekening nodig maakte. Dit alles geldt te meer daar gezien de datum van de factuur (8 mei 2010) de genoemde berekeningen en tekeningen kennelijk zijn gemaakt op een moment dat [geïntimeerde] nog aan het werk was. Het incidenteel appel slaagt voor wat betreft de funderingskosten, zodat de vergoeding van de factuur van [adviesbureau] alsnog zal worden afgewezen.
-
-6.3.8
-Voor het bedrag van € 450,- wegens omwisselen van de kisten ontbreekt ook in hoger beroep iedere onderbouwing, zodat deze vordering voor het niet erkende deel van € 290,- terecht is afgewezen. Grief 1 in het principaal appel faalt.
-
-6.3.9
-Voor wat betreft het bedrag van € 3.250,- wegens extra fundering geldt eveneens dat een deugdelijke onderbouwing ontbreekt. Zelfs een eenvoudige berekening van de gebruikte hoeveelheid extra beton en ander materiaal gerelateerd aan daarvoor normaliter gekoppelde prijzen is niet gegeven. Ook in de rapportages van [deskundige] (waarnaar herhaald wordt verwezen), ontbreekt een berekening die sluit op het door [appellant] gevorderde bedrag. Het ligt op de weg van [appellant] feiten en omstandigheden te stellen waaruit zijn vordering volgt. Zelfs de voor een schatting als bedoeld in artikel 6:97 BW vereiste feitelijke aanknopingspunten ontbreken. Grief 2 in het principaal appel faalt.
-
-6.3.10
-Het verweer van [geïntimeerde] dat op het toe te wijzen bedrag de verzekeringsuitkering in mindering dient te komen, gaat het hof voorbij nu dit verweer niet of onvoldoende is onderbouwd. Op zich staat vast dat sprake is van een verzekeringsuitkering, maar dat deze ook dient om de transportkosten van € 160,- voor het omwisselen van de kisten te dekken volgt niet uit hetgeen is gesteld of gebleken.
-
-6.4
-De kosten van herstel aan de berg- en kapschuur en het stookhutje
-
-6.4.1
-Voorop staat dat de opsomming door de rechtbank van de gebreken aan de berg- en kapschuur en het stookhutje (hierna: de schuren en het hutje) onder 2.17 niet meer of minder is dan een weergave van de door [appellant] gestelde gebreken zonder dat de rechtbank die gebreken daarmee als vaststaand beschouwt. [appellant] kent daaraan in zijn grief ten onrechte een verderstrekkende betekenis toe.
-
-6.4.2
-Ook hier geldt dat het aan [appellant] is feiten en omstandigheden te stellen en zo nodig te bewijzen waaruit volgt dat de door [deskundige] in zijn rapport opgesomde feiten het gevolg zijn van door [geïntimeerde] gemaakte fouten en wat die fouten zijn. Uit de thans door [appellant] gekozen onderbouwing volgt niet meer dan dat sprake is van schuren en een hutje waaraan gebreken zijn vastgesteld. Een omschrijving, bijvoorbeeld van de werkzaamheden aan de schuren en het hutje door [geïntimeerde] zijn uitgevoerd en in hoeverre gebruik is gemaakt van bestaande bouw ontbreekt. Duidelijkheid volgt evenmin uit de overgelegde overeenkomst van 8 oktober 2009. Het rapport van [deskundige] schetst weliswaar een beeld van schuren en een hut in een slechte bouwkundige staat maar tot welke fouten door [geïntimeerde] de bouwkundige problemen zijn te herleiden, is niet toereikend onderbouwd.
-
-6.4.3
-Anderzijds zijn partijen het er over eens dat [geïntimeerde] een dak op de schuren heeft aangebracht waarvan [deskundige] concludeert dat dit veel te zwaar is voor de muren, waardoor er (kort gezegd) instortingsgevaar bestaat. [geïntimeerde] heeft echter gesteld dat hij handelde op uitdrukkelijk instructie van [appellant]. Dat [geïntimeerde] een waarschuwingsplicht heeft geschonden is door [appellant] niet aan zijn vordering ten grondslag gelegd.
-
-6.4.4
-Daarmee is de vraag of hetgeen reeds door [appellant] is aangevoerd voldoende ruimte biedt voor nadere verdieping van die feitelijke grondslag om aan te tonen dat [geïntimeerde] toerekenbaar te kort is geschoten. Het hof acht het zinvol dat partijen dienaangaande op een comparitie hun standpunten toelichten. Alvorens verder aangaande grief 3 te beslissen zal het hof daarom eerst een comparitie van partijen gelasten.
-
-6.5
-In grief 4. verzet [geïntimeerde] zicht tegen de afwijzing door de rechtbank van de vermeerdering van eis. In dit deel van zijn hoger beroep kan [geïntimeerde] echter niet worden ontvangen nu artikel 130 lid 2 Rv een hogere voorziening tegen een dergelijke beslissing uitsluit.
-6.5.1
-De beslissingen aangaande de grieven 5 en 6 houdt het hof aan.
-
-6.6
-De panlatten (incidenteel appel)
-
-6.6.1
-In het incidenteel appel betoogt [geïntimeerde] dat er geen noodzaak was de door hem aangebrachte panlatten te vervangen door nieuwe. Het hof overweegt dienaangaande het volgende.
-
-6.6.2
-Bij conclusie van repliek (randnummer 78 en 79) concretiseert [appellant] voor het eerst welke gebreken vervanging van de door [geïntimeerde] aangebrachte panlatten nodig maakte:
-
-
-“78. (…) Wat [appellant] in dit opzicht aan [geïntimeerde] verwijt is dat hij onder elke panlat een klein latje heeft geschroefd, met als gevolg dat elke panlat een scharnier was, waardoor de pannen zijn gaan bewegen.
-79. Daarnaast was de onderlinge verdeling van de pannen niet goed. Met als gevolg dat de pannen er niet op pasten. [appellant] had dus geen andere keuze dan firma [bouwbedrijf] te vragen alle panlatten en tengellatten te verwijderen en opnieuw aan te brengen. Daarop ziet een gedeelte van de tweede vermeerdering van eis.”
-6.6.3
-In het rapport [deskundige] van 7 maart 2011 is het volgende vermeld:
-
-
-“Gangbaar is dat de panlatten op de tengellatten liggen. De panlatten liggen horizontaal en de tengellatten lopen van de nok naar de voet van het dak, dus verticaal. De aannemer heeft onder elke panlat een klein latje geschroefd. Elke panlat was toen een scharnier de pannen gaan dan bewegen. 
-Ook de onderlinge verdeling was niet goed, de pannen pasten er niet op. Bouwbedrijf [bouwbedrijf] uit Tynaarlo heeft alle panlatten en tegellatten weer verwijderd.”
-6.6.4
-Het vorenstaande is een herhaling van de discussie die in eerste aanleg al is gevoerd. De rechtbank heeft ten aanzien van dit deel van de vordering onder 5.22. t/m 5.24 overwogen dat [geïntimeerde] onvoldoende heeft weersproken dat hij werkzaamheden aan het dak van het voorhuis heeft verricht en dat hij in dat licht bezien duidelijker had moeten weerleggen dat de door hem uitgevoerde werkzaamheden onjuist zijn verricht.
-
-6.6.5
-In hoger beroep betoogt [geïntimeerde] niet langer dat hij geen werkzaamheden aan het dak van het voorhuis heeft verricht. Hij stelt echter dat de wijze waarop hij de panlatten heeft bevestigd niet onjuist was. De door [appellant] gestelde onjuiste verdeling van de panlatten op het dak, waardoor de pannen niet pasten, laat [geïntimeerde] onweersproken. Daarmee kan aan de discussie aangaande de bevestigingswijze van de panlatten voorbij worden gegaan. Immers ook als de panlatten op de juiste wijze, maar op de verkeerde plaats zijn aangebracht zodat de pannen daarop niet passen, dienden zij te worden verwijderd en opnieuw te worden bevestigd. De omvang van dit deel van de vordering is door [geïntimeerde] niet bestreden. Uit het vorenstaande volgt dat de incidentele grief faalt voor wat betreft dit deel van de vordering.
-
-6.7
-De kozijnen
-
-6.7.1
-Voor wat betreft de kozijnen concretiseert [appellant] zijn vordering voor het eerst in zijn conclusie van repliek (randnummers 47 t/m 50 en 76). [appellant] stelt daar dat [geïntimeerde] is uitgegaan van het oude bouwbesluit dat een hoogte van 2011 mm voorschreef, terwijl dat op grond van het geldende bouwbesluit 2300 mm had moeten zijn. Bij deze wat cryptische omschrijving verwijst [appellant] naar het rapport [deskundige] (kennelijk doelend op versie 2), waar onder meer is vermeld:
-
-
-“Binnendeur kozijnen 
-Volgens het bouwbesluit is de deurhoogte nu 2300 mm Dhr. [geïntimeerde] is uitgegaan van de voorgaande eis van 2011 mm. Daarom zijn alle stijlen te kort afgezaagd. Als oplossing werden er neuten ondergezet om p de juiste hoogte te komen. De is niet met de opdrachtgever besproken. Ook de deuren wilden niet goed open en dicht omdat de neuten de draairichting belemmerden.”
-6.7.2
-[geïntimeerde] heeft bij dupliek aangevoerd dat de kozijnen minimaal 2190 mm dienen te zijn en de neuten 150 mm en dat dit in overeenstemming is met het bouwbesluit. [appellant] heeft daarop gereageerd met het betoog dat [geïntimeerde] het tegenover hem deed voorkomen dat de neuten geplaatst werden om esthetische redenen. Volgens [deskundige] is dat, aldus [appellant], niet het geval. [geïntimeerde] voert daarop weer aan dat [appellant] bij het uitzoeken van de kozijnen en neuten aanwezig was en zijn toestemming heeft gegeven (naar het hof aanneemt voor het toepassen van neuten). [geïntimeerde] verwijst hierbij naar de ter comparitie van 14 februari 2011 overgelegde verklaring van [betrokkene 2]. De vordering is, aldus [geïntimeerde], onvoldoende onderbouwd.
-
-6.7.3
-De rechtbank overweegt in haar tussenvonnis van 7 september 2011 onder 5.27 dat [geïntimeerde] niet ingaat op de kritiek die [appellant] heeft op de verklaring van [betrokkene 2], op welke kritiek de rechtbank daarbij doelt wordt het hof niet duidelijk. De rechtbank gaat daarom uit van de juistheid van dit weerwoord. De rechtbank overweegt vervolgens dat aanwezigheid van [appellant] bij het uitzoeken van de neuten en de daarvoor gegeven toestemming, de stellingen van eiser op dit punt dan ook onverlet laat. [geïntimeerde] is, aldus de rechtbank, niet ingegaan op de stelling van [appellant] dat [geïntimeerde] de kozijnen te kort had afgezaagd waardoor het gebruik van neuten noodzakelijk werd. Het verweer van [geïntimeerde] wordt als onvoldoende gemotiveerd gepasseerd. De rechtbank overweegt dat [geïntimeerde] terzake ondeugdelijk werk heeft verricht en dat hij aansprakelijk is voor de daardoor geleden schade, die de rechtbank begroot op € 1.936.34.
-
-6.7.4
-[appellant] heeft tegen de hoogte van de door de rechtbank vastgestelde schade geen grief opgeworpen. Het incidenteel appel is uitsluitend gericht tegen de overweging van de rechtbank dat [geïntimeerde] ondeugdelijk werk heeft geleverd. Het hof overweegt dienaangaande het volgende.
-
-6.7.5
-Voor de grondslag van zijn vordering lijkt [appellant] enerzijds te steunen op strijd met het bouwbesluit, anderzijds op esthetische argumenten en dan weer op functionele problemen als gevolg van de gebruikte neuten.
-
-6.7.6
-Voor wat betreft de esthetische bezwaren geldt dat het hof deze als onvoldoende onderbouwd ter zijde laat. [appellant] stelt niet meer dan dat [deskundige] de neuten esthetisch niet vindt voldoen. Voor wat betreft het niet goed functioneren van de deuren geldt dat een deugdelijke onderbouwing ontbreekt, ook het rapport van [deskundige] biedt daartoe onvoldoende aanknopingspunten.
-
-6.7.7
-Wat overblijft is het betoog dat de kozijnen in strijd zijn met het bouwbesluit. De vraag is wat [appellant] met dit standpunt beoogt. Door het gebruik van neuten wordt, naar het hof uit de stellingen van partijen begrijpt, wel voldaan aan het bouwbesluit voor wat betreft de hoogte van de kozijnstijlen. Dat de kozijnen zonder gebruik van neuten te kort zijn, is alleen dan een tekortkoming door [geïntimeerde] als gebruik van neuten in de overeenkomst niet was toegestaan. Dat dit gebruik juist wel was toegestaan, lijkt echter te volgen uit de door [appellant] gegeven toestemming daarvoor.
-
-6.7.8
-Mocht [appellant] bedoelen dat hij op grond van een onjuiste voorstelling van zaken aangaande het gebruik van neuten heeft gedwaald (achteraf niet esthetisch), dan zou dit onder omstandigheden kunnen leiden tot vernietiging van de vordering. Een vordering in die zin ontbreekt echter. De incidentele grief slaagt, de vordering voor wat betreft de kozijnen zal alsnog worden afgewezen.
-
-7 Slotsom
-Alvorens verder te beslissen aangaande de grieven, zal het hof eerst een comparitie van partijen gelasten om hen de mogelijkheid te geven zich nader uit te laten aangaande hetgeen het hof heeft overwogen ten aanzien van schuren en het hutje (hiervoor onder 6.4.). Alle overige beslissingen worden aangehouden.
-
-
-
-8. De beslissing
-Het gerechtshof:
-bepaalt dat partijen in persoon, samen met hun advocaten zullen verschijnen voor het hierbij tot raadsheer-commissaris benoemde lid van het hof mr. G. van Rijssen , die daartoe zitting zal houden in het paleis van justitie aan het Wilhelminaplein 1 te Leeuwarden op een nader door deze te bepalen dag en tijdstip, om inlichtingen te geven als onder 7 vermeld en opdat kan worden onderzocht of partijen het op een of meer punten met elkaar eens kunnen worden;
-bepaalt dat partijen de verhinderdagen van partijen en hun advocaten in de maanden oktober tot en met december 2013 zullen opgeven op de roldatum van dinsdag 24 september 2013 , waarna dag en uur van de comparitie (ook indien voormelde opgave van een of meer van partijen ontbreekt) door de raadsheer-commissaris zullen worden vastgesteld;
-bepaalt dat indien een partij ter comparitie nog een proceshandeling wenst te verrichten en/of producties in het geding wil brengen, zij ervoor dient te zorgen dat aan het hof en de wederpartij schriftelijk wordt meegedeeld wat de inhoud is van de ter comparitie te verrichten proceshandeling (voorzien van stukken) en indien een partij ter comparitie nog producties in het geding wenst te brengen dat zij daarvan goed leesbare afschriften aan het hof en de wederpartij dient over te leggen, in beide gevallen uiterlijk veertien dagen voorafgaand aan de zitting;
-verstaat dat de advocaat van [appellant] uiterlijk twee weken voor de verschijning zal plaatsvinden een kopie van het volledige procesdossier ter griffie van het hof doet bezorgen, bij gebreke waarvan de advocaat van [geïntimeerde] alsnog de gelegenheid heeft uiterlijk één week voor de vastgestelde datum een kopie van de processtukken over te leggen.
-Dit arrest is gewezen door mr. M.W. Zandbergen, mr. G. van Rijssen en mr. B.J.H. Hofstee en is door de rolraadsheer in tegenwoordigheid van de griffier in het openbaar uitgesproken op dinsdag 27 augustus 2013.
+Onderzoek van de zaak
+Dit vonnis is gewezen naar aanleiding van het onderzoek op de terechtzitting van 
+
+13 augustus 2013.
+De tenlastelegging
+Aan verdachte is ten laste gelegd dat:
+1.
+zij op een of meerdere tijdstip(pen) in of omstreeks de periode van 01
+februari 2012 tot en met 03 maart 2012 te Putten en/of een of meerdere andere
+plaats(en) in Nederland, in elk geval in Nederland,
+(telkens) ter uitvoering van het voornemen en het misdrijf om, tezamen en in
+vereniging met een ander of anderen, althans alleen, met het oogmerk om zich
+of een ander wederrechtelijk te bevoordelen, door bedreiging met smaad,
+smaadschrift of openbaring van een geheim, een of meerdere perso(o)n(en) ([benadeelde 1]
+[benadeelde 1] en/of [benadeelde 2] en/of [benadeelde 3] en/of [benadeelde 4]) te dwingen tot
+de afgifte van een geldbedrag (varierend tussen de 500 en 2.000 Euro), in elk
+geval enig geldbedrag, dat geheel of ten dele toebehoort aan die [benadeelde 1]
+en/of [benadeelde 2] en/of [benadeelde 3] en/of [benadeelde 4], in elk geval aan een
+ander of anderen dan aan verdachte en/of haar mededader(s),
+welke bedreiging met smaad, smaadschrift of openbaring van een geheim hieruit
+bestond dat verdachte en/of haar mededader(s) (telkens) voornoemde [benadeelde 1]
+en/of [benadeelde 2] en/of [benadeelde 3] en/of die [benadeelde 4] (telkens) een of
+meerdere sms-bericht(en) e-mail(s) heeft/hebben gestuurd en/of een of meerdere
+telefoongesprekken met die [benadeelde 1] en/of die [benadeelde 2] en/of die [benadeelde 3] en/of
+die [benadeelde 4] heeft gevoerd, waarin gedreigd werd de (pedo)seksuele geaardheid
+en/of een of meerdere door die [benadeelde 1] en/of [benadeelde 2] en/of [benadeelde 3] en/of die
+[benadeelde 4] gepleegde strafbare feiten en/of een of meerdere door/van hen gemaakte
+videobeelden openbaar te maken,
+terwijl de uitvoering van dit voorgenomen misdrijf niet is voltooid;
+art 45 lid 1 Wetboek van Strafrecht
+art 47 ahf/ond 1 Wetboek van Strafrecht
+art 318 lid 1 Wetboek van Strafrecht
+2.
+zij op een of meerdere tijdstip(pen) in of omstreeks de periode van 01
+februari tot en met 03 maart 2012, te Rotterdam en/of een of meerdere andere
+plaats(en) in Nederland, in elk geval in Nederland,
+tezamen en in vereniging met een andere of anderen, althans alleen,
+een voorwerp(en), te weten een of meerdere geldbedrag(en) van (in totaal)
+ongeveer 2.500 Euro, heeft verworven, voorhanden heeft gehad, heeft
+overgedragen en/of omgezet, althans van die/dat geldbedrag(en), gebruik heeft
+gemaakt,
+terwijl verdachte en/of haar mededader(s) wist(en) dat bovenomschreven
+voorwerp(en) - onmiddellijk of middellijk - afkomstig was uit enig misdrijf;
+art 47 ahf/sub 1 Wetboek van Strafrecht
+art 420bis lid 1 ahf/ond b Wetboek van Strafrecht
+3.
+zij op een of meerdere tijdstip(pen) in of omstreeks de periode van 01
+februari 2012 tot en met 03 maart 2012 te Rotterdam en/of een of meerdere
+andere plaatsen in Nederland, in elk geval in Nederland,
+(telkens) tezamen en in vereniging met een ander of anderen, althans alleen,
+opzettelijk en wederrechtelijk gegevens (te weten: een of meerdere
+e-mailberichten en/of foto's en/of videobeelden) die door middel van een
+geautomatiseerd werk of door middel van een telecommunicatie waren opgeslagen
+en/of werden verwerkt en/of overgedragen, heeft gewist en/of onbruikbaar
+gemaakt en/of ontoegankelijk gemaakt, door (met voornoemd opzet) de/het
+wachtenwoord(en) van de e-mailaccount(s),
+- [e-mailaccount], en/of
+- [e-mailaccount 2], en/of
+- [e-mailaccount 3], en/of
+- [e-mailaccount 4], en/of
+- [e-mailaccount 5], en/of
+- [e-mailaccount 6], en/of
+- [e-mailaccount 7], en/of
+- [e-mailaccount 8], en/of
+- [e-mailaccount 9], en/of
+- [e-mailaccount 10], en/of
+- [e-mailaccount 11], en/of
+- het e-mailadres van een persoon zich noemende [naam 1], en/of
+- het e-mailadres van een persoon zich noemende [naam 2]
+[naam 2], en/of
+- het e-mailadres van een persoon zich noemende [naam 3], en/of
+- het e-mailadres van een persoon zich noemende [naam 4], en/of
+- het e-mailadres van een persoon zich noemende [naam 5], en/of
+- het e-mailadres van een persoon zich noemende [naam 6], en/of
+- het e-mailadres van een persoon zich noemende [naam 7], en/of
+- het e-mailadres van een persoon zich noemende [naam 8], en/of
+- het e-mailadres van een persoon zich noemende [naam 9], en/of
+- het e-mailadres van een persoon zich noemende [naam 10], en/of
+- het e-mailadres van een persoon zich noemende [naam 11]
+[naam 11],
+waarin die berichten en/of die foto's en/of die videobeelden werden
+opgeslagen, te wijzigen;
+art 350a lid 1 Wetboek van Strafrecht
+4.
+hij op een of meerdere tijdstip(pen) in of omstreeks de periode vam 01
+februari 2012 tot en met 03 maart 2012 te Rotterdam en/of een of meerdere
+andere plaats(en) in Nederland, in elk geval in Nederland,
+tezamen met een ander of anderen, althans alleen, opzettelijk en
+wederrechtelijk in een of meer geautomatiseerde werken, te weten een of
+meerdere e-mailaccount(s), te weten:
+- [e-mailaccount], en/of
+- [e-mailaccount 2], en/of
+- [e-mailaccount 3], en/of
+- [e-mailaccount 4], en/of
+- [e-mailaccount 5], en/of
+- [e-mailaccount 6], en/of
+- [e-mailaccount 7], en/of
+- [e-mailaccount 8], en/of
+- [e-mailaccount 9], en/of
+- [e-mailaccount 10], en/of
+- [e-mailaccount 11], en/of
+- het e-mailadres van een persoon zich noemende [naam 1], en/of
+- het e-mailadres van een persoon zich noemende [naam 2]
+[naam 2], en/of
+- het e-mailadres van een persoon zich noemende [naam 3], en/of
+- het e-mailadres van een persoon zich noemende [naam 4], en/of
+- het e-mailadres van een persoon zich noemende [naam 5], en/of
+- het e-mailadres van een persoon zich noemende [naam 6], en/of
+- het e-mailadres van een persoon zich noemende [naam 7], en/of
+- het e-mailadres van een persoon zich noemende [naam 8], en/of
+- het e-mailadres van een persoon zich noemende [naam 9], en/of
+- het e-mailadres van een persoon zich noemende [naam 10], en/of
+- het e-mailadres van een persoon zich noemende [naam 11]
+[naam 11],
+of in een deel daarvan, is binnengedrongen, waarna verdachte vervolgens
+gegevens, die waren opgeslagen, werden verwerkt of werden overgedragen door
+middel van dat/die geautomatiseerd(e) werk(en) waarin verdachte zich
+wederrechtelijk bevond, voor zichzelf of een ander heeft overgenomen, afgetapt
+of opgenomen;
+art 47 lid 1 ahf/ond a Wetboek van Strafrecht
+art 138ab lid 2 Wetboek van Strafrecht.
+Aanhoudingsverzoek
+aanhoudingsverzoek verdediging
+Door de raadsvrouw is primair om aanhouding verzocht van de strafzaak, teneinde aangever [benadeelde 1] als getuige te horen ter beantwoording van de vraag in welke mate de telefoongesprekken / sms berichten vlak voorafgaand aan de aanhouding van verdachten zijn ingegeven c.q. gestuurd door de politie. Zij heeft daarbij gewezen op de omstandigheid dat er onder regie van de politie afspraken zijn gemaakt over de betaling (pag. 4 stamproces-verbaal) en de tapgesprekken waaronder testcalls (pag. 123 e.v.). De raadsvouw heeft daarbij gewezen op het arrest van de HR, LJN BK5593, en dat gelet op dat arrest in het onderhavige geval sprake kan zijn geweest van een pseudodienstverlening.
+Standpunt van het openbaar ministerie
+De officier heeft zich op het standpunt gesteld dat het horen van de getuige [benadeelde 1] niets toe of afdoet aan de rechtmatigheid van de aanhouding en de heldere verklaringen die verdachte zelf heeft afgelegd. Het arrest waaraan is gerefereerd – ziende op een pseudodienstverlening in verband met een drugsdealer - ziet op een geheel andere situatie dan de situatie in de onderhavige zaak. In de onderhavige zaak gaat het enkel om een wijziging van de al gemaakte afspraak over de betaling van het geld. Het verzoek om aanhouding dient daarom te worden afgewezen
+Beoordeling door de rechtbank
+De rechtbank is van oordeel dat van een situatie als bedoeld in artikel 126i en 126ij van het Wetboek van Strafvordering in deze zaak geen sprake is. In het onderhavige geval ging het om een al gemaakte afspraak omtrent een reeds door aangever [benadeelde 1] voorgenomen betaling van een geldbedrag om de veranderde wachtwoorden van zijn computer van verdachte te verkrijgen teneinde openbaarmaking van bestanden/een filmpje te voorkomen. Dit ziet op een geheel andere situatie dan die waar de wetgever met artikel 126i en 126ij het oog op heeft gehad. Het horen van deze getuige op de door de raadsvrouw aangegeven punten kan daarom in redelijkheid niet van belang zijn voor enige in de strafzaak te nemen beslissing in de zin van artikel 348 en 350 van het Wetboek van Strafvordering. Het verzoek om deze getuige in het kader van het verdedigingsbelang op de zitting te horen zal dan ook worden afgewezen.
+Overwegingen ten aanzien van het bewijs 1
+Aanleiding tot het onderzoek
+Aanleiding voor het onderzoek was een aangifte door [benadeelde 1]. [benadeelde 1] was op 21 februari 2012 en 1 maart 2012 op zijn mobiele telefoon gebeld door een hem onbekende man die hem vertelde dat hij de hotmail account van [benadeelde 1] had en dat hij de hotmail account had doorgespit.
+De man vertelde hem dat hij een mooi filmpje had gevonden dat op internet gezet zou gaan worden en dat [benadeelde 1] dit kon voorkomen als hij 1000 euro zou betalen. [benadeelde 1] vermoedde dat het zou gaan om een filmpje waarop te zien was dat hij seksuele handelingen verrichtte.
+Na telefonisch contact tussen [benadeelde 1] en medeverdachte [medeverdachte] is onder regie van het onderzoeksteam een afspraak gemaakt om te betalen bij de McDonald’s bij strand Horst te Ermelo. Tijdens de overdracht van die betaling zijn [medeverdachte] en [verdachte] als verdachten aangehouden.
+Standpunt van het openbaar ministerie
+De officier van justitie heeft geconcludeerd tot bewezenverklaring van het onder 1, 2, 3 en 4 tenlastegelegde. Ter zitting heeft de officier van justitie de bewijsmiddelen opgesomd en toegelicht.
+Standpunt van de verdachte / de verdediging
+De raadsvrouw heeft zich met betrekking tot de inhoudelijke beoordeling van de ten laste gelegde feiten gerefereerd aan het oordeel van de rechtbank met betrekking tot de onder 1 en 2 aan verdachte ten laste gelegde feiten. Met betrekking tot de onder 3 en 4 aan verdachte ten laste gelegde feiten heeft de raadsvrouw zich op het standpunt gesteld dat verdachte dient te worden vrijgesproken bij gebrek aan voldoende wettig en overtuigend bewijs, aangezien uit de bevindingen van de digitale recherche onvoldoende kan worden afgeleid of er gegevens in de computers van de betrokken personen zijn gewist, onbruikbaar gemaakt of ontoegankelijk zijn gemaakt, terwijl evenmin sprake is geweest van hacken.
+Ter terechtzitting heeft de raadsvrouw het standpunt van de verdediging toegelicht.
+Beoordeling door de rechtbank
+De rechtbank gaat bij de beoordeling van de ten laste gelegde feiten uit van de volgende feiten en omstandigheden.
+Aangezien verdachte zowel bij de politie 2 als ter terechtzitting 3 duidelijk en ondubbelzinnig een bekennende verklaring heeft afgelegd, zal worden volstaan met een opgave van de bewijsmiddelen als bedoeld in artikel 359, derde lid, van het Wetboek van Strafvordering.
+Naast deze verklaring van verdachte is voor het bewijs voorhanden de aangiften van 
+[benadeelde 1] 4 , [benadeelde 2] 5 , [benadeelde 3] 6 , [benadeelde 4] 7 , de bij de aangifte van [benadeelde 4] gevoegde mailberichten 8 , de verklaringen van de medeverdachte [medeverdachte] 9 , en de bevindingen van het digitaal onderzoek 10 .
+De rechtbank acht op grond daarvan bewezen dat verdachte zich heeft schuldig gemaakt aan de aan haar verweten gedragingen zoals hierna in de bewezenverklaring wordt opgenomen.
+Het betoog van de raadsvrouw met betrekking tot feit 2 dat geen sprake is geweest van verhulling, volgt de rechtbank niet. Verdachte heeft verklaard een deel van het met de afpersing verkregen geld te hebben aangewend voor het kopen van verschillende goederen ten behoeve van gezamenlijk gebruik en een bedrag van € 500 te hebben gestort op haar bankrekening. Zij heeft verklaard tegen haar moeder te hebben verteld dat medeverdachte [medeverdachte] geld had gewonnen in het casino. In zoverre is sprake geweest van gedragingen die meer omvatten dan het enkele voorhanden hebben van de betreffende geldbedragen en hebben die gedragingen een op het daadwerkelijk verbergen of verhullen van de criminele herkomst van dat door eigen misdrijf verkregen voorwerp ingericht karakter. De rechtbank komt ter zake van dit feit dan ook tot een bewezenverklaring.
+De verdediging heeft voorts gesteld dat geen sprake is geweest van “computervredebreuk” in de zin van artikel 138ab van het Wetboek van Strafrecht, aangezien verdachte en haar medeverdachte geen beveiligingen hebben doorbroken en zij zich op reglementaire wijze, met behulp van een door de slachtoffers vrijwillig gegeven wachtwoord, de toegang hebben verschaft tot de computers van de slachtoffers. Ook dit betoogt slaagt niet. Van binnendringen in vorenbedoelde zin is ook sprake indien men zich de toegang tot een geautomatiseerd werk of een deel daarvan verschaft door met behulp van valse signalen of een valse sleutel dan wel het aannemen van een valse hoedanigheid. Dat laatste is in dit geval zeker van toepassing, aangezien verdachte en haar medeverdachte een autorisatie door de ‘eigenaar’ hebben voorgewend. Ook op dit punt komt de rechtbank tot een bewezenverklaring.
+Bewezenverklaring
+Naar het oordeel van de rechtbank is wettig en overtuigend bewezen dat de verdachte het onder 1, 2, 3 en 4 ten laste gelegde heeft begaan, te weten dat:
+1.
+zij op tijdstippen in de periode van 01 februari 2012 tot en met 03 maart 2012 te Putten en/of een of meerdere andere plaats(en) in Nederland, telkens ter uitvoering van het voornemen en het misdrijf om, tezamen en in vereniging met een ander, met het oogmerk om zichof een ander wederrechtelijk te bevoordelen, door bedreiging met smaad, smaadschrift of openbaring van een geheim, meerdere personen ([benadeelde 1] en [benadeelde 2] en [benadeelde 3] en [benadeelde 4]) te dwingen tot de afgifte van een geldbedrag (variërend tussen de 500 en 2.000 Euro), dat geheel of ten dele toebehoort aan die [benadeelde 1] en/of [benadeelde 2] en/of [benadeelde 3] en/of [benadeelde 4], welke bedreiging met smaad, smaadschrift of openbaring van een geheim hieruit bestond dat verdachte en haar mededader telkens voornoemde [benadeelde 1] en [benadeelde 2] en [benadeelde 3] en die [benadeelde 4] (telkens) een of meerdere sms-bericht(en) e-mail(s) hebben gestuurd en/of een of meerdere telefoongesprekken met die [benadeelde 1] en/of die [benadeelde 2] en/of die [benadeelde 3] en/of die [benadeelde 4] hebben gevoerd, waarin gedreigd werd de (pedo)seksuele geaardheid en/of een of meerdere door die [benadeelde 1] en/of [benadeelde 2] en/of [benadeelde 3] en/of die [benadeelde 4] gepleegde strafbare feiten en/of een of meerdere door/van hen gemaakte
+videobeelden openbaar te maken, terwijl de uitvoering van dit voorgenomen misdrijf niet is voltooid;
+2.
+zij op tijdstippen in of omstreeks de periode van 01 februari tot en met 03 maart 2012, te Rotterdam tezamen en in vereniging met een ander voorwerpen, te weten geldbedragen heeft verworven, voorhanden heeft gehad, heeft overgedragen en/of omgezet, althans van die/dat geldbedrag(en), gebruik heeft gemaakt, terwijl verdachte en haar mededader wisten dat bovenomschreven voorwerpen - onmiddellijk of middellijk - afkomstig wa s ren uit enig misdrijf;
+3.
+zij op tijdstippen in of omstreeks de periode van 01 februari 2012 tot en met 03 maart 2012 te Rotterdam (telkens) tezamen en in vereniging met een ander opzettelijk en wederrechtelijk gegevens (te weten: een of meerdere e-mailberichten en/of foto's en/of videobeelden) die door middel van een geautomatiseerd werk of door middel van een telecommunicatie waren opgeslagen en/of werden verwerkt en/of overgedragen, heeft gewist en/of ontoegankelijk gemaakt, door met voornoemd opzet de wachtenwoorden van de e-mailaccounts,
+- [e-mailaccount 2], en
+- [e-mailaccount 3], en
+- [e-mailaccount 4], en
+- [e-mailaccount 6], en
+- het e-mailadres van een persoon zich noemende [naam 1], en
+- het e-mailadres van een persoon zich noemende [naam 2]
+[naam 2], en
+- het e-mailadres van een persoon zich noemende [naam 3], en
+- het e-mailadres van een persoon zich noemende [naam 5], en
+- het e-mailadres van een persoon zich noemende [naam 9], en
+- het e-mailadres van een persoon zich noemende [naam 11]
+[naam 11],
+waarin die berichten en/of die foto's en/of die videobeelden werden
+opgeslagen, te wijzigen;
+4.
+zij op tijdstippen in of omstreeks de periode van 01 februari 2012 tot en met 03 maart 2012 te Rotterdam tezamen met een ander opzettelijk en wederrechtelijk in geautomatiseerde werken, te weten e-mailaccount(s), te weten:
+- [e-mailaccount 2], en
+- [e-mailaccount 3], en
+- [e-mailaccount 4], en
+- [e-mailaccount 6], en
+- het e-mailadres van een persoon zich noemende [naam 1], en
+- het e-mailadres van een persoon zich noemende [naam 2]
+[naam 2], en
+- het e-mailadres van een persoon zich noemende [naam 3], en
+- het e-mailadres van een persoon zich noemende [naam 5], en
+- het e-mailadres van een persoon zich noemende [naam 9], en
+- het e-mailadres van een persoon zich noemende [naam 11]
+[naam 11],
+of in een deel daarvan, is binnengedrongen, waarna verdachte vervolgens
+gegevens, die waren opgeslagen, werden verwerkt of werden overgedragen door
+middel van die geautomatiseerde werken waarin verdachte zich wederrechtelijk bevond, voor zichzelf of een ander heeft overgenomen, afgetapt of opgenomen.
+Voor zover in de tenlastelegging taal- en/of schrijffouten en/of kennelijke omissies voorkomen, zijn deze in de bewezenverklaring verbeterd. De verdachte is daardoor niet geschaad in de verdediging.
+Strafbaarheid van het bewezenverklaarde
+Het bewezene levert de navolgende strafbare feiten op:
+feit 1: poging tot medeplegen van afdreiging, meermalen gepleegd;
+feit 2: medeplegen van witwassen, meermalen gepleegd;
+feit 3: medeplegen van opzettelijk en wederrechtelijk gegevens die door middel van een geautomatiseerd werk of door middel van telecommunicatie zijn opgeslagen, worden verwerkt of overgedragen, wissen, onbruikbaar of ontoegankelijk maken, meermalen gepleegd;
+feit 4: medeplegen van computervredebreuk, meermalen gepleegd.
+Strafbaarheid van de verdachte
+Verdachte is strafbaar, nu geen omstandigheid is gebleken of aannemelijk geworden die de strafbaarheid van verdachte uitsluit.
+Oplegging van straf en/of maatregel
+De officier van justitie heeft gevorderd dat verdachte terzake van de door haar onder 1, 2, 3 en 4 bewezen geachte feiten zal worden veroordeeld tot een voorwaardelijke gevangenisstraf voor de duur van zes maanden met een proeftijd van twee jaar en een werkstraf van 240 uur, subsidiair 120 dagen vervangende hechtenis met aftrek van de dagen in verzekering doorgebracht. De officier heeft in de strafeis onder meer betrokken dat verdachte en haar medeverdachte inbreuk hebben gemaakt op de persoonlijke levenssfeer van hun slachtoffers en dat de bedreiging van de onder 1 genoemde slachtoffers weliswaar andersoortig is dan de bedreiging in de zin van artikel 317 van het Wetboek van Strafrecht, maar dat deze bedreigingen zeker niet minder ernstig zijn. Daarnaast heeft de officier rekening gehouden met de persoonlijke omstandigheden van verdachte, het feit dat verdachte een blanco straf blad heeft en haar leven inmiddels weer aardig op de rails heeft en dat de gepleegde feiten al weer enige tijd – anderhalf jaar – geleden hebben plaatsgevonden. Dit maakt dat de officier aanleiding heeft gezien om geen onvoorwaardelijke gevangenisstraf te vorderen.
+De raadsvrouw heeft bepleit om in het geval van een veroordeling geen voorwaardelijke gevangenisstraf op te leggen. De raadsvrouw heeft onder meer aangevoerd dat de feiten anderhalf jaar geleden hebben plaatsgevonden en dat in november 2012 uit de relatie van verdachte met de medeverdachte [medeverdachte] een zoontje is geboren voor wie verdachte zorg draagt. De onderhavige strafzaak, de consequenties die de strafzaak reeds heeft gehad en daarnaast de extreme spanningen die de strafzaak met zich brengt, maken dat geen voorwaardelijke gevangenisstraf behoeft te worden opgelegd, aangezien de kans dat verdachte ooit weer met justitie in aanraking zal komen gering is en de onderhavige feiten als een eenmalige gebeurtenis moeten worden beschouwd.
+De rechtbank acht na te melden beslissing in overeenstemming met de aard en de ernst van het bewezenverklaarde en de omstandigheden waaronder dit is begaan, mede gelet op de persoon van verdachte, zoals van een en ander tijdens het onderzoek ter terechtzitting is gebleken. De rechtbank heeft verder het volgende in aanmerking genomen.
+Verdachte heeft samen met haar medeverdachte ernstige inbreuk gemaakt op de persoonlijke levenssfeer van een aantal door haar en haar medeverdachte geselecteerde slachtoffers. Verdachte en haar medeverdachte hebben aangevoerd daarmee vermeende (pedofiele) praktijken aan de kaak te willen stellen en hun slachtoffers onder druk te willen zetten daarmee op te houden. Verdachte en haar medeverdachte hebben dat motief echyter tevens aangewend om ten behoeve van eigen gewin geld te verkrijgen. Verdachte en haar medeverdachte zijn daarbij stelselmatig te werk gegaan. Verdachte heeft een blanco strafblad.
+De reclassering heeft geen strafadvies uitgebracht. Contra-indicaties voor het opleggen van werkstraf zijn er niet. Het recidiverisico wordt als laag ingeschat.
+Uit het rapport van de reclassering van 31 juli 2013 komt naar voren dat verdachte een enigszins starre en stereotype denktrant heeft, waardoor zij van mening was dat de slachtoffers het verdienden afgeperst te worden. Zij dacht dat zij goed bezig was, maar ziet nu in dat zij te ver is gegaan. Zij heeft een laag gemiddeld IQ en heeft hierdoor enige beperkingen in haar sociale en cognitieve vaardigheden. Zij kan enigszins impulsief zijn, waardoor zij niet goed nadenkt over de gevolgen van haar gedrag. Zij heeft een Wajong uitkering. Zij heeft samen met medeverdachte [medeverdachte] een baby van – inmiddels – negen maanden oud. Er zijn geen problematische schulden.
+
+De rechtbank acht, gelet op het vorenstaande, een strafoplegging zoals door de officier van justitie gevorderd op zijn plaats, maar ziet in de persoonlijke omstandigheden van de verdachte aanleiding om de gevorderde werkstraf enigszins te matigen. De rechtbank acht een voorwaardelijke gevangenisstraf aangewezen, niet zo zeer vanwege het zoveel mogelijk beperken van de kans op recidive, maar veel meer om de ernst van de onderhavige feiten te benadrukken. Zij zal daarom geen reclasseringstoezicht opleggen.
+Vorderingen tot schadevergoeding en/of schadevergoedingsmaatregel
+De benadeelde partij [benadeelde 4] heeft zich met een vordering tot schadevergoeding ten bedrage van € 476,53 (immaterieel € 300,00, materieel € 176,53) ter zake de door hem geleden schade gevoegd in het strafproces ten aanzien van het tenlastegelegde.
+De officier van justitie heeft zich op het standpunt gesteld dat de vordering van de benadeelde partij integraal kan worden toegewezen.
+De raadsvrouw heeft zich op het standpunt gesteld dat de vordering ten aanzien van de immateriële schade dient te worden afgewezen dan wel dient te worden verminderd tot maximaal € 100, aangezien de onderhavige zaak de vergelijking met de uitspraak van de rechtbank Utrecht (LJN: BA5303) waarnaar de benadeelde partij heeft verwezen, niet kan doorstaan. In die uitspraak ging het om een forse afdreiging van iemand die prostituees bezocht, welke gedraging niet strafbaar was. Ten aanzien van de materiële schade dienen de opgenomen verlofuren buiten beschouwing te worden gelaten.
+Naar het oordeel van de rechtbank is, op grond van de gebezigde bewijsmiddelen en wat verder ter terechtzitting met betrekking tot de vordering is gebleken, komen vast te staan dat de benadeelde partij als gevolg van het bewezen verklaarde handelen rechtstreeks schade heeft geleden, waarvoor verdachte naar burgerlijk recht aansprakelijk is.
+De rechtbank begroot de immateriële schade, rekening houdende met alle omstandigheden, naar billijkheid op een bedrag van € 100,00. De materiële schade zal de rechtbank beperken tot een bedrag van € 135,17, aangezien zij de opgegeven hoeveelheid gederfde verlofuren bovenmatig acht en een matiging tot zes uren billijk acht. De vordering zal dan ook worden toegewezen tot een bedrag van € 235,17 en de benadeelde partij zal voor het overige 
+niet-ontvankelijk worden verklaard in zijn vordering.
+Gelet op het voorgaande ziet de rechtbank aanleiding om aan verdachte op basis van het bepaalde in artikel 36f van het Wetboek van Strafrecht de verplichting op te leggen tot betaling aan de Staat van na te melden bedrag ten behoeve van genoemd slachtoffer.
+In beslag genomen voorwerpen
+De officier van justitie heeft verbeurdverklaring gevorderd van de op de lijst van inbeslaggenomen voorwerpen onder de nummers 2, 3, 4 en 6 vermelde voorwerpen. De officier heeft verder de teruggave gevorderd van de op voormelde lijst onder 8 vermelde computer aan [medeverdachte].
+De raadsvrouw heeft aangevoerd dat er redenen zijn – beperkte financiële draagkracht – om, hoewel er sprake is van medeplegen van een strafbaar feit, de laptop/notebook (nummer 3 van de lijst) te doen teruggeven aan verdachte.
+
+De rechtbank is van oordeel dat de onder verdachte in beslag genomen laptop/notebook, volgens opgave van verdachte aan haar toebehorend, vatbaar is voor verbeurdverklaring, nu het een voorwerp is met behulp waarvan het bewezenverklaarde is begaan en voorbereid.
+De rechtbank heeft hierbij rekening gehouden met de draagkracht van verdachte.
+Ten aanzien van de overige voorwerpen zal de rechtbank de officier van justitie in deze strafzaak niet ontvankelijk verklaren in haar vordering, aangezien het ziet op goederen die onder de medeverdachte [medeverdachte] in beslag zijn genomen en waarvan de verdachte en de medeverdachte te kennen hebben gegeven dat deze voorwerpen aan hem toebehoren.
+Toepasselijke wettelijke voorschriften
+Deze strafoplegging is gegrond op de artikelen 10, 14a, 14b, 14c, 22c, 22d, 24c, 27, 33, 33a, 36f, 45, 47, 57, 138ab, 350a, 318 en 420bis van het Wetboek van Strafrecht. Beslissing
+De rechtbank:
+ wijst het verzoek tot schorsing van het onderzoek ter terechtzitting ten behoeve van het horen van aangever [benadeelde 1] als getuige af ;
+
+ verklaart, zoals hiervoor overwogen, bewezen dat verdachte het onder 1, 2, 3 en 4 tenlastegelegde heeft begaan;
+
+ verklaart niet bewezen hetgeen verdachte meer of anders is ten laste gelegd dan hierboven is bewezen verklaard en spreekt verdachte daarvan vrij;
+
+ verklaart het bewezenverklaarde strafbaar, kwalificeert dit als:
+
+de misdrijven:
+feit 1: poging tot medeplegen van afdreiging, meermalen gepleegd;
+feit 2: medeplegen van witwassen, meermalen gepleegd;
+feit 3: medeplegen van opzettelijk en wederrechtelijk gegevens die door middel van een geautomatiseerd werk of door middel van telecommunicatie zijn opgeslagen, worden verwerkt of overgedragen, wissen, onbruikbaar of ontoegankelijk maken, meermalen gepleegd ;
+feit 4: medeplegen van computervredebreuk, meermalen gepleegd
+en verklaart verdachte hiervoor strafbaar;
+-
+veroordeelt verdachte tot een gevangenisstraf voor de duur van zes (6) maanden ;
+-
+bepaalt, dat de gevangenisstraf niet zal worden ten uitvoer gelegd , tenzij de rechter later anders mocht gelasten, op grond dat veroordeelde zich vóór het einde van een proeftijd van 2 jaren aan een strafbaar feit heeft schuldig gemaakt;
+ veroordeelt de verdachte tot de navolgende taakstraf , te weten:
+een werkstraf gedurende honderdtachtig (180) uren , met bevel dat indien deze straf niet naar behoren wordt verricht vervangende hechtenis zal worden toegepast voor de duur van 90 dagen;
+
+ beveelt dat voor de tijd die door de veroordeelde vóór de tenuitvoerlegging van de taakstraf in verzekering is doorgebracht, bij de uitvoering van die straf uren in mindering worden gebracht volgens de maatstaf dat per dag in verzekering doorgebracht 2 uur in mindering wordt gebracht;
+
+ verklaart verbeurd de op de lijst van inbeslaggenomen voorwerpen onder 3 vermelde HP notebook / laptop;
+
+ verklaart de officier van justitie voor het overige niet-ontvankelijk in haar vordering tot verbeurdverklaring dan wel teruggave van in beslag genomen voorwerpen;
+
+ veroordeelt verdachte ten aanzien van de feiten 1, 3 en 4 tot betaling van schadevergoeding aan de benadeelde partij [benadeelde 4] van een bedrag van
+€ 235,17 vermeerderd met de wettelijke rente vanaf 3 maart 2012, met veroordeling van verdachte in de kosten van het geding en de tenuitvoerlegging door de benadeelde partij gemaakt, tot op heden begroot op nihil;
+
+ verklaart de benadeelde partij voor het overige niet-ontvankelijk in zijn vordering;
+
+ legt aan veroordeelde de verplichting op om aan de Staat , ten behoeve van het slachtoffer [benadeelde 4] voornoemd een bedrag te betalen van € 235,17 vermeerderd met de wettelijke rente vanaf 3 maart 2012, met bevel dat bij gebreke van betaling en verhaal vier dagen hechtenis zal kunnen worden toegepast zonder dat de betalingsverplichting vervalt;
+
+ bepaalt dat, indien veroordeelde heeft voldaan aan de verplichting tot betaling aan de Staat daarmee de verplichting tot betaling aan de benadeelde partij in zoverre komt te vervallen en andersom dat, indien veroordeelde heeft voldaan aan de verplichting tot betaling aan de benadeelde partij daarmee de verplichting tot betaling aan de Staat in zoverre komt te vervallen;
+
+ verstaat dat indien en voor zover door de medeveroordeelde het betreffende schadebedrag is betaald, veroordeelde daarvan zal zijn bevrijd;
+
+ heft op het – geschorste – bevel tot voorlopige hechtenis.
+
+Aldus gewezen door mr. Welbergen, voorzitter, mr. E.G. De Jong en mr. Kropman, rechters, in tegenwoordigheid van Van Bun, griffier, en uitgesproken op de openbare terechtzitting van 27 augustus 2013.
+Mr. De Jong is buiten staat dit vonnis mede te ondertekenen.
 
 """.decode(errors="ignore")
 
 print model.decision_function(parseText(text))
+print model.predict(parseText(text))
