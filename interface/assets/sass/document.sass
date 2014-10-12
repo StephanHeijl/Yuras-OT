@@ -2,7 +2,8 @@ body {
     background: #333;
     font-family: Roboto, sans-serif;
     color: white;
-    line-height: 1.5em;
+    line-height: 1.2em;
+    margin: 50px 0px;
 }
 
 h1,h2,h3 {
@@ -10,6 +11,52 @@ h1,h2,h3 {
     font-weight: normal;
 }
 
+
+/* Document variables */
+
+$documentBackground: #fefefe;
+$documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
+
+/* Document wrapper */
+
 .wrapper {
-    
+    margin: 0 auto;
+    width: 780px;
+}
+
+/* Document styling */
+
+/* This element scales to this size of a standard A4 paper. */
+.document {
+    background: $documentBackground;
+    color: #333;
+    width: 100%;
+    position: relative;
+    display: inline-block;
+}
+
+.document-content {
+
+    position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+
+    &:before {
+        content: "";
+    	display: block;
+    	padding-top: 141%; 	/* initial ratio of 1:1*/
+        background: $documentBackground;
+
+        -webkit-box-shadow: $documentInsetShadow;
+        box-shadow: $documentInsetShadow;
+    }
+}
+
+.document-content-padding {
+    padding: 10%;
+    position: absolute;
+    top: 0;
+    left:0;
 }
