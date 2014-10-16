@@ -3,6 +3,8 @@ body {
     font-family: Roboto, sans-serif;
     color: white;
     line-height: 1.2em;
+	margin: 0;
+	padding: 0;
 }
 
 h1,h2,h3 {
@@ -16,26 +18,43 @@ h1,h2,h3 {
 $documentBackground: #fefefe;
 $documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
 
-/* Document wrapper */
+/* Wrapper */
 
-.wrapper {
-    margin: 0 auto;
-    width: 780px;
+.document-wrapper {
+    width: 75%;
+	display: inline-block;
+	float: left;
+}
+
+.annotation-wrapper {
+	width: 25%;
+	height: 100%;
+	background: #444;
+	display: inline-block;
+	right: 0;
+	top: 0;
+	position: fixed;
+	overflow: hidden;
+}
+
+.annotation-wrapper-padding {
+	padding: 5%;
+	position: relative;
 }
 
 /* Document styling */
 
-/* This element scales to this size of a standard A4 paper. */
+/* This element is the size of a standard A4 paper. */
 .document {
     background: $documentBackground;
     color: #333;
-    width: 100%;
+    width: 780px;
     position: relative;
-    display: inline-block;
+    display: block;
 	background: white;
 	height: 1100px;
 	max-height: 1100px;
-	margin: 25px 0;
+	margin: 25px auto;
 }
 
 .document-content {
@@ -44,4 +63,16 @@ $documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
 
 .document-content-padding {
     padding: 75px;
+}
+
+/* Annotation styling */
+
+.annotation-page {
+	height: 100%;
+	width: 100%;
+}
+.annotation {
+	padding: 5%;
+	background: rgb(155, 89, 182);
+	margin-bottom: 15px;
 }
