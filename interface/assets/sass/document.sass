@@ -3,7 +3,6 @@ body {
     font-family: Roboto, sans-serif;
     color: white;
     line-height: 1.2em;
-    margin: 50px 0px;
 }
 
 h1,h2,h3 {
@@ -33,30 +32,16 @@ $documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
     width: 100%;
     position: relative;
     display: inline-block;
+	background: white;
+	height: 1100px;
+	max-height: 1100px;
+	margin: 25px 0;
 }
 
 .document-content {
 
-    position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-
-    &:before {
-        content: "";
-    	display: block;
-    	padding-top: 141%; 	/* initial ratio of 1:1*/
-        background: $documentBackground;
-
-        -webkit-box-shadow: $documentInsetShadow;
-        box-shadow: $documentInsetShadow;
-    }
 }
 
 .document-content-padding {
-    padding: 10%;
-    position: absolute;
-    top: 0;
-    left:0;
+    padding: 75px;
 }

@@ -19,7 +19,6 @@ def parseText(text):
 	X_train_counts = counter.transform([contents])
 	X_train_tfidf  = transformer.transform(X_train_counts)
 
-
 	return X_train_tfidf
 
 text = """

@@ -117,7 +117,7 @@ class JKPParser():
 			
 			documents = directories[key]
 			random.shuffle(documents)
-			splitAt = int(math.floor(len(documents)*0.99))
+			splitAt = int(math.floor(len(documents)*0.75))
 			
 			for i, document in enumerate(documents):
 				print document
