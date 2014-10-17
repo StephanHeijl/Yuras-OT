@@ -1,13 +1,11 @@
-import os, sys, collections,re 
+import os, re
 from sklearn.linear_model import SGDClassifier
-from sklearn.naive_bayes import MultinomialNB
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 
 from sklearn import metrics
 
 import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.externals import joblib
 
 specialCharacters = re.compile("[^ a-z\-]")

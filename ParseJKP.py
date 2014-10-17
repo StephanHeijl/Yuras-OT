@@ -1,5 +1,4 @@
-import sys, os, re, json, shutil, random, math
-from pprint import pprint as pp
+import sys, os, re, random, math
 from bs4 import BeautifulSoup
 
 class JKPParser():

@@ -1,6 +1,3 @@
- #!/usr/bin/python
- # -*- coding: latin-1 -*-
-
 from sklearn.externals import joblib
 import sys, re
 
@@ -301,4 +298,3 @@ Dit arrest is gewezen door mr. M.W. Zandbergen, mr. G. van Rijssen en mr. B.J.H.
 
 #print model.decision_function(parseText(text))
 print model.predict(parseText(text))
->>>>>>> c1e6859daf7b39f2cf7164cfc12c50316133567c
