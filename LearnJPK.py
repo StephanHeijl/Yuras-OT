@@ -70,12 +70,12 @@ def tfidfDirectory(d, count_vect=None,tf_transformer=None):
 
 X_train_tfidf, docs, target_train, count_vect, tf_transformer = tfidfDirectory("output-learn")
 
-joblib.dump(count_vect, "fittedCounter.cnt")
-joblib.dump(tf_transformer, "fittedTransformer.trf")
+joblib.dump(count_vect, "trainedModels/fittedCounter.cnt")
+joblib.dump(tf_transformer, "trainedModels/fittedTransformer.trf")
 
 clf = SGDClassifier(n_iter=100,shuffle=True).fit(X_train_tfidf, target_train)
 
-joblib.dump(clf, "trainedModel.mod")
+joblib.dump(clf, "trainedModels/trainedModel.mod")
 
 # Let's test
 X_test_tfidf, docs, target_test, count_vect, tf_transformer  = tfidfDirectory("output-test",count_vect = count_vect,tf_transformer=tf_transformer)
