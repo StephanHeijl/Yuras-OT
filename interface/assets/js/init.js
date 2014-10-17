@@ -11,7 +11,6 @@ $(function() {
         var documentUrl = $(this).attr("href");
         $.get(documentUrl, function(scss) {
             css = Sass.compile(scss);
-			console.log(css);
             $("body").append("<style>"+css+"</style>");
         });
 
@@ -89,5 +88,62 @@ $(function() {
 		}
 
 	});
+
+    /* TESTING */
+    setTimeout(function() {
+        var d = 0;
+        $(".document").each(function() {
+            paragraphs = $(this).find("p")
+
+            $(".annotation-page").eq(d).find(".annotation").each(function() {
+
+                var random = Math.floor(Math.random()*paragraphs.length)
+                paragraphs.eq(random).addClass("marked").data("for", "annotation-" + $(this).index() )
+
+            });
+            d++;
+        });
+
+    }, 2000);
+
+    s = Snap("#annotation-connector");
+    /* Annotation connector behaviour */
+    $("body").on("click", ".marked", function() {
+
+        var documentIndex = $(this).parents(".document").index(".document"),
+            markedIndex = $(this).index(".marked"),
+            connector = $("#annotation-connector"),
+            annotation = $(".annotation-page").eq(documentIndex).find(".annotation").eq(markedIndex)
+            thisOffset = $(this).offset(),
+            annoOffset = annotation.offset(),
+            connOffset = connector.offset();
+
+        left = thisOffset.left + $(this).width();
+
+        // Determine the topmost point.
+        t = thisOffset.top<annoOffset.top?thisOffset.top:annoOffset.top;
+
+        // Determine the bottom-most point.
+        thisBottom = thisOffset.top + $(this).outerHeight()
+        annoBottom = annoOffset.top + annotation.outerHeight()
+
+        b = thisBottom>annoBottom?thisBottom:annoBottom;
+        width = annoOffset.left - left;
+        connector.css({"top": t, "left": left, "height": b-t, "width" : width});
+
+        var connAnnoTop = annoOffset.top - t,
+            connAnnoBottom = connAnnoTop + annotation.outerHeight(),
+            connThisTop = thisOffset.top - t,
+            connThisBottom = connThisTop + $(this).outerHeight(),
+            points = [[width,connAnnoTop], [width,connAnnoBottom], [0,connThisTop], [0,connThisBottom]];
+
+        for(p in points) {
+            marker = s.circle(points[p][0], points[p][1], 5);
+            marker.attr({
+                "fill":"red"
+
+            })
+        }
+    });
 
 });

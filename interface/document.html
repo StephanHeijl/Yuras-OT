@@ -3,12 +3,14 @@
         <script src="assets/js/jquery-2.1.1.min.js"></script>
         <script src="assets/js/sass.min.js"></script>
         <script src="assets/js/markdown.min.js"></script>
+        <script src="assets/js/snap.svg-min.js"></script>
         <link rel="stylesheet-sass" href="assets/sass/document.sass"/>
 
         <link href='http://fonts.googleapis.com/css?family=Roboto|Roboto+Slab:400,300' rel='stylesheet' type='text/css'>
 
     </head>
     <body>
+        <svg id="annotation-connector"></svg>
        	<div class="annotation-wrapper">
        		<div class="annotation-wrapper-padding">
        			<div class="annotation-page">
@@ -137,15 +139,17 @@ can [see the source for it by adding '.text' to the URL][src].
 
 * * *
 
-<h2 id="overview">Overview</h2>
+Overview
+--------
 
-<h3 id="philosophy">Philosophy</h3>
+### Philosophy ###
+
 
 Markdown is intended to be as easy-to-read and easy-to-write as is feasible.
 
 Readability, however, is emphasized above all else. A Markdown-formatted
 document should be publishable as-is, as plain text, without looking
-like it's been marked up with tags or <span id="annotation-one">formatting</span> instructions. While
+like it's been marked up with tags or instructions. While
 Markdown's syntax has been influenced by several existing text-to-HTML
 filters -- including [Setext] [1], [atx] [2], [Textile] [3], [reStructuredText] [4],
 [Grutatext] [5], and [EtText] [6] -- the single biggest source of

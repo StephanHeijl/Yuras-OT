@@ -65,6 +65,12 @@ $documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
     padding: 75px;
 }
 
+.marked {
+    background: rgba(155, 89, 182, 0.3);
+    transform: translate(-5px, 0px);
+    padding: 5px;
+}
+
 /* Annotation styling */
 
 .annotation-page {
@@ -75,4 +81,13 @@ $documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
 	padding: 5%;
 	background: rgb(155, 89, 182);
 	margin-bottom: 15px;
+}
+
+#annotation-connector {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99999;
+    border: 2px solid red;
+
 }
