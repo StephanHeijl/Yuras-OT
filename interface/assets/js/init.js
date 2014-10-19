@@ -1,6 +1,7 @@
 doc = undefined;
 elementHeight = undefined;
 bodyHeight = undefined;
+selectedAnnotation = undefined;
 
 currentPage = 0;
 
@@ -57,6 +58,91 @@ $(function() {
 		$(".document").eq(0).remove();
 	}, 1000)
 
+	/* Annotation connector behaviour */
+    function calculateConnectorPoints(annotatedElement) {
+        var documentIndex = annotatedElement.parents(".document").index(".document"),
+            markedIndex = annotatedElement.index(".marked"),
+            connector = $("#annotation-connector"),
+            annotation = $(".annotation-page").eq(documentIndex).find(".annotation").eq(markedIndex)
+            thisOffset = annotatedElement.offset(),
+            annoOffset = annotation.offset(),
+            connOffset = connector.offset();
+
+        left = thisOffset.left + annotatedElement.width();
+        left += 10; /* Compensate for padding */
+
+        // Determine the topmost point.
+        t = thisOffset.top<annoOffset.top?thisOffset.top:annoOffset.top;
+
+        // Determine the bottom-most point.
+        thisBottom = thisOffset.top + annotatedElement.outerHeight()
+        annoBottom = annoOffset.top + annotation.outerHeight()
+
+        b = thisBottom>annoBottom?thisBottom:annoBottom;
+        width = annoOffset.left - left;
+        connector.css({"top": t, "left": left, "height": b-t, "width" : width});
+
+        var connAnnoTop = annoOffset.top - t,
+            connAnnoBottom = connAnnoTop + annotation.outerHeight(),
+            connThisTop = thisOffset.top - t,
+            connThisBottom = connThisTop + annotatedElement.outerHeight(),
+            points = [[width,connAnnoTop], [width,connAnnoBottom], [0,connThisBottom], [0,connThisTop]];
+
+        return points;
+    }
+
+    function moveAnnotationConnector(annotatedElement) {
+        var points = calculateConnectorPoints(annotatedElement);
+        if($("#annotation-connector").children("polyline").length == 0) {
+            connection = s.polyline(points);
+            connection.attr({
+                "id":"annotation-connection"
+            });
+
+            bg = annotatedElement.css("background-color");
+
+            c = Snap.color(bg);
+            gradBg = "rgba(" + [c["r"]-40,c["g"]-40,c["b"]-40,c["opacity"]].join(",") +")" + "-rgb(" + [c["r"]-40,c["g"]-40,c["b"]-40].join(",") + ")";
+            console.log(gradBg)
+
+            g = s.gradient("l(0,0,1,0)"+gradBg);
+
+            connection.attr({
+                //"fill":annotatedElement.css("background-color"),
+                "fill":g,
+                "points":points.join(",")
+            })
+        } else {
+            connection = Snap.select("#annotation-connection")
+
+            oldPoints = connection.attr("points");
+            betweenPoints = oldPoints.slice(0,5).join(",") + points.slice(2,5).join(",");
+
+            /* Animated */
+            /*
+            connection.attr({
+                "points":betweenPoints
+            });
+
+            connection.animate({
+                "points":points.join(",")
+            },200)
+            */
+            /* Non-animated */
+            connection.attr({
+                "points":points.join(",")
+            })
+        }
+    }
+
+    s = Snap("#annotation-connector");
+
+    $("body").on("click", ".marked", function() {
+        moveAnnotationConnector($(this));
+        selectedAnnotation = $(this);
+    });
+
+
 	/* Handle switching the annotation page */
 	$(window).on("scroll", function() {
 		var st = $("body").scrollTop();
@@ -87,9 +173,15 @@ $(function() {
 
 		}
 
+		/* Scrolling the annotation marker */
+		if(typeof selectedAnnotation !== "undefined") {
+            moveAnnotationConnector(selectedAnnotation);
+		}
+
+
 	});
 
-    /* TESTING */
+    /* TESTING - This adds annotated elements to each page randomly.*/
     setTimeout(function() {
         var d = 0;
         $(".document").each(function() {
@@ -97,53 +189,13 @@ $(function() {
 
             $(".annotation-page").eq(d).find(".annotation").each(function() {
 
-                var random = Math.floor(Math.random()*paragraphs.length)
-                paragraphs.eq(random).addClass("marked").data("for", "annotation-" + $(this).index() )
+                var random = Math.floor(Math.random()*paragraphs.length);
+                paragraphs.eq(random).addClass("marked").data("for", "annotation-" + $(this).parent().index(this) );
 
             });
             d++;
         });
 
-    }, 2000);
-
-    s = Snap("#annotation-connector");
-    /* Annotation connector behaviour */
-    $("body").on("click", ".marked", function() {
-
-        var documentIndex = $(this).parents(".document").index(".document"),
-            markedIndex = $(this).index(".marked"),
-            connector = $("#annotation-connector"),
-            annotation = $(".annotation-page").eq(documentIndex).find(".annotation").eq(markedIndex)
-            thisOffset = $(this).offset(),
-            annoOffset = annotation.offset(),
-            connOffset = connector.offset();
-
-        left = thisOffset.left + $(this).width();
-
-        // Determine the topmost point.
-        t = thisOffset.top<annoOffset.top?thisOffset.top:annoOffset.top;
-
-        // Determine the bottom-most point.
-        thisBottom = thisOffset.top + $(this).outerHeight()
-        annoBottom = annoOffset.top + annotation.outerHeight()
-
-        b = thisBottom>annoBottom?thisBottom:annoBottom;
-        width = annoOffset.left - left;
-        connector.css({"top": t, "left": left, "height": b-t, "width" : width});
-
-        var connAnnoTop = annoOffset.top - t,
-            connAnnoBottom = connAnnoTop + annotation.outerHeight(),
-            connThisTop = thisOffset.top - t,
-            connThisBottom = connThisTop + $(this).outerHeight(),
-            points = [[width,connAnnoTop], [width,connAnnoBottom], [0,connThisTop], [0,connThisBottom]];
-
-        for(p in points) {
-            marker = s.circle(points[p][0], points[p][1], 5);
-            marker.attr({
-                "fill":"red"
-
-            })
-        }
-    });
+    }, 1000);
 
 });
