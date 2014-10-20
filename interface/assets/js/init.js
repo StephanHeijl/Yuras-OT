@@ -169,12 +169,16 @@ $(function() {
 			var annotationPage = $(".annotation-page").eq(currentPage);
 			var paddingTop = parseInt($(".annotation-wrapper-padding").css("padding-top"));
 
-			$(".annotation-wrapper").animate({scrollTop: annotationPage.position().top - paddingTop}, 500, function() {
-				/* Scrolling the annotation marker */
-				if(typeof selectedAnnotation !== "undefined") {
-		            		moveAnnotationConnector(selectedAnnotation);
+			$(".annotation-wrapper").animate({scrollTop: annotationPage.position().top - paddingTop}, 
+				{"duration":500, 
+				 "step": function() {
+						/* Scrolling the annotation marker, called on each step of the animation to provide a smooth transition*/
+						if(typeof selectedAnnotation !== "undefined") {
+				            		moveAnnotationConnector(selectedAnnotation);
+						}
+					}
 				}
-			});
+			);
 
 		}
 
