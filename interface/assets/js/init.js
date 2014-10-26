@@ -102,7 +102,7 @@ $(function() {
             bg = annotatedElement.css("background-color");
 
             c = Snap.color(bg);
-            gradBg = "rgba(" + [c["r"]-40,c["g"]-40,c["b"]-40,c["opacity"]].join(",") +")" + "-rgb(" + [c["r"]-40,c["g"]-40,c["b"]-40].join(",") + ")";
+            gradBg = "rgba(" + [c["r"],c["g"],c["b"],c["opacity"]].join(",") +")" + "-rgb(" + [c["r"],c["g"],c["b"]].join(",") + ")";
             console.log(gradBg)
 
             g = s.gradient("l(0,0,1,0)"+gradBg);
