@@ -1,5 +1,6 @@
 import os, re
 from sklearn.linear_model import SGDClassifier
+from sklearn.naive_bayes import GaussianNB
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -7,6 +8,8 @@ from sklearn import metrics
 
 import numpy as np
 from sklearn.externals import joblib
+
+from pprint import pprint as pp
 
 specialCharacters = re.compile("[^ a-z\-]")
 
@@ -16,13 +19,6 @@ def custom_tokenizer(string):
 	tokens = []
 	words = string.split(" ")
 	tokens+=words
-	"""
-	for w in range(len(words)):
-		if w < len(words)-2:
-			tokens.append( " ".join(words[w:w+2]))
-		if w < len(words)-3:
-			tokens.append( " ".join(words[w:w+3]))
-	"""
 	tokens = tuple(tokens)
 	return tokens
 
@@ -49,7 +45,7 @@ def tfidfDirectory(d, count_vect=None,tf_transformer=None):
 			contents = " ".join(filter(lambda w: len(w) > 0 and w not in stopWords, contents.split(" ")))
 
 			allContents.append(contents)
-	
+
 	if count_vect == None:
 		count_vect = CountVectorizer(tokenizer=custom_tokenizer)
 		X_train_counts = count_vect.fit_transform(allContents)
@@ -61,41 +57,36 @@ def tfidfDirectory(d, count_vect=None,tf_transformer=None):
 		X_train_tfidf = tf_transformer.fit_transform(X_train_counts)
 	else:
 		X_train_tfidf = tf_transformer.transform(X_train_counts)
-		
+
 	return X_train_tfidf, docs, target, count_vect, tf_transformer
 
 
 
 X_train_tfidf, docs, target_train, count_vect, tf_transformer = tfidfDirectory("output-learn")
 
-joblib.dump(count_vect, "trainedModels/fittedCounter.cnt")
-joblib.dump(tf_transformer, "trainedModels/fittedTransformer.trf")
+#joblib.dump(count_vect, "trainedModels/fittedCounter.cnt")
+#joblib.dump(tf_transformer, "trainedModels/fittedTransformer.trf")
 
-clf = SGDClassifier(n_iter=100,shuffle=True).fit(X_train_tfidf, target_train)
+clf = GaussianNB().fit(X_train_tfidf.toarray(), target_train)
 
-joblib.dump(clf, "trainedModels/trainedModel.mod")
+#joblib.dump(clf, "trainedModels/trainedModel.mod")
 
 # Let's test
 X_test_tfidf, docs, target_test, count_vect, tf_transformer  = tfidfDirectory("output-test",count_vect = count_vect,tf_transformer=tf_transformer)
 
-predicted_train = clf.predict(X_train_tfidf)
-predicted_test = clf.predict(X_test_tfidf)
+predicted_test = clf.predict(X_test_tfidf.toarray())
 
 #correct = 0
 #for doc, category, t in zip(docs, predicted_test, target):
 #	if category == t:
 #		correct += 1
 #	print("\t".join([str(s) for s in [doc,category, t, int(category == t)]]))
-	
+
 #print float(correct)/float(len(target)) * 100
 
-print('\nPrediction accuracy for the training dataset')
-print('{:.2%}\n'.format(metrics.accuracy_score(target_train, predicted_train)))
-
 print('Prediction accuracy for the test dataset')
-print('{:.2%}\n'.format(metrics.accuracy_score(target_test, predicted_test)))
+print('{:.2%}\n'.format(metrics.accuracy_score( predicted_test, target_test )))
 
-print('Confusion Matrix of the SGD-classifier')
-confMatrix = metrics.confusion_matrix(target_test, clf.predict(X_test_tfidf), target_test)
-print(confMatrix)
-np.savetxt("confusionMatrix.csv", confMatrix, delimiter=";")
+print('Classification report')
+report = metrics.classification_report(predicted_test, target_test)
+print(report)
