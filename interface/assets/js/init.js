@@ -20,6 +20,7 @@ $(function() {
     $(".markdown").each(function() {
         md = $(this).text();
         $(this).html( markdown.toHTML(md) );
+
     });
 });
 
@@ -103,7 +104,6 @@ $(function() {
 
             c = Snap.color(bg);
             gradBg = "rgba(" + [c["r"],c["g"],c["b"],c["opacity"]].join(",") +")" + "-rgb(" + [c["r"],c["g"],c["b"]].join(",") + ")";
-            console.log(gradBg)
 
             g = s.gradient("l(0,0,1,0)"+gradBg);
 

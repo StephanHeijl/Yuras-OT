@@ -17,22 +17,65 @@ h1,h2,h3 {
 
 $documentBackground: #fefefe;
 $documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
+$menuHeight: 40px;
+$annotationColor: #1abc9c;
+$annotationTextColor: white;
+
+/* General purpose */
+
+.pull-right {
+	float:right;
+}
+
+/* Menu */
+
+.menu {
+	width: 100%;
+	padding-right: 1.25%;
+	height: $menuHeight;
+	background: #222;
+	position: fixed;
+	top: 0;
+	z-index: 100;
+}
+
+.menu-button-list {
+	display: block;
+	margin: 0;
+	padding: 0;
+}
+
+.menu-button {
+	float: left;
+	list-style-type: none;
+	height: $menuHeight;
+	line-height: $menuHeight;
+	padding: 0 25px;
+	cursor: pointer;
+
+ 	&:hover {
+		background-color: rgba(255,255,255,0.2);
+		border-bottom: 3px solid rgba(255,255,255,0.2);
+	}
+}
+
 
 /* Wrapper */
-
 .document-wrapper {
     width: 75%;
 	display: inline-block;
 	float: left;
+	margin-top: $menuHeight;
+	z-index: 50;
 }
 
 .annotation-wrapper {
 	width: 25%;
 	height: 100%;
-	background: #444;
+	background: #434343;
 	display: inline-block;
 	right: 0;
-	top: 0;
+	top: $menuHeight;
 	position: fixed;
 	overflow: hidden;
 }
@@ -66,9 +109,10 @@ $documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
 }
 
 .marked {
-    background: rgba(155, 89, 182, 0.3);
+    background: $annotationColor;
     transform: translate(-5px, 0px);
     padding: 5px;
+	color: $annotationTextColor;
 }
 
 /* Annotation styling */
@@ -77,15 +121,35 @@ $documentInsetShadow: inset 0px 0px 100px rgba(0,0,0,0.05);
 	height: 100%;
 	width: 100%;
 }
+
+.search-bar-container {
+	position: relative;
+	margin-bottom: 15px;
+	background: #666;
+	color: white;
+	padding: 5%;
+}
+
+.search-bar {
+	width: 95%;
+	display: inline-block;
+	outline: 0;
+}
+
 .annotation {
 	padding: 5%;
-	background: rgb(155, 89, 182);
+	background: $annotationColor;
 	margin-bottom: 15px;
+	color:  $annotationTextColor;
+
+	&:hover {
+		background: $annotationColor;
+	}
 }
 
 #annotation-connector {
     position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 99999;
+    top: -9999px;
+    left: -9999px;
+    z-index: 99;
 }
