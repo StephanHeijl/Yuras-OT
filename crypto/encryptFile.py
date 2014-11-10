@@ -28,7 +28,8 @@ class FileEncryptor(object):
 					
 		# Encrypt the file with a random 256 bit key.
 		randomKey = Random.new().read(keyLength)
-		cipher = AES.new(randomKey)
+		iv = Random.new().read(AES.block_size)
+		cipher = AES.new(randomKey, AES.MODE_CBC, iv)
 		encryptedContents = cipher.encrypt(contents)
 		
 		# Encrypt the random key.

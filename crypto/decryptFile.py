@@ -26,7 +26,8 @@ class FileDecryptor(object):
 			
 		decryptedKey = cipher.decrypt(binaryKey)
 		
-		cipher = AES.new(decryptedKey)		
+		iv = contents[:AES.block_size]
+		cipher = AES.new(decryptedKey,AES.MODE_CBC ,iv)
 		decryptedContents = cipher.decrypt(contents)
 		
 		return decryptedContents
@@ -50,4 +51,3 @@ if __name__ == "__main__":
 	f =  FD.loadEncryptedFile(args["in"])
 	dc = FD.decryptContents(args["privateKey"],args["key"],f, args["b64"])
 	FD.storeDecrypted(args["out"],dc)
-	

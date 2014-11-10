@@ -8,7 +8,7 @@ class KeyPairGenerator(object):
 		self.name = "sample"
 		
 	def createKeyPair(self):
-		self.key = RSA.generate(2048, self.random.read)
+		self.key = RSA.generate(4096, self.random.read)
 		return self.key
 		
 	def getPublicKey(self):
@@ -41,4 +41,3 @@ if __name__ == "__main__":
 	kpg.createKeyPair()
 	kpg.storePublicKey()
 	kpg.storePrivateKey()
-	
