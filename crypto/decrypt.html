@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Decrypt with JS.</title>		
+	</head>
+	<body>
+		<h1>Decrypt a file.</h1>
+		<p>Select a file, select a private key. Decrypt.</p>
+		
+		<fieldset>
+			<label for="encrypted-file">Encrypted file</label> <br/>
+			<input type="file" id="encrypted-file" name="encrypted-file" /> <br/>
+			<br/>
+			<label for="private-key-file">Private key file</label> <br/>
+			<input type="file" id="private-key-file" name="private-key-file" /> <br/>			
+			<br/>
+			<label for="encryption-key-file">Encryption key file</label> <br/>
+			<input type="file" id="encryption-key-file" name="encryption-key-file" /> <br/>			
+			<br/>
+			<button type="button" id="decrypt"> Decrypt </button>
+		</fieldset>
+		
+		<h2> Encrypted file </h2>
+		<textarea id="encrypted-file-contents" cols=80 rows=5></textarea>
+		<h2> Private key file </h2>
+		<textarea id="private-key-file-contents" cols=80 rows=5></textarea>
+		<h2> Encryption key file </h2>
+		<textarea id="encryption-key-file-contents" cols=80 rows=5></textarea>
+		<h2> Decrypted file </h2>
+		<textarea id="decrypted-file-contents" cols=80 rows=5></textarea>
+		
+		
+		<script src="jsencrypt.min.js"></script>
+		<script>
+			var crypt = new JSEncrypt();
+			window.EncryptedFile = null;
+			window.PrivateKey = null;
+			window.EncryptionKey = null;
+			
+			function doFileAPICheck() {
+				if (window.File && window.FileReader && window.FileList && window.Blob) {
+					return true;
+				}
+				return false;	
+			}
+			
+			function handleFileSelect(evt) {
+				var files = evt.target.files; // FileList object
+				var file = files[0];
+				
+				if( evt.srcElement.id == "encrypted-file" ) {
+					var reader = new FileReader();					
+					reader.onloadend = function(evt) {
+						if (evt.target.readyState == FileReader.DONE) {
+							window.EncryptedFile = evt.target.result;
+							document.getElementById("encrypted-file-contents").innerHTML = window.EncryptedFile;
+						}
+					}					
+					reader.readAsBinaryString(file)	
+				}
+				
+				if( evt.srcElement.id == "encryption-key-file" ) {
+					var reader = new FileReader();					
+					reader.onloadend = function(evt) {
+						if (evt.target.readyState == FileReader.DONE) {							
+							window.EncryptionKey = atob(evt.target.result);
+							document.getElementById("encryption-key-file-contents").innerHTML = window.EncryptionKey;
+						}
+					}					
+					reader.readAsBinaryString(file)	
+				}
+				
+				if( evt.srcElement.id == "private-key-file" ) {
+					var reader = new FileReader();					
+					reader.onloadend = function(evt) {
+						if (evt.target.readyState == FileReader.DONE) {
+							window.PrivateKey = evt.target.result;							
+							document.getElementById("private-key-file-contents").innerHTML = window.PrivateKey;
+						}
+					}
+					reader.readAsText(file)
+				}
+				
+			}
+			
+			
+			function handleDecryptCall() {
+				if (window.EncryptedFile && window.PrivateKey && window.EncryptionKey) {
+					crypt.setPrivateKey(window.PrivateKey);
+					console.log(window.EncryptionKey)
+					console.log( crypt.decrypt(window.EncryptionKey) );
+				} else {
+					
+				}
+			}
+			
+			document.getElementById('decrypt').addEventListener('click', handleDecryptCall, false);
+
+			document.getElementById('encrypted-file').addEventListener('change', handleFileSelect, false);
+			document.getElementById('private-key-file').addEventListener('change', handleFileSelect, false);			
+			document.getElementById('encryption-key-file').addEventListener('change', handleFileSelect, false);			
+		</script>
+		
+	</body>	
+</html>
