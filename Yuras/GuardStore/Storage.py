@@ -30,6 +30,9 @@ class Storage(Singleton):
 		
 		Nonetheless, it is important to take this vurnerability into account.
 		
+		Special note: this security layer is NOT INTENDED to store plaintext passwords. At no point in time should you
+		ever store a password in a production database as plaintext.
+		
 	"""
 	def __init__(self, encryptDocuments=True):
 		""" Initializes the connection with the Mongo database. 
