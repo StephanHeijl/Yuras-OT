@@ -1,0 +1,4 @@
+pillow>=2.6.1
+qrcode>=5.1
+pycrypto>=2.6.1
+argparse>=1.2.1
