@@ -1,13 +1,60 @@
 body {
 	background: #eee;
 	font-family: Oxygen;
+	font-size: 13pt;
 }
 
 header {
 	text-align:center;
-	margin-bottom: 100px;
+	margin: 100px 0;
 }
 
-h1 {
-	font-size: 48px;
+.row {
+	margin-top: 50px;
+}
+
+#usp-callout {
+	text-align: center;
+	margin: 50px 0;
+	background: #222;
+	color: #eee;
+	box-shadow: inset black 0 0 50px;
+}
+
+.marked {
+	padding: 2px 5px;
+	color: white;
+	background-color: #1abc9c;
+}
+
+p {
+	text-align: justify;
+}
+
+.quote {
+	font-family: Georgia;
+	font-style: italic;
+	font-size: 16pt;
+}
+
+.quote:before {
+	content: "\201c";
+	font-style: normal;
+}
+
+.quote:after {
+	content: "\201d";
+	font-style: normal;
+}
+
+.quote-author {
+	text-align: right;
+	display: block;
+	font-size: 14pt;
+	margin-top: 1em;
+	opacity: 0.6;
+}
+
+.quote-author:before {
+	content: "~ ";
 }
