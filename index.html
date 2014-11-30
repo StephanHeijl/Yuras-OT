@@ -1,129 +1,306 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Yuras</title>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
-		<link href='http://fonts.googleapis.com/css?family=Oxygen:400,700' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" href="./yuras.css">
-	</head>
-	<body>
-		
-		<nav class="nav-container">
-			<div class="container">
-				<div class="btn btn-yuras btn-selected">Home</div>
-				<div class="btn btn-yuras">Features</div>
-				<div class="btn btn-yuras">Plans &amp; Pricing</div>
-				<div class="btn btn-yuras">Contact</div>
-			</div>			
-		</nav>
-		
-		<header class="jumbotron">
 
-			<hgroup>
-				<h1><strong>Yuras</strong> streamlines your data gathering process.</h1>
-				<h2>Store and use your existing legal data, securely. </h2>
-			</hgroup>
+<head>
+	<title>Yuras</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+	<link href='http://fonts.googleapis.com/css?family=Oxygen:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="./yuras.css">
+</head>
 
-		</header>
-	
-		<div class="container">			
-			
-			<div class="row">
-				<div class="col-md-4">
-					<h3>Security</h3>
-					<p>
-						Yuras uses <span class="marked">top of the line encryption</span> and key exchange methods to guarantee the safety of your data.
-						Where other providers will store your data, even your passwords(!), in plain text, we encrypt every single 
-						piece of data. We <strong>never</strong> compromise on security.
-					</p>
-				</div>
+<body>
 
-				<div class="col-md-4">
-					<h3>Ease of use</h3>
-					<p>
-						Technology is made to make your life easier. You should never be a slave to the software you are using.
-						Yuras supports all the filetypes and formats used in your industry. <span class="marked">We prioritize interoperability</span> and
-						will work with you to enhance your existing workflow.
-					</p>
-
-				</div>
-
-				<div class="col-md-4">
-					<h3>Cost effective</h3>
-					<p>
-						Yuras services are affordable. We offer monthly plans for your organization, no matter the scale.
-						We make sure that you only pay for the services you use. <span class="marked">There are no upfront fees</span>, and you can stop at
-						any time.
-						<a>Check out our plans and pricing</a>.
-					</p>
-				</div>
-			</div>
-		</div>
-			
-		<div class="jumbotron usp-callout">
-			<div class="container">	
-				<h2>Startup agility, old-fashioned reliability.</h2>
-				<span class="quote">We ensure <span class="marked">state of the art security</span> combined with a personal touch.<br/>
-				We will personally work with you to introduce you and your personnel to these tools.</span>
-				<span class="quote-author">Stephan Heijl, Chief Technology Officer</span>
-			</div>
-		</div>
-			
+	<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 		<div class="container">
-			<div class="row">
-				<div class="col-md-5">
-					<h3>At Yuras, we promise you three things</h3>
-					<ul>
-						<li><strong>You</strong> always remain in control of your data.</li>
-						<li><strong>You</strong> always get the latest system updates, as soon as they are available.</li>
-						<li><strong>You</strong> only pay for what you use.</li>
-					</ul>
-					<br/>
-					<p>
-						<span class="marked">No one at Yuras can see what secure documents you store.</span> You can at any
-						time stop using Yuras and personally oversee the removal of all your data.
-						Because of the way Yuras works, we can not and will not provide any law enforcement agency, internation
-						or otherwise, with unencrypted data.
-					</p>
-
-				</div>
-
-				<div class="col-md-7">
-					<br/>
-					<img src="assets/img/Screenshot.png" style="width: 100%;"/>
-				</div>
+			<!-- Brand and toggle get grouped for better mobile display -->
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#">Yuras</a>
 			</div>
-			
-			<div class="row">
-				<div class="col-lg-8 col-lg-push-4 col-md-push-6 col-md-6">
-					<h3>Our services are cross-platform</h3>
-					<p>
-						We don't think you should be locked to a single type of computer or device to use our services.
-						Due to their web-based infrastructure, we can provide any device with Yuras tools, <span class="marked">both desktop
+
+			<!-- Collect the nav links, forms, and other content for toggling -->
+			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li class="active">
+						<a href="#" data-to="start">Start<span class="sr-only">(current)</span></a>
+					</li>
+					<li>
+						<a href="#" data-to="features">Features</a>
+					</li>
+					<li>
+						<a href="#" data-to="plans-and-pricing">Plans &amp; Pricing</a>
+					</li>
+					<li>
+						<a href="#">Sign up</a>
+					</li>
+					<li>
+						<a href="#">Contact</a>
+					</li>
+				</ul>
+			</div>
+			<!-- /.navbar-collapse -->
+		</div>
+		<!-- /.container-fluid -->
+	</nav>
+
+	<header class="jumbotron" data-target="start">
+
+		<hgroup>
+			<h1><strong>Yuras</strong> streamlines your data gathering process.</h1>
+			<h2>Store and use your existing legal data, securely. </h2>
+		</hgroup>
+
+	</header>
+
+	<div class="container">
+
+		<div class="row">
+			<div class="col-md-4">
+				<h3><span class="glyphicon glyphicon-lock pull-right"></span> Security</h3>
+				<p>
+					Yuras uses <span class="marked">top of the line encryption</span> and key exchange methods to guarantee the safety of your data. Where other providers will store your data, even your passwords(!), in plain text, we encrypt every single piece of data. We <strong>never</strong> compromise on security.
+				</p>
+			</div>
+
+			<div class="col-md-4">
+				<h3><span class="glyphicon glyphicon-user pull-right"></span> Ease of use</h3>
+				<p>
+					Technology is made to make your life easier. You should never be a slave to the software you are using. Yuras supports all the filetypes and formats used in your industry. <span class="marked">We prioritize interoperability</span> and will work with you to enhance your existing workflow.
+				</p>
+
+			</div>
+
+			<div class="col-md-4">
+				<h3><span class="glyphicon glyphicon-usd pull-right"></span> Cost effective</h3>
+				<p>
+					Yuras services are affordable. We offer monthly plans for your organization, no matter the scale. We make sure that you only pay for the services you use. <span class="marked">There are no upfront fees</span>, and you can stop at any time.
+					<a>Check out our plans and pricing</a>.
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="jumbotron usp-callout" data-target="features">
+		<div class="container">
+			<h2>Startup agility, old-fashioned reliability.</h2>
+			<span class="quote">We ensure <span class="marked">state of the art security</span> combined with a personal touch.
+			<br/>We will personally work with you to introduce you and your personnel to these tools.</span>
+			<span class="quote-author">Stephan Heijl, Chief Technology Officer</span>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-5">
+				<h3>At Yuras, we promise you three things</h3>
+				<ul>
+					<li><strong>You</strong> always remain in control of your data.</li>
+					<li><strong>You</strong> always get the latest system updates, as soon as they are available.</li>
+					<li><strong>You</strong> only pay for what you use.</li>
+				</ul>
+				<br/>
+				<p>
+					<span class="marked">No one at Yuras can see what secure documents you store.</span> You can at any time stop using Yuras and personally oversee the removal of all your data. Because of the way Yuras works, we can not and will not provide any law enforcement agency, internation or otherwise, with unencrypted data.
+				</p>
+
+			</div>
+
+			<div class="col-md-7">
+				<br/>
+				<img src="assets/img/Screenshot.png" style="width: 100%;" />
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-lg-8 col-lg-push-4 col-md-push-6 col-md-6">
+				<h3>Our services are cross-platform</h3>
+				<p>
+					We don't think you should be locked to a single type of computer or device to use our services. Due to their web-based infrastructure, we can provide any device with Yuras tools, <span class="marked">both desktop
 						and mobile. </span>
-					</p>
-				</div>
-				
-				<div class="col-lg-4 col-lg-pull-8 col-md-pull-6 col-md-6">
-					<img src="http://upload.wikimedia.org/wikipedia/commons/a/ac/Nexus_5_Front_View.png" style="width: 24%;"/>
-					<img src="http://pngimg.com/upload/laptop_PNG5903.png" style="width: 74%;"/>
-				</div>
+				</p>
+			</div>
+
+			<div class="col-lg-4 col-lg-pull-8 col-md-pull-6 col-md-6">
+				<img src="http://upload.wikimedia.org/wikipedia/commons/a/ac/Nexus_5_Front_View.png" style="width: 24%;" />
+				<img src="http://pngimg.com/upload/laptop_PNG5903.png" style="width: 74%;" />
 			</div>
 		</div>
-		
-		<div class="jumbotron usp-callout">
-			<div class="container">	
-				<h2>Plans &amp; Pricing</h2>
-				<span class="quote">Some quote related to <span class="marked">pricing</span>. </span>
-				<span class="quote-author">Saman Khanpour, Chief Exective Officer</span>
-			</div>
-		</div>
-			
+	</div>
+
+	<div class="jumbotron usp-callout" data-target="plans-and-pricing">
 		<div class="container">
-
-			<footer>
-
-			</footer>		
+			<h2>Plans &amp; Pricing</h2>
+			<span class="quote">We believe that people should only pay for what they actually need.<br/> Our basic plans can always be <span class="marked">suited to your needs</span> and fitted with features that are relevant to your business.</span>
+			<span class="quote-author">Saman Khanpour, Chief Exective Officer</span>
 		</div>
-	</body>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3 col-sm-6 price-table">
+				<h3>Single user</h3>
+				<table class="table table-striped">
+					<tr>
+						<td>Users</td>
+						<td>1</td>
+					</tr>
+					<tr>
+						<td>Documents stored</td>
+						<td>100</td>
+					</tr>
+					<tr>
+						<td>U2F two factor authentication**</td>
+						<td>No</td>
+					</tr>
+					<tr>
+						<td>Share documents</td>
+						<td>No</td>
+					</tr>
+					<tr>
+						<td>Fast access*</td>
+						<td width=60px>7-23h</td>
+					</tr>
+					<tr>
+						<td class="price" colspan=2>
+							&euro; 19<small>/month</small>
+						</td>
+					</tr>
+				</table>
+				<div class="btn btn-yuras">
+					Sign up now - 30 days free!
+				</div>
+			</div>
+			<div class="col-lg-3 col-sm-6 price-table">
+				<h3>Small company</h3>
+				<table class="table table-striped">
+					<tr>
+						<td>Users</td>
+						<td>1-5</td>
+					</tr>
+					<tr>
+						<td>Documents stored</td>
+						<td>500</td>
+					</tr>
+					<tr>
+						<td>U2F two factor authentication**</td>
+						<td>&euro; 25/user</td>
+					</tr>
+					<tr>
+						<td>Share documents</td>
+						<td>Yes</td>
+					</tr>
+					<tr>
+						<td>Fast access</td>
+						<td width=95px>Always</td>
+					</tr>
+					<tr>
+						<td class="price" colspan=2>
+							&euro; 99<small>/month</small>
+						</td>
+					</tr>
+				</table>
+				<div class="btn btn-yuras">
+					Sign up now - 30 days free!
+				</div>
+			</div>
+			<div class="col-lg-3 col-sm-6 price-table">
+				<h3>Medium company</h3>
+				<table class="table table-striped">
+					<tr>
+						<td>Users</td>
+						<td>5-50</td>
+					</tr>
+					<tr>
+						<td>Documents stored</td>
+						<td>1000</td>
+					</tr>
+					<tr>
+						<td>U2F two factor authentication**</td>
+						<td>&euro; 20/user</td>
+					</tr>
+					<tr>
+						<td>Share documents</td>
+						<td>Yes</td>
+					</tr>
+					<tr>
+						<td>Fast access</td>
+						<td width=95px>Always</td>
+					</tr>
+					<tr>
+						<td class="price" colspan=2>
+							&euro; 249<small>/month</small>
+						</td>
+					</tr>
+				</table>
+				<div class="btn btn-yuras">
+					Contact us
+				</div>
+
+			</div>
+			<div class="col-lg-3 col-sm-6 price-table">
+				<h3>Large company</h3>
+				<table class="table table-striped">
+					<tr>
+						<td>Users</td>
+						<td>50-100</td>
+					</tr>
+					<tr>
+						<td>Documents stored</td>
+						<td>Unlimited</td>
+					</tr>
+					<tr>
+						<td>U2F two factor authentication**</td>
+						<td>&euro; 18/user</td>
+					</tr>
+					<tr>
+						<td>Share documents</td>
+						<td>Yes</td>
+					</tr>
+					<tr>
+						<td>Fast access</td>
+						<td width=95px>Always</td>
+					</tr>
+					<tr>
+						<td class="price" colspan=2>
+							&euro; 499<small>/month</small>
+						</td>
+					</tr>
+				</table>
+				<div class="btn btn-yuras">
+					Contact us
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<footer>
+				<p>
+					* When Yuras is used outside Fast Access hours you might experience some delay when connecting. This allows us to keep computing costs down by only requisitioning computer power when it is actually needed, in turn providing a lower charge for our customers.
+				</p>
+				<p>
+					** Two factor authentication is always implemented with your smartphone. U2F Authentication will provide you with a separate key, allowing for more advanced and secure logins. This is not a recurring charge. In case your U2F token is lost, it will be replaced for the rate your program allows and your previous token will be blocked.
+				</p>
+
+				<center>
+					&copy; Yuras, 2014
+				</center>
+				<br/>
+			</footer>
+		</div>
+
+	</div>
+
+	<!-- Javascript -->
+	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+	<script src="yuras.js"></script>
+</body>
+
 </html>
