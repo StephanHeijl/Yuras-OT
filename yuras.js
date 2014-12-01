@@ -1,11 +1,11 @@
-$(".navbar a").click(function (e) {
+$("a[data-to]").click(function (e) {
 	e.preventDefault();
 
 	// Scroll to element with data-target.
 	var to = $(this).data("to"),
 		target = $("*[data-target=" + to + "]");
 
-	$("body").animate({
+	$("body,html").animate({
 		scrollTop: target.offset().top - $(".navbar").height()
 	})
 
