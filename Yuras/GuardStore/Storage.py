@@ -59,7 +59,7 @@ class Storage(Singleton):
 			except:
 				self.iv = Random.new().read(AES.block_size)
 				Config().iv = base64.b64encode( self.iv )
-				Config().save()		
+				Config().save()
 		
 	def reconnect(self):
 		""" Executes the initialization function again. This will reconnect the instance to the server. """
@@ -178,20 +178,42 @@ class Storage(Singleton):
 	
 	def __encryptDocument(self, document):
 		""" Encrypts a dictionary/document for before storage. Skips the ID field for retreival purposes. Field names are left intact.
+		Structural information will also be maintained.
 		
 :param document: The document that should be encrypted. This is a normal MongoDB document (dictionary).
 :returns: The MongoDB document with encrypted, base64 encoded values.
 		"""
-		encryptedDocument = {}
-		for key, value in document.items():
-			if key == "_id": # Do not encrypt _id field.
-				encryptedDocument["_id"] = value
-				continue
+		if isinstance(document, list):
+			encryptedDocument = []
+			
+			for value in document:
+				if isinstance(value, list) or isinstance(value, dict):
+					encryptedDocument[key] = self.__encryptDocument(value)
+					continue
 				
-			cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
-			paddedValue = self.__padObject(value)
-			encryptedValue = cipher.encrypt( paddedValue )
-			encryptedDocument[key] = base64.b64encode( encryptedValue )
+				cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
+				paddedValue = self.__padObject(value)
+				encryptedValue = cipher.encrypt( paddedValue )
+				encryptedDocument.append(base64.b64encode( encryptedValue ))
+			
+		elif isinstance(document, dict):
+			encryptedDocument = {}
+			for key, value in document.items():
+				if key == "_id": # Do not encrypt _id field.
+					encryptedDocument["_id"] = value
+					continue
+
+				if isinstance(value, list) or isinstance(value, dict):
+					encryptedDocument[key] = self.__encryptDocument(value)
+					continue
+
+				cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
+				paddedValue = self.__padObject(value)
+				encryptedValue = cipher.encrypt( paddedValue )
+				encryptedDocument[key] = base64.b64encode( encryptedValue )
+				
+		else:
+			raise ValueError, "Not a valid encryptable object."
 		
 		return encryptedDocument
 	
@@ -201,20 +223,46 @@ class Storage(Singleton):
 :param document: The document that should be decrypted. This is a normal MongoDB document (dictionary) with encrypted values.
 :returns: The MongoDB document with decrypted values.		
 		"""
-		decryptedDocument = {}
 		
-		for key, value in document.items():
-			if key == "_id": # Do not decrypt _id field.
-				decryptedDocument["_id"] = value
-				continue
-							
-			value = base64.b64decode(value)			
-			cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
+		if isinstance(document, list):
+			decryptedDocument = []
 			
-			decryptedValue = cipher.decrypt( value )
-			unpaddedValue = self.__unpadString(decryptedValue)
+			for value in document:
+				if isinstance(value, list) or isinstance(value, dict):
+					decryptedDocument[key] = self.__decryptDocument(value)
+					continue
+				
+				value = base64.b64decode(value)			
+				cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
+
+				decryptedValue = cipher.decrypt( value )
+				unpaddedValue = self.__unpadString(decryptedValue)
+
+				decryptedDocument.append(unpaddedValue)			
 			
-			decryptedDocument[key] = unpaddedValue
+		elif isinstance(document, dict):
+			decryptedDocument = {}
+
+			for key, value in document.items():
+				if key == "_id": # Do not decrypt _id field.
+					decryptedDocument["_id"] = value
+					continue
+					
+				if isinstance(value, list) or isinstance(value, dict):
+					decryptedDocument[key] = self.__decryptDocument(value)
+					continue
+
+				value = base64.b64decode(value)			
+				cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
+
+				decryptedValue = cipher.decrypt( value )
+				unpaddedValue = self.__unpadString(decryptedValue)
+
+				decryptedDocument[key] = unpaddedValue
+				
+		else:
+			raise ValueError, "Not a valid decryptable object."
+		
 		
 		return decryptedDocument
 		
@@ -253,7 +301,7 @@ class Storage(Singleton):
 			
 		if self.__encryptDocuments:
 			document = self.__encryptDocument(document)
-			
+						
 		self.__currentCollection.save( document )
 		
 	def removeDocuments(self, match):
@@ -414,7 +462,7 @@ def test_Encrypted_saveDocument():
 	storage.getDatabase("test_Encrypted_database")
 	storage.getCollection("test_Encrypted_collection")
 	
-	doc = {"name":"test_Encrypted_document_save", "version":1}
+	doc = {"name":"test_Encrypted_document_save", "version":1, "list-test":[1,2,3,4,5,"six"]}
 	storage.insertDocuments(doc)
 	ndoc = storage.getDocuments({"name":"test_Encrypted_document_save"})[0]
 	ndoc["version"] = 2
