@@ -1,5 +1,5 @@
 """
-This module was originally programmed for Olympus, but can now be used as a component for Yuras.
+This module was originally programmed for GuardStore, but can now be used as a component for Yuras.
 It has also been extended with encryption and decryption on save and restore respectively.
 """
 
@@ -39,7 +39,7 @@ class Storage(Singleton):
 	"""
 	def __init__(self, encryptDocuments=True):
 		""" Initializes the connection with the Mongo database. 
-		As this is a Singleton, this is only done **once** per instance of Olympus resulting in lower connection time overhead (unless `reconnect` is called.)
+		As this is a Singleton, this is only done **once** per instance of GuardStore resulting in lower connection time overhead (unless `reconnect` is called.)
 		This might pose problems if the ongoing connection is forcefully closed for whatever reason.
 		"""
 		
