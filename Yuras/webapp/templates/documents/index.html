@@ -1,0 +1,38 @@
+{% extends "layout/master.html" %} 
+{% block index %}
+{{ deferJS("/assets/js/yuras.js", 1) }}
+{{ deferJS("/assets/js/documents-popup.js", 1) }}
+	<div class="container">
+
+		<div class="row">
+
+			<div class="col-lg-12">
+				<h2>Documents</h2>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th> Name </th>
+							<th> Author </th>
+							<th> Secure </th>
+							<th> Created </th>
+							<th> Modified </th>
+						</tr>						
+					</thead>
+					<tbody>
+						{% for document in documents %} 
+						<tr>
+							<td><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a></td>
+							<td>{{ document.author }}</td>
+							<td>{{ document.secure }}</td>
+							<td>{{ document._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+							<td>{{ document.modifiedDate}}</td>
+						</tr>					
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+
+	</div>
+{% endblock %}

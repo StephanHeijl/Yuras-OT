@@ -12,8 +12,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "ubuntu/trusty64"
   config.vm.provision "shell",
-    inline: "cd /vagrant; sudo bash ./YurasSetup.sh"	
-
+    inline: "cd /vagrant; sudo bash ./YurasSetup.sh"
+  
+  config.vm.provider "virtualbox" do |v|
+    v.memory = 2048
+    v.cpus = 2
+  end
+  config.vm.network "forwarded_port", guest: 5000, host: 7000
+  config.vm.network "forwarded_port", guest: 5001, host: 7001
+  
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
   # `vagrant box outdated`. This is not recommended.

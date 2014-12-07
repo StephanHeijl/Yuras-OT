@@ -1,0 +1,50 @@
+{% extends "layout/viewer.html" %} 
+{% block index %}
+	<svg id="annotation-connector"></svg>
+		<div class="menu-container">
+
+			<div class="menu">
+				<ul class="menu-button-list">
+					<li class="menu-button">File</li>
+					<li class="menu-button">Edit</li>
+					<li class="menu-button">View</li>
+
+				</ul>
+				<ul class="menu-button-list pull-right">
+					<li class="menu-button" onclick="window.close()">Exit</li>
+				</ul>
+			</div>
+
+		</div>
+
+
+		<div class="annotation-wrapper">
+			<div class="annotation-wrapper-padding">
+
+				<div class="annotation-page">
+					<div class="search-bar-container">
+						<div class="search-bar" contenteditable="true">
+							Search
+						</div>
+						<span class="glyphicon glyphicon-search"></span>
+					</div>
+
+					<div class="annotation" data-for="annotation-one">
+						While Markdown's syntax has been influenced by several existing text-to-HTML filters -- including Setext, atx, Textile, reStructuredText, Grutatext, and EtText -- the single biggest source of inspiration for Markdown's syntax is the format of plain text email.
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+		<div class="document-wrapper">
+			<div class="document">
+				<div class="document-content">
+					<div class="document-content-padding">
+						<div class="document-body markdown">
+							{{ document.contents|safe}}
+						</div>
+					</div>
+				</div>
+			</div>
+{% endblock %}

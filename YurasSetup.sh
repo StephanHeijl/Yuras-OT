@@ -1,5 +1,11 @@
-#sudo apt-get update
-sudo apt-get install python python-dev python-pip python-nose mongodb -y
+﻿#sudo apt-get update
+sudo apt-get install python python-dev python-pip python-nose mongodb haskell-platform texlive -y
+# install pandoc
+sudo cabal update
+sudo cabal install pandoc
+# add pandoc dir to path
+#export PATH=$PATH:~/.cabal/bin 
+
 sudo mkdir /data
 sudo mkdir /data/db
 sudo chown -R vagrant /data 

@@ -1,0 +1,83 @@
+body {
+	background: #eee;
+	font-family: Oxygen;
+	font-size: 13pt;
+	text-rendering: optimizeLegibility;
+	-webkit-font-kerning: normal;
+	-moz-font-kerning: normal;
+}
+header {
+	text-align: center;
+	margin: 100px 0;
+}
+h1 {
+	letter-spacing: -1px;
+}
+.row {
+	margin-top: 50px;
+}
+.usp-callout {
+	text-align: center;
+	margin: 50px 0;
+	background: #222;
+	color: #eee;
+	box-shadow: inset black 0 0 50px;
+}
+.marked {
+	padding: 2px 5px;
+	color: white;
+	background-color: #1abc9c;
+	display: inline;
+	box-shadow: rgba(0, 0, 0, 0.1) 2px 2px 3px;
+}
+p {
+	text-align: justify;
+}
+.quote {
+	font-family: Georgia;
+	font-style: italic;
+	font-size: 16pt;
+}
+.quote:before {
+	content: "\201c";
+	font-style: normal;
+}
+.quote:after {
+	content: "\201d";
+	font-style: normal;
+}
+.quote-author {
+	text-align: right;
+	display: block;
+	font-size: 14pt;
+	margin-top: 1em;
+	opacity: 0.6;
+}
+.quote-author:before {
+	content: "~ ";
+}
+.navbar-nav>.active>a {
+	color: #1abc9c !important;
+}
+.navbar-nav>li>a {
+	color: #337ab7 !important;
+}
+.price-table h3 {
+	text-align: center;
+}
+td.price {
+	text-align: center;
+	font-size: 200%;
+}
+td.price small {
+	font-size: 33%;
+}
+.btn-yuras {
+	border-color: #1abc9c;
+	color: #1abc9c;
+	background: white;
+	margin: 0 auto;
+	text-align: center;
+	width: 100%;
+	font-size: 14pt;
+}
