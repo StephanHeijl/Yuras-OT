@@ -1,21 +1,54 @@
 {% extends "layout/viewer.html" %} 
 {% block index %}
-	<svg id="annotation-connector"></svg>
-		<div class="menu-container">
-
-			<div class="menu">
-				<ul class="menu-button-list">
-					<li class="menu-button">File</li>
-					<li class="menu-button">Edit</li>
-					<li class="menu-button">View</li>
-
-				</ul>
-				<ul class="menu-button-list pull-right">
-					<li class="menu-button" onclick="window.close()">Exit</li>
-				</ul>
-			</div>
-
+<svg id="annotation-connector"></svg>
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="/">Yuras</a>
 		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">File <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#" id="new-document">New</a></li>
+						<li><a href="#" id="open-document">Open</a></li>
+						<li><a href="#" id="save-document" data-csrf={{ csrf_token() }}>Save</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Recent</a></li>
+						<li class="divider"></li>
+						<li><a href="#">Exit</a></li>
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Edit <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Copy</a></li>
+						<li><a href="#">Cut</a></li>
+						<li><a href="#">Paste</a></li>
+					</ul>
+				</li>
+				
+				<li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Annotate <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Selection</a></li>
+						<li><a href="#">Word</a></li>
+						<li><a href="#">Paragraph</a></li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+		<!-- /.navbar-collapse -->
+</nav>
 
 
 		<div class="annotation-wrapper">
@@ -41,8 +74,8 @@
 			<div class="document">
 				<div class="document-content">
 					<div class="document-content-padding">
-						<div class="document-body markdown">
-							{{ document.contents|safe}}
+						<div class="document-body markdown" contenteditable="true">
+{{document.contents|safe}}
 						</div>
 					</div>
 				</div>

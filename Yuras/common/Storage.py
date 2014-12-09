@@ -8,12 +8,12 @@ from Yuras.common.Config import Config
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-import datetime
+import datetime, base64
 
 # Crypto imports
 from Crypto.Cipher import PKCS1_OAEP, AES
 from Crypto import Random
-import base64
+from Crypto.Random import random
 
 class Storage(Singleton):
 	""" The storage module provides a layer of abstraction over PyMongo. 
@@ -170,6 +170,8 @@ class Storage(Singleton):
 		import importlib
 		if type_ == "NoneType":
 			return None
+		if type_ == "bool":
+			return type_ == "True"
 		if type_ == "datetime.datetime":
 			return datetime.datetime.strptime(value,'%Y-%m-%d %H:%M:%S.%f')
 		

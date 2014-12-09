@@ -1,129 +1,113 @@
 body {
-  background: #333;
-  font-family: Oxygen, sans-serif;
-  color: white;
-  line-height: 1.2em;
-  margin: 0;
-  padding: 0;
+	background: #eee;
+	font-family: Oxygen, sans-serif;
+	color: white;
+	line-height: 1.2em;
+	margin: 0;
+	padding: 0;
 }
 
 /* General purpose */
 .pull-right {
-  float: right;
+	float: right;
 }
 
-/* Menu */
-.menu {
-  width: 100%;
-  padding-right: 1.25%;
-  height: 40px;
-  background: #222;
-  position: fixed;
-  z-index: 100;
-}
-
-.menu-button-list {
-  display: block;
-  margin: 0;
-  padding: 0;
-}
-
-.menu-button {
-  float: left;
-  list-style-type: none;
-  height: 40px;
-  line-height: 40px;
-  padding: 0 25px;
-  cursor: pointer;
-}
-.menu-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-bottom: 3px solid rgba(255, 255, 255, 0.2);
-}
 
 /* Wrapper */
 .document-wrapper {
-  width: 75%;
-  display: inline-block;
-  float: left;
-  margin-top: 40px;
-  z-index: 50;
+	width: 75%;
+	display: inline-block;
+	float: left;
+	margin-top: 50px;
+	z-index: 50;
 }
 
 .annotation-wrapper {
-  width: 25%;
-  height: 100%;
-  background: #434343;
-  display: inline-block;
-  right: 0;
-  top: 40px;
-  position: fixed;
-  overflow: hidden;
+	width: 25%;
+	height: 100%;
+	background: #ddd;
+	display: inline-block;
+	right: 0;
+	top: 50px;
+	position: fixed;
+	overflow: hidden;
+	border-left: 1px solid #ccc;
 }
 
 .annotation-wrapper-padding {
-  padding: 5%;
-  position: relative;
+	padding: 5%;
+	position: relative;
 }
 
 /* Document styling */
 /* This element is the size of a standard A4 paper. */
 .document {
-  background: #fefefe;
-  color: #333;
-  width: 780px;
-  position: relative;
-  display: block;
-  background: white;
-  height: 1100px;
-  max-height: 1100px;
-  margin: 25px auto;
+	background: #fefefe;
+	color: #333;
+	width: 780px;
+	position: relative;
+	display: block;
+	background: white;
+	height: 1100px;
+	max-height: 1100px;
+	margin: 25px auto;
+	border: 1px solid #cdcdcd;
 }
 
 .document-content-padding {
-  padding: 75px;
+	padding: 75px;
+}
+
+.document-body {
+	outline: 0;
 }
 
 .marked {
-  background: #1abc9c;
-  transform: translate(-5px, 0px);
-  padding: 5px;
-  color: white;
+	background: #1abc9c;
+	transform: translate(-5px, 0px);
+	padding: 5px;
+	color: white;
 }
 
 /* Annotation styling */
 .annotation-page {
-  height: 100%;
-  width: 100%;
+	height: 100%;
+	width: 100%;
 }
 
 .search-bar-container {
-  position: relative;
-  margin-bottom: 15px;
-  background: #666;
-  color: white;
-  padding: 5%;
+	position: relative;
+	margin-bottom: 15px;
+	background: #999;
+	color: white;
+	padding: 5%;
 }
 
 .search-bar {
-  width: 95%;
-  display: inline-block;
-  outline: 0;
+	width: 95%;
+	display: inline-block;
+	outline: 0;
 }
 
 .annotation {
-  padding: 5%;
-  background: #1abc9c;
-  margin-bottom: 15px;
-  color: white;
+	padding: 5%;
+	background: #1abc9c;
+	margin-bottom: 15px;
+	color: white;
 }
 .annotation:hover {
-  background: #1abc9c;
+	background: #1abc9c;
+}
+
+.search-bar-container > .glyphicon-search {
+	position: absolute;
+	top: 50%;
+	margin-top: -0.5em;
 }
 
 #annotation-connector {
-  position: absolute;
-  top: -9999px;
-  left: -9999px;
-  z-index: 99;
+	position: absolute;
+	top: -9999px;
+	left: -9999px;
+	z-index: 99;
 }
