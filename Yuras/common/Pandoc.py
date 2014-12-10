@@ -1,9 +1,9 @@
-import subprocess
+import subprocess, tempfile, os
 
 class Pandoc():
 	""" Provides basic integration with pandoc for text conversion."""
 	def __init__(self):
-		self.baseCommand = "pandoc -f {from} -t {to} <<< \"{text}\""
+		self.baseCommand = "pandoc -f {from} -t {to} < {text}"
 		
 	def convert(self, from_, to_, text):
 		""" Converts a string from one format to another, returns the result.
@@ -13,11 +13,17 @@ class Pandoc():
 :param text: The string to convert.
 :returns: The converted result as a string.
 		"""
-		formatDict = {"from":from_, "to":to_, "text":text}
+		
+		tmp = tempfile.NamedTemporaryFile(delete=False)
+		tmp.write( text.decode(errors="ignore") )
+		tmp.close()
+		
+		formatDict = {"from":from_, "to":to_, "text":tmp.name}
 		command = self.baseCommand.format(**formatDict)
 		pdp = subprocess.Popen(command,shell=True,executable='/bin/bash',stdout=subprocess.PIPE)
-		return pdp.communicate()[0]
-		
+		result = pdp.communicate()[0]
+		os.unlink(tmp.name)
+		return result		
 		
 # TESTING #
 def test_convert():
