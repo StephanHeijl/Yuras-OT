@@ -1,5 +1,5 @@
-﻿#sudo apt-get update
-sudo apt-get install python python-dev python-pip python-nose mongodb haskell-platform texlive -y
+#sudo apt-get update
+sudo apt-get install python python-dev python-pip python-nose mongodb haskell-platform texlive python-scipy python-numpy -y
 # install pandoc
 sudo cabal update
 sudo cabal install pandoc
