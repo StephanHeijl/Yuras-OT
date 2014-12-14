@@ -42,7 +42,7 @@ def index():
 		{},
 		limit=10)
 	news = ["First mockup released"]
-	return render_template("homepage/index.html", name="Dashboard", users=users, documents=documents, news=news)
+	return render_template("homepage/index.html", name="Dashboard", users=users, documents=documents, news=news, active="dashboard")
 
 @app.route("/assets/<assettype>/<filename>")
 def assets(assettype, filename):
@@ -75,7 +75,7 @@ def documentsIndex():
 	documents = Document().matchObjects(
 		{},
 		limit=25)
-	return render_template("documents/index.html", name="Documents overview", documents=documents)
+	return render_template("documents/index.html", name="Documents overview", documents=documents, active="documents")
 
 @app.route("/documents/new")
 def documentNew():
@@ -92,7 +92,7 @@ def documentViewer(id):
 	except:
 		return abort(404)
 		
-	return render_template("documents/viewer.html", name="Document", document=document)
+	return render_template("documents/viewer.html", name="Document", document=document, active="documents")
 
 @app.route("/documents/<id>/save",methods=["POST"])
 def documentSave(id):
@@ -107,9 +107,6 @@ def documentSave(id):
 	contents = urllib.unquote( request.form.get("contents",None) )
 	contents_escaped = contents.replace("\"", r"\"").strip(" \n\t")
 	contents_md = Pandoc().convert("html","markdown",contents_escaped)
-	
-	print contents
-	print contents_md
 	
 	if contents is not None:
 		document.contents = contents_md
