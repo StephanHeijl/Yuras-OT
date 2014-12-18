@@ -6,14 +6,19 @@ body {
 	margin: 0;
 	padding: 0;
 }
-
 /* General purpose */
+
 .pull-right {
 	float: right;
 }
+/* Navbar */
 
+#document-title-input {
+	margin-top: -5px;
+}
 
 /* Wrapper */
+
 .document-wrapper {
 	width: 75%;
 	display: inline-block;
@@ -21,7 +26,6 @@ body {
 	margin-top: 50px;
 	z-index: 50;
 }
-
 .annotation-wrapper {
 	width: 25%;
 	height: 100%;
@@ -33,14 +37,14 @@ body {
 	overflow: hidden;
 	border-left: 1px solid #ccc;
 }
-
 .annotation-wrapper-padding {
 	padding: 5%;
 	position: relative;
 }
-
 /* Document styling */
+
 /* This element is the size of a standard A4 paper. */
+
 .document {
 	background: #fefefe;
 	color: #333;
@@ -53,28 +57,24 @@ body {
 	margin: 25px auto;
 	border: 1px solid #cdcdcd;
 }
-
 .document-content-padding {
 	padding: 75px;
 }
-
 .document-body {
 	outline: 0;
 }
-
 .marked {
 	background: #1abc9c;
 	transform: translate(-5px, 0px);
 	padding: 5px;
 	color: white;
 }
-
 /* Annotation styling */
+
 .annotation-page {
 	height: 100%;
 	width: 100%;
 }
-
 .search-bar-container {
 	position: relative;
 	margin-bottom: 15px;
@@ -82,13 +82,11 @@ body {
 	color: white;
 	padding: 5%;
 }
-
 .search-bar {
 	width: 95%;
 	display: inline-block;
 	outline: 0;
 }
-
 .annotation {
 	padding: 5%;
 	background: #1abc9c;
@@ -98,13 +96,11 @@ body {
 .annotation:hover {
 	background: #1abc9c;
 }
-
 .search-bar-container > .glyphicon-search {
 	position: absolute;
 	top: 50%;
 	margin-top: -0.5em;
 }
-
 #annotation-connector {
 	position: absolute;
 	top: -9999px;
