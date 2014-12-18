@@ -1,4 +1,4 @@
-import os, re, base64, urllib, json
+import os, re, base64, urllib2, json
 from flask import Flask,render_template,abort, Response, request, session, redirect
 from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
@@ -23,7 +23,7 @@ for attribute in dir(tools):
 def csrf_protect(*args, **kwargs):
    	if request.method == "POST":
 		token = session.pop('_csrf_token', None)
-		givenToken = urllib.unquote( request.form.get('_csrf_token') )
+		givenToken = urllib2.unquote( request.form.get('_csrf_token') )
 		if not token or token != givenToken:
 			abort(403)
 			
@@ -88,9 +88,10 @@ def documentNew():
 def documentViewer(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
-		document.contents = Pandoc().convert("markdown", "html", document.contents.replace("\"", r"\""))
-	except:
+	except Exception as e:
 		return abort(404)
+	
+	document.contents = Pandoc().convert("markdown", "html", document.contents.encode("utf8").replace("\"", r"\"")).decode("utf8")
 		
 	return render_template("documents/viewer.html", name="Document", document=document, active="documents")
 
@@ -104,12 +105,14 @@ def documentSave(id):
 	if request.method != "POST":
 		return abort(405)
 	
-	contents = urllib.unquote( request.form.get("contents",None) )
+	contents = urllib2.unquote( request.form.get("contents","").encode('ascii') )
 	contents_escaped = contents.replace("\"", r"\"").strip(" \n\t")
 	contents_md = Pandoc().convert("html","markdown",contents_escaped)
+	title = urllib2.unquote( request.form.get("title","").encode('ascii') )
 	
-	if contents is not None:
+	if contents is not "":
 		document.contents = contents_md
+		document.title = title
 		document.save()
 		return json.dumps( { 
 			"success":"true",

@@ -124,7 +124,7 @@ class LearnModule():
 
 			labels = self.__uniqify(testCategories)
 
-			self.classifier = SGDClassifier(**{ "shuffle":True, "n_iter":math.ceil(10**6/(len(self.categorizedData.values())*(1-(1./x)))) })
+			self.classifier = SGDClassifier(shuffle=True, n_iter=math.ceil(10**6/(len(self.categorizedData.values())*(1-(1./x)))) })
 			classifier = self.teachMachine(trainDocuments, trainCategories)
 
 			predictedTest = classifier.predict(testDocuments)

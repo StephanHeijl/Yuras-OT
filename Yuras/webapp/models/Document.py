@@ -14,7 +14,6 @@ class Document(StoredObject):
 		super(Document, self).__init__(database = "Yuras1", collection = "documents")
 		
 	def save(self):
-		contents = self.contents
-		
+		contents = self.contents	
 		
 		super(Document, self).save()

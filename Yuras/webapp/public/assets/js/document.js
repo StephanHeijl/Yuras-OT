@@ -204,11 +204,13 @@ $(function () {
 		$(".document-body").each(function () {
 			html += $(this).html()
 		});
-		contents = encodeURIComponent(html)
+		contents = encodeURIComponent(html);
+		title = encodeURIComponent($("#document-title").text());
 		url = window.location.href.replace("#", "") + "/save"
 
 		$.post(url, {
 			"contents": contents,
+			"title": title,
 			"_csrf_token": csrfToken
 		}, function (response) {
 			response = JSON.parse(response)
@@ -298,6 +300,27 @@ $(function () {
 			markerContainer.appendChild( document.createTextNode(text) )
             range.insertNode( markerContainer );
         }
+	});
+	
+	$("#document-title").click(function() {
+		
+		currentTitle = $(this).text()
+		titleInput = $("<input>")
+		titleInput.attr("id","document-title-input")
+		titleInput.attr("value",currentTitle)
+		$(this).html("");
+		titleInput.click(function() { return false; })
+		titleInput.appendTo($(this))
+		titleInput.blur(function() {
+			newTitle = $(this).val()
+			if (newTitle.length > 0) {
+				$(this).parent().text(newTitle);	
+			} else {
+				$(this).parent().text(currentTitle);
+			}
+		})
+		titleInput.focus()
+		
 	});
 	
 	$("#annotate-paragraph").click(function(e) {

@@ -15,7 +15,7 @@ class Pandoc():
 		"""
 		
 		tmp = tempfile.NamedTemporaryFile(delete=False)
-		tmp.write( text.decode(errors="ignore") )
+		tmp.write( text )
 		tmp.close()
 		
 		formatDict = {"from":from_, "to":to_, "text":tmp.name}

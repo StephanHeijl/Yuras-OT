@@ -105,6 +105,7 @@ class Storage(Singleton):
 		Will throw a ValueError if no database has been selected.
 		
 		:param collection: The name the collection that is to be accessed.
+		:param collection: The name the collection that is to be accessed.
 		:rtype: The name of the collection that is currently being accessed.
 		"""
 		if self.__currentDatabase == None:
@@ -133,7 +134,9 @@ class Storage(Singleton):
 :returns: A padded string with type included.
 		"""
 		objType = type(obj)
-		objString = str(obj)
+		
+		objString = base64.b64encode(str(obj))			
+		
 		paddingChar = "{"
 		blockSize = AES.block_size
 		
@@ -152,7 +155,7 @@ class Storage(Singleton):
 		fullString = fullString.strip(paddingChar)
 		stringTypeSplit = fullString.split(paddingChar)
 		
-		objString = paddingChar.join(stringTypeSplit[:-1])
+		objString = base64.b64decode(paddingChar.join(stringTypeSplit[:-1]))
 		objType = stringTypeSplit[-1].split("'")[1]
 				
 		obj = self.__convert(objString,objType)
@@ -168,16 +171,19 @@ class Storage(Singleton):
 :returns: A properly cast object.
 		"""
 		import importlib
+		
 		if type_ == "NoneType":
 			return None
 		if type_ == "bool":
 			return type_ == "True"
 		if type_ == "datetime.datetime":
 			return datetime.datetime.strptime(value,'%Y-%m-%d %H:%M:%S.%f')
-		
+		if type_ == "str":
+			return value.decode("utf8")
+				
 		try:
 			# Check if it's a builtin type
-			module = importlib.import_module('__builtin__')			
+			module = importlib.import_module('__builtin__')
 			cls = getattr(module, type_)
 		except AttributeError:
 			# if not, separate module and class
