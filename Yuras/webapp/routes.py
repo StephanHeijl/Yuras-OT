@@ -91,7 +91,7 @@ def documentViewer(id):
 	except Exception as e:
 		return abort(404)
 	
-	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf8").replace("\"", r"\"")).decode("utf8")
+	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf8")).decode("utf8")
 		
 	return render_template("documents/viewer.html", name="Document", document=document, active="documents")
 
@@ -106,7 +106,7 @@ def documentSave(id):
 		return abort(405)
 	
 	contents = urllib2.unquote( request.form.get("contents","").encode('ascii') )
-	contents_escaped = contents.replace("\"", r"\"").strip(" \n\t")
+	contents_escaped = contents.strip(" \n\t")
 	contents_md = Pandoc().convert("html","markdown_github",contents_escaped)
 	title = urllib2.unquote( request.form.get("title","").encode('ascii') )
 	
@@ -128,14 +128,21 @@ def documentDownload(id, filetype):
 		return abort(404)
 	
 	filetypes = {
-		"docx":"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+		"docx":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		"pdf":"application/pdf",
+		"txt":"text/plain",
 	}
 	
-	if filetype not in filetypes:
-		return Pandoc().convert("markdown_github", filetype, document.contents.encode("utf8").replace("\"", r"\"")).decode("utf8")	
+	if filetype in filetypes:
+		responseContents = Pandoc().convert("markdown_github", filetype, document.contents.encode("utf8"))
+		response = Response(responseContents, mimetype=filetypes[filetype])
+		
+		filename = document.title + "." + filetype
+		
+		response.headers['Content-Disposition'] = "attachment; filename=%s" % filename
+		return response
 	else:
-		response = Pandoc().convert("markdown_github", filetype, document.contents.encode("utf8").replace("\"", r"\""))
-		return Response(response, mimetype=filetypes[filetype])
+		return abort(405)
 	
 	
 	
