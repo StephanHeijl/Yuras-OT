@@ -8,22 +8,28 @@ class Config(Singleton):
 	The configuration files are set to be stored in a 'pretty' format, so as to be easily human-readable and -editable.
 	"""
 	
-	def __init__(self):
+	def __init__(self, configurationPath=None):
 		if self.instantiated:
 			return 
 		currentDir = os.path.dirname(__file__)
+		
 		# guardStore.conf is the configuration file that is loaded for guardStore
-		guardStoreConfName = "../GuardStore.conf"
-		guardStoreConfPath = os.path.abspath(os.path.join(currentDir,guardStoreConfName))
+		if configurationPath == None:
+			guardStoreConfName = "../GuardStore.conf"
+			guardStoreConfPath = os.path.abspath(os.path.join(currentDir,guardStoreConfName))
+		else:
+			guardStoreConfPath = os.path.abspath(configurationPath)
+			
 		# Default.conf is loaded if guardStore.conf is not available.
 		# It provides a safe fallback for testing purposes. If you are setting up your
 		# own guardStore you should copy this and work from there.
 		defaultConfName = "./default.conf"
-		defaultConfPath = os.path.abspath(os.path.join(currentDir,defaultConfName))
+		defaultConfPath = os.path.abspath(os.path.join(defaultConfName))
 		
 		self.configFileName = ""
 		""" This attribute stores the location where the configuration is to be saved. """
 		
+		print guardStoreConfPath
 		if os.path.exists(guardStoreConfPath):
 			self.setConfig(json.load( open(guardStoreConfPath, "r") ))
 			self.configFileName = guardStoreConfPath

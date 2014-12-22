@@ -1,4 +1,4 @@
-import os, threading, inspect
+import os, threading, inspect, argparse
 from Yuras.common.Config import Config
 from tornado.wsgi import WSGIContainer
 from tornado.httpserver import HTTPServer
@@ -9,9 +9,19 @@ from flask import Flask, render_template, abort, Response, request, redirect, ur
 from Yuras.webapp.routes import app
 
 class Server(threading.Thread):
-	def __init__(self):		
-		self.PORT = 5000
-		super(Server, self).__init__()
+	def __init__(self):	
+		self.argparser = argparse.ArgumentParser(description='Start a Yuras instance.')
+		self.parseArguments()
+		
+		args = vars( self.argparser.parse_args() )
+		
+		self.PORT = args.get("port", 5000)
+		self.CONFIG = args.get("config", None)
+		super(Server, self).__init__()		
+		
+	def parseArguments(self):
+		self.argparser.add_argument("--config", type=str, help="The config file to load.", required=False)
+		self.argparser.add_argument("--port", type=int, help="The port to launch this server on.", default=5000, required=False)
 	
 	def checkWorkingDirectory(self):
 		""" Checks the working directory and sets it to the webapp directory if needed. """
@@ -33,7 +43,7 @@ class Server(threading.Thread):
 		
 		print ("Starting Yuras Tornado HTTP Server")
 		print ("----------------------------------")
-		Config() # Initialize the Config before switching to the webapp directory to make sure it gets loaded correctly.
+		Config(self.CONFIG) # Initialize the Config before switching to the webapp directory to make sure it gets loaded correctly.
 
 		self.checkWorkingDirectory()	
 		self.storeWebAppDirectories()	
@@ -60,7 +70,7 @@ class Server(threading.Thread):
 	def startLocal(self):
 		print ("Starting Yuras Tornado HTTP Server (LOCAL)")
 		print ("------------------------------------------")
-		Config() # Initialize the Config before switching to the webapp directory to make sure it gets loaded correctly.
+		Config(self.CONFIG) # Initialize the Config before switching to the webapp directory to make sure it gets loaded correctly.
 
 		self.checkWorkingDirectory()	
 		self.storeWebAppDirectories()
