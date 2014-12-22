@@ -91,7 +91,7 @@ def documentViewer(id):
 	except Exception as e:
 		return abort(404)
 	
-	document.contents = Pandoc().convert("markdown", "html", document.contents.encode("utf8").replace("\"", r"\"")).decode("utf8")
+	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf8").replace("\"", r"\"")).decode("utf8")
 		
 	return render_template("documents/viewer.html", name="Document", document=document, active="documents")
 
@@ -107,7 +107,7 @@ def documentSave(id):
 	
 	contents = urllib2.unquote( request.form.get("contents","").encode('ascii') )
 	contents_escaped = contents.replace("\"", r"\"").strip(" \n\t")
-	contents_md = Pandoc().convert("html","markdown",contents_escaped)
+	contents_md = Pandoc().convert("html","markdown_github",contents_escaped)
 	title = urllib2.unquote( request.form.get("title","").encode('ascii') )
 	
 	if contents is not "":
@@ -119,3 +119,25 @@ def documentSave(id):
 			"new_csrf":generate_csrf_token()
 		} );
 	return abort(403)
+
+@app.route("/documents/<id>/download/<filetype>")
+def documentDownload(id, filetype):
+	try:
+		document = Document().getObjectsByKey("_id", id)[0]
+	except:
+		return abort(404)
+	
+	filetypes = {
+		"docx":"application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	}
+	
+	if filetype not in filetypes:
+		return Pandoc().convert("markdown_github", filetype, document.contents.encode("utf8").replace("\"", r"\"")).decode("utf8")	
+	else:
+		response = Pandoc().convert("markdown_github", filetype, document.contents.encode("utf8").replace("\"", r"\""))
+		return Response(response, mimetype=filetypes[filetype])
+	
+	
+	
+	
+	

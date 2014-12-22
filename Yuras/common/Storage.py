@@ -105,7 +105,6 @@ class Storage(Singleton):
 		Will throw a ValueError if no database has been selected.
 		
 		:param collection: The name the collection that is to be accessed.
-		:param collection: The name the collection that is to be accessed.
 		:rtype: The name of the collection that is currently being accessed.
 		"""
 		if self.__currentDatabase == None:
