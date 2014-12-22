@@ -48,7 +48,7 @@ class Server(threading.Thread):
 		self.checkWorkingDirectory()	
 		self.storeWebAppDirectories()	
 		
-		print ("Starting on port %s..." % PORT)
+		print ("Starting on port %s..." % self.PORT)
 
 		# Compress all plaintext communications
 		Compress(app)
@@ -56,15 +56,15 @@ class Server(threading.Thread):
 		app.config['COMPRESS_DEBUG'] = True
 		
 		serverStarted = False
-		while not serverStarted:
+		while not serverStarted and self.PORT < 10000:
 			# Try adding 1 to the port every time we can't listen on the preferred port.
 			try:
-				print ("Starting on port %s..." % self.PORT)
 				http_server = HTTPServer(WSGIContainer(app))
-				http_server.listen(PORT)
+				http_server.listen(self.PORT)
 				IOLoop.instance().start()
 				serverStarted = True
-			except Exception:
+			except Exception as e:
+				print e
 				self.PORT +=1
 
 	def startLocal(self):
@@ -76,7 +76,7 @@ class Server(threading.Thread):
 		self.storeWebAppDirectories()
 		
 		serverStarted = False
-		while not serverStarted:
+		while not serverStarted and self.PORT < 10000:
 			# Try adding 1 to the port every time we can't listen on the preferred port.
 			try:
 				print ("Starting on port %s..." % self.PORT)
@@ -84,11 +84,13 @@ class Server(threading.Thread):
 				http_server.listen(self.PORT)
 				IOLoop.instance().start()
 				serverStarted = True
-			except Exception:
+			except Exception as e:
+				print e
 				self.PORT +=1
 		
 	def run(self):
 		self.startLocal()
+		#self.startCompressed()
 	
 if __name__ == "__main__":
 	Server().run()
