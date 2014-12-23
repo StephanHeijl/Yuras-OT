@@ -1,5 +1,5 @@
-import os, re, base64, urllib2, json
-from flask import Flask,render_template,abort, Response, request, session, redirect
+import os, re, base64, urllib2, json, time
+from flask import Flask,render_template,abort, Response, request, session, redirect, g
 from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
 
@@ -33,6 +33,17 @@ def generate_csrf_token():
 	return session['_csrf_token']
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
+
+
+# REQUEST TIME #
+@app.before_request
+def startRequestTimer():
+	g.start_time = time.time()
+	
+@app.after_request
+def stopRequestTime(response):
+	#print "Request took %s ms." % ((time.time() - g.start_time)*1000), request.endpoint, request.view_args
+	return response
 		
 # ROUTES #
 @app.route("/")

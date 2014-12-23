@@ -4,6 +4,7 @@ This module was originally programmed for Olympus, but can now be used as a comp
 
 from abc import ABCMeta, abstractmethod
 from Yuras.common.Storage import Storage
+from Yuras.common.Config import Config
 import random, time, datetime, copy
 
 class StoredObject():
@@ -19,7 +20,7 @@ class StoredObject():
 		:param collection: Optional, the collecion where this object is to be stored.
 		:param name: The pretty name of this object.
 		"""
-		self._database = database
+		self._database = Config().database
 		self._collection = collection
 		self.name = name
 		self._created = datetime.datetime.now()
