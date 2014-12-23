@@ -213,8 +213,9 @@ $(function () {
 			"title": title,
 			"_csrf_token": csrfToken
 		}, function (response) {
-			response = JSON.parse(response)
-			$("#save-document").data("csrf", response.new_csrf)
+			response = JSON.parse(response);
+			$("#save-document").data("csrf", response.new_csrf);
+			$("#document-title").removeClass("not-saved");
 		})
 	}
 
@@ -322,6 +323,11 @@ $(function () {
 		titleInput.focus()
 		
 	});
+	
+	$("body").on("change input",".document-body", function(e) {
+		e.stopPropagation()
+		$("#document-title").addClass("not-saved");
+	})
 	
 	$("#annotate-paragraph").click(function(e) {
 		e.preventDefault()

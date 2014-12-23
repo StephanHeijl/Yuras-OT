@@ -17,6 +17,11 @@ body {
 	margin-top: -5px;
 }
 
+#document-title.not-saved:after {
+	color: rgb(26, 188, 156);
+	content: " *";
+}
+
 /* Wrapper */
 
 .document-wrapper {

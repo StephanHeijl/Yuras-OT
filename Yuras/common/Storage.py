@@ -255,7 +255,10 @@ class Storage(Singleton):
 				cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
 
 				decryptedValue = cipher.decrypt( value )
-				unpaddedValue = self.__unpadString(decryptedValue)
+				try:
+					unpaddedValue = self.__unpadString(decryptedValue)
+				except UnicodeDecodeError:
+					print "Decryption error, wrong key used."
 
 				decryptedDocument.append(unpaddedValue)			
 			
