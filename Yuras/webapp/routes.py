@@ -4,6 +4,7 @@ from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
 
 from Yuras.webapp.models.Document import Document
+from Yuras.webapp.models.Annotation import Annotation
 
 from Crypto import Random
 
@@ -102,9 +103,11 @@ def documentViewer(id):
 	except Exception as e:
 		return abort(404)
 	
+	annotations = Annotation().getObjectsByKey("document", id)
+	
 	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf8")).decode("utf8")
 		
-	return render_template("documents/viewer.html", name="Document", document=document, active="documents")
+	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, active="documents")
 
 @app.route("/documents/<id>/save",methods=["POST"])
 def documentSave(id):
@@ -125,10 +128,28 @@ def documentSave(id):
 		document.contents = contents_md
 		document.title = title
 		document.save()
+	
+	annotations = urllib2.unquote( request.form.get("annotations","").encode('ascii') )
+	print contents_md
+	print annotations
+	
+	if annotations is not "":
+		annotations = json.loads(annotations)
+		for anno_id, annotation in annotations.items():
+			try:
+				a = Annotation().getObjectsByKey("_id", anno_id)[0]
+			except:
+				a = Annotation()
+			a.contents = annotation
+			a.document = id
+			a.save()
+	
+	if contents is not "":
 		return json.dumps( { 
-			"success":"true",
-			"new_csrf":generate_csrf_token()
-		} );
+				"success":"true",
+				"new_csrf":generate_csrf_token()
+			} );
+	
 	return abort(403)
 
 @app.route("/documents/<id>/download/<filetype>")

@@ -111,4 +111,5 @@ body {
 	top: -9999px;
 	left: -9999px;
 	z-index: 99;
+	pointer-events: none;
 }

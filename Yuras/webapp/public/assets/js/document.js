@@ -207,9 +207,21 @@ $(function () {
 		contents = encodeURIComponent(html);
 		title = encodeURIComponent($("#document-title").text());
 		url = window.location.href.replace("#", "") + "/save"
+		annotations = {};
+		
+		$(".annotation").each(function() {
+			annotations[$(this).data("annotation-id")] = $(this).html().trim();
+		});
+		
+		console.log(annotations)
+		console.log(JSON.stringify(annotations))
+		annotations = encodeURIComponent( JSON.stringify(annotations) );
+		console.log(annotations)
+		
 
 		$.post(url, {
 			"contents": contents,
+			"annotations": annotations,
 			"title": title,
 			"_csrf_token": csrfToken
 		}, function (response) {
@@ -230,6 +242,15 @@ $(function () {
 		}
 	});
 	
+	function addAnnotation() {
+		annotation = $("<div>");
+		annotation.addClass("annotation");
+		annotation.attr("contenteditable","true")
+		annotation.appendTo(".annotation-page");
+		annotation.html("<em>Add annotation text here</em>")
+		annotation.click(function() { $(this).html(""); $(this).unbind("click") })
+	}
+	
 	$("#annotate-selection").click(function(e) {
 		e.preventDefault()
 		var sel = window.getSelection(),
@@ -243,6 +264,8 @@ $(function () {
 			markerContainer.appendChild( document.createTextNode(text) )
             range.insertNode( markerContainer );
         }
+		
+		addAnnotation();
 	});
 	
 	$("#annotate-word").click(function(e) {
@@ -269,9 +292,13 @@ $(function () {
             range.deleteContents();
 			markerContainer = document.createElement("span");
 			markerContainer.className = "marked";
+			markerContainer.setAttribute("data-annotation",$(".annotation").length);
 			markerContainer.appendChild( document.createTextNode(text) )
             range.insertNode( markerContainer );
         }
+		
+		addAnnotation();
+		
 	});
 	
 	$("#annotate-sentence").click(function(e) {
@@ -301,6 +328,9 @@ $(function () {
 			markerContainer.appendChild( document.createTextNode(text) )
             range.insertNode( markerContainer );
         }
+		
+		addAnnotation();
+		
 	});
 	
 	$("#document-title").click(function() {

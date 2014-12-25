@@ -11,7 +11,7 @@ class Document(StoredObject):
 		
 		self.secure = False
 		
-		super(Document, self).__init__(database = "Yuras1", collection = "documents")
+		super(Document, self).__init__(collection = "documents")
 		
 	def save(self):
 		contents = self.contents	
