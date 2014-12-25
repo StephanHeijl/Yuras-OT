@@ -287,7 +287,7 @@ $(function () {
 		
 		if (sel.getRangeAt && sel.rangeCount) {
             range = sel.getRangeAt(0);
-			range.setStart(sel.anchorNode,wordStart)
+			range.setStart(sel.anchorNode,wordStart+1)
 			range.setEnd(sel.anchorNode,wordEnd)
             range.deleteContents();
 			markerContainer = document.createElement("span");
@@ -315,13 +315,12 @@ $(function () {
 			sentenceEnd++;
 		}
 		
-		text = text.substr(sentenceStart+1,(sentenceEnd-sentenceStart-1))
-		console.log(sentenceStart, sentenceEnd, text);
+		text = text.substr(sentenceStart,(sentenceEnd-sentenceStart+1))
 		
 		if (sel.getRangeAt && sel.rangeCount) {
             range = sel.getRangeAt(0);
 			range.setStart(sel.anchorNode,sentenceStart)
-			range.setEnd(sel.anchorNode,sentenceEnd)
+			range.setEnd(sel.anchorNode,sentenceEnd+1)
             range.deleteContents();
 			markerContainer = document.createElement("span");
 			markerContainer.className = "marked";
@@ -331,6 +330,14 @@ $(function () {
 		
 		addAnnotation();
 		
+	});
+	
+	$("#annotate-paragraph").click(function(e) {
+		e.preventDefault()
+		var sel = window.getSelection();
+		console.log(sel)
+		sel.baseNode.parentElement.className += " marked"
+		sel.baseNode.parentElement.style.display = "block"
 	});
 	
 	$("#document-title").click(function() {
@@ -358,13 +365,6 @@ $(function () {
 		e.stopPropagation()
 		$("#document-title").addClass("not-saved");
 	})
-	
-	$("#annotate-paragraph").click(function(e) {
-		e.preventDefault()
-		var sel = window.getSelection();
-		console.log(sel)
-		sel.baseNode.parentElement.className += " marked"
-	});
 
 	$("#save-document").click(function (e) {
 		e.preventDefault()

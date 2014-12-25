@@ -71,7 +71,8 @@ body {
 .marked {
 	background: #1abc9c;
 	transform: translate(-5px, 0px);
-	padding: 5px;
+	padding: 0.1em;
+	line-height: 1.4em;
 	color: white;
 }
 /* Annotation styling */
