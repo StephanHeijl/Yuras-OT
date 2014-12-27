@@ -1,0 +1,52 @@
+{% extends "layout/minimal.html" %} {% block index %}
+<div class="container">
+
+	<div class="row">
+		<div class="col-lg-4"></div>
+		<div class="col-lg-4">
+			<br>
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<form>
+						<div class="form-group">
+							<label for="username">Username</label>
+							<input type="text" class="form-control" id="username" placeholder="Enter Username">
+						</div>
+						<div class="form-group">
+							<label for="password">Password</label>
+							<input type="password" class="form-control" id="password" placeholder="Password">
+						</div>
+						<button type="submit" class="btn col-sm-12 btn-yuras">Log in</button>
+						<br/>
+						<br/>
+						<a href="/help" type="submit" class="btn col-sm-12 btn-default">I don't have an account</a>
+					</form>
+				</div>
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+
+<script src="chrome-extension://pfboblefjcgdjicmnffhdgionmgcdmne/u2f-api.js"></script>
+
+<script>
+
+var challenge = "abd"
+window.u2f.register([
+    {
+        version : "U2F_V2",
+        challenge : "YXJlIHlvdSBib3JlZD8gOy0p",
+        appId : "http://example.org",
+        sessionId : "26"
+    }
+], [], function (data) {
+	console.log(data);
+});
+
+</script>
+
+{% endblock %}

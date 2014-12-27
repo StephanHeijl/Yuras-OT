@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Yuras | {{ name }} </title>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet" />
+	<link href='https://fonts.googleapis.com/css?family=Oxygen:400,700' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="/assets/css/yuras.css">
+</head>
+
+<body>	
+	{% block index %}{% endblock %}
+	
+	<!-- Javascript -->
+	<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+	{{ renderJS()|safe }}
+</body>
+
+</html>

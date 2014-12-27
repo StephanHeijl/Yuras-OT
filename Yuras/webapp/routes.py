@@ -47,7 +47,15 @@ def stopRequestTime(response):
 	return response
 		
 # ROUTES #
-@app.route("/")
+
+# AUTHENTICATION #
+@app.route("/login")
+def login():
+	return render_template("users/login.html", name="Login", active=None)
+
+# AFTER AUTH #
+
+@app.route("/dashboard")
 def index():
 	users = ["Jan", "Piet", "Klaas", "Yuri"]
 	documents = Document().matchObjects(
@@ -81,6 +89,8 @@ def assets(assettype, filename):
 		return abort(404);
 	
 	return Response( assetContents, mimetype=mimeTypes.get(filename.split(".")[-1], "text/plain") )
+
+# DOCUMENTS #
 
 @app.route("/documents/")
 def documentsIndex():
@@ -142,6 +152,7 @@ def documentSave(id):
 				a = Annotation()
 			a.contents = annotation
 			a.document = id
+			a.documentTitle = document.title
 			a.save()
 	
 	if contents is not "":
@@ -149,6 +160,24 @@ def documentSave(id):
 				"success":"true",
 				"new_csrf":generate_csrf_token()
 			} );
+	
+	return abort(403)
+
+@app.route("/documents/<id>/delete",methods=["POST"])
+def documentDelete(id):
+	try:
+		document = Document().getObjectsByKey("_id", id)[0]
+	except:
+		document = None
+	
+	if request.method != "POST":
+		return abort(405)
+	
+	
+	return json.dumps( { 
+			"success":"true",
+			"new_csrf":generate_csrf_token()
+		} );
 	
 	return abort(403)
 
@@ -176,6 +205,15 @@ def documentDownload(id, filetype):
 	else:
 		return abort(405)
 	
+# ANNOTATIONS #
+
+@app.route("/annotations/")
+def annotationsIndex():
+	annotations = Annotation().matchObjects(
+		{},
+		limit=25)
+	
+	return render_template("annotations/index.html", name="Annotations overview", annotations=annotations, active="annotations")
 	
 	
 	

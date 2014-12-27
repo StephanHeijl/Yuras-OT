@@ -14,10 +14,13 @@
 		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 			<ul class="nav navbar-nav">
 				<li {% if active=="dashboard" %}class="active"{% endif %}>
-					<a href="/">Dashboard</a>
+					<a href="/dashboard">Dashboard</a>
 				</li>
 				<li {% if active=="documents" %}class="active"{% endif %}>
 					<a href="/documents">Documents</a>
+				</li>
+				<li {% if active=="annotations" %}class="active"{% endif %}>
+					<a href="/annotations">Annotations</a>
 				</li>
 				<li {% if active=="users" %}class="active"{% endif %}>
 					<a href="#">Users</a>
