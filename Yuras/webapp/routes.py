@@ -5,6 +5,7 @@ from Yuras.common.Pandoc import Pandoc
 
 from Yuras.webapp.models.Document import Document
 from Yuras.webapp.models.Annotation import Annotation
+from Yuras.webapp.models.User import User
 
 from Crypto import Random
 
@@ -48,6 +49,19 @@ def stopRequestTime(response):
 		
 # ROUTES #
 
+# ERROR PAGES #
+
+@app.errorhandler(403)
+def page_not_found(e):
+    return render_template('errors/403.html'), 403
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('errors/404.html'), 404
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('errors/500.html'), 500
 # AUTHENTICATION #
 @app.route("/login")
 def login():
@@ -215,6 +229,35 @@ def annotationsIndex():
 	
 	return render_template("annotations/index.html", name="Annotations overview", annotations=annotations, active="annotations")
 	
+	
+
+# USERS #
+@app.route("/users/")
+def usersIndex():
+	users = User().matchObjects(
+		{},
+		limit=25)
+	
+	return render_template("users/index.html", name="Users overview", users=users, active="users")
+
+@app.route("/users/new")
+def createUser():
+	user = User()
+	user.save()
+	_id = user._id;
+	return redirect("/users/%s/edit" % _id)
+
+@app.route("/users/<id>/edit")
+def editUser(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+			
+	return render_template("users/edit.html", name="Edit user", user=user, active="users")
+
+
+
 	
 	
 	

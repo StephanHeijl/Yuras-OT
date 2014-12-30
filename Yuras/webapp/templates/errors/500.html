@@ -1,0 +1,19 @@
+{% extends "layout/minimal.html" %} 
+{% block index %}
+	<div class="container">
+		
+		<div class="row" style="position:relative;">
+			
+			<div class="col-md-6">
+				<h1>An error occured. </h1>
+				<p> 
+					The document you are looking for may have been moved or removed.
+					You can go <a href="javascript:history.back()">back to the previous page</a> or go to your <a href="/dashboard">dashboard</a>.
+				 </p>
+			</div>
+			<div style="font-size: 200px; color: black; opacity:0.2; position: absolute;right:1%;bottom:-220px;">!</div>
+
+		</div>
+	
+	</div>
+{% endblock %}

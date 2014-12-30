@@ -1,0 +1,88 @@
+{% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }}
+<div class="container">
+
+	<div class="row">
+
+		<div class="col-lg-12">
+			<h2>Edit a user</h2>	
+		</div>
+
+		<div class="col-lg-8">
+			<form class="form-horizontal">
+				<div class="form-group">
+					<label for="firstname" class="col-sm-2 control-label">First name</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="firstname" placeholder="First name">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="lastname" class="col-sm-2 control-label">Last name</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="lastname" placeholder="Last name">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="lastname" class="col-sm-2 control-label">Username</label>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" id="username" placeholder="Username">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="email" class="col-sm-2 control-label">Email</label>
+					<div class="col-sm-10">
+						<input type="email" class="form-control" id="email" placeholder="Email">
+					</div>
+				</div>
+
+				<a class="col-sm-12 control-label" data-toggle="collapse" data-target="#collapseDangerous" aria-expanded="false" aria-controls="collapseDangerous">
+					Click here to show dangerous settings.
+				</a>
+
+				<div class="collapse" id="collapseDangerous">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">Password</label>
+						<div class="col-sm-10">
+							<p class="form-control-static">
+								<input type="text" class="form-control" readonly=readonly value="****************" />
+							</p>
+							<button class="btn btn-danger pull-right">Reset password</button>
+
+						</div>
+					</div>
+					<hr/>
+					<div class="form-group">
+						<label for="removeUser" class="col-sm-2 control-label"></label>
+						<div class="col-sm-10">
+							<input type="checkbox" id="removeUserSure" onchange="javascript:$('#removeUser').attr('disabled',!$('#removeUserSure').prop('checked'))">
+							<label for="removeUserSure"> I'm sure I would like to remove this user.</label>
+							<button class="btn btn-danger pull-right" id="removeUser" disabled=true>Remove user</button>
+
+						</div>
+					</div>
+				</div>
+
+
+
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-success">Save user</button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<div class="col-lg-4">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					Users can be edited here. The password cannot be altered, but it can be reset if you are an administrator.
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+</div>
+{% endblock %}

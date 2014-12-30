@@ -1,0 +1,41 @@
+{% extends "layout/master.html" %} 
+{% block index %}
+{{ deferJS("/assets/js/yuras.js", 1) }}
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-lg-12">
+				<h2>Users</h2>
+				
+				<a class="btn btn-default" href="new"><span class="glyphicon glyphicon-user"></span> New user</a>
+				
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th> Contents </th>
+							<th> Document </th>
+							<th> Created </th>
+							<th> Actions </th>
+						</tr>						
+					</thead>
+					<tbody>
+						{% for user in users %} 
+						<tr>
+							<td>{{ user.contents[:30] }}</td>
+							<td><a href="/documents/{{ user.document }}" class="document-link">{{ user.documentTitle }}</a></td>
+							<td>{{ user._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+							<td>
+								<a href="/users/{{ user._id }}/delete" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
+							</td>
+						</tr>					
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+
+		</div>
+
+	</div>
+{% endblock %}
