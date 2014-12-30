@@ -25,7 +25,10 @@ for attribute in dir(tools):
 def csrf_protect(*args, **kwargs):
    	if request.method == "POST":
 		token = session.pop('_csrf_token', None)
-		givenToken = urllib2.unquote( request.form.get('_csrf_token') )
+		print token
+		
+		givenToken = urllib2.unquote( request.form.get('_csrf_token',False) )
+		print givenToken
 		if not token or token != givenToken:
 			abort(403)
 			
@@ -182,11 +185,12 @@ def documentDelete(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
-		document = None
+		return abort(404)
 	
 	if request.method != "POST":
 		return abort(405)
 	
+	document.remove()
 	
 	return json.dumps( { 
 			"success":"true",
@@ -229,7 +233,24 @@ def annotationsIndex():
 	
 	return render_template("annotations/index.html", name="Annotations overview", annotations=annotations, active="annotations")
 	
+@app.route("/annotations/<id>/delete",methods=["POST"])
+def annotationDelete(id):
+	try:
+		annotation = Annotation().getObjectsByKey("_id", id)[0]
+	except:
+		return abort(404)
 	
+	if request.method != "POST":
+		return abort(405)
+	
+	annotation.remove()
+	
+	return json.dumps( { 
+			"success":"true",
+			"new_csrf":generate_csrf_token()
+		} );
+	
+	return abort(403)
 
 # USERS #
 @app.route("/users/")
@@ -241,20 +262,39 @@ def usersIndex():
 	return render_template("users/index.html", name="Users overview", users=users, active="users")
 
 @app.route("/users/new")
-def createUser():
+def userCreate():
 	user = User()
 	user.save()
 	_id = user._id;
 	return redirect("/users/%s/edit" % _id)
 
 @app.route("/users/<id>/edit")
-def editUser(id):
+def userEdit(id):
 	try:
 		user = User().getObjectsByKey("_id", id)[0]
 	except Exception as e:
 		return abort(404)
 			
 	return render_template("users/edit.html", name="Edit user", user=user, active="users")
+
+@app.route("/users/<id>/delete",methods=["POST"])
+def userDelete(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except:
+		return abort(404)
+	
+	if request.method != "POST":
+		return abort(405)
+	
+	user.remove()
+	
+	return json.dumps( { 
+			"success":"true",
+			"new_csrf":generate_csrf_token()
+		} );
+	
+	return abort(403)
 
 
 

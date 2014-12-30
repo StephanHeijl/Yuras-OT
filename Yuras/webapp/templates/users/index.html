@@ -13,8 +13,8 @@
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th> Contents </th>
-							<th> Document </th>
+							<th> Username </th>
+							<th> Email </th>
 							<th> Created </th>
 							<th> Actions </th>
 						</tr>						
@@ -22,8 +22,8 @@
 					<tbody>
 						{% for user in users %} 
 						<tr>
-							<td>{{ user.contents[:30] }}</td>
-							<td><a href="/documents/{{ user.document }}" class="document-link">{{ user.documentTitle }}</a></td>
+							<td>{{ user.username }}</td>
+							<td>{{ user.email }}</td>
 							<td>{{ user._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
 							<td>
 								<a href="/users/{{ user._id }}/delete" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>

@@ -15,26 +15,34 @@ $(function () {
 
 	});
 	
-	console.log($(".delete-document, a[href$='/delete']"))
-
-	$(".delete-document, a[href$='/delete']").click(function (e) {
+	
+	// Adds a confirm dialog to elements that may be deleted
+	$("a[href$='/delete']").click(function(e) {
+		e.preventDefault()
+		confirmDelete = window.confirm("Are you sure you want to remove this?")
+		if(!confirmDelete) {
+			e.stopImmediatePropagation() // This stops all other events from executing
+		} else {
+			$(this).parents("tr").fadeOut() // This fades out the parent table row.
+		}
+	});
+	
+	// Handle links with csrf requirements
+	$("a[data-csrf]").click(function (e) {
 		e.preventDefault();
 		csrfToken = encodeURIComponent($(this).data("csrf"));
-		documentId = $(this).data("document-id");
-		url = "/documents/" + documentId + "/delete"
-
+		url = $(this).attr("href")
 		$.post(url, {
 			"_csrf_token": csrfToken
-		}, function (response) {
+		}, function (response,textStatus) {
+			if(textStatus != "success") {
+				return false; // Handle csrf errors here
+			}
 			response = JSON.parse(response);
-			console.log($("*[data-csrf]"))
-			$("*[data-csrf]").each(function() {
-				console.log(response.new_csrf)
-				console.log($(this).data("csrf"))
+			$("a[data-csrf]").each(function() {
 				$(this).data("csrf", response.new_csrf);
-				console.log($(this).data("csrf"))
-				console.log("")
 			});
 		})
 	});
+	
 })
