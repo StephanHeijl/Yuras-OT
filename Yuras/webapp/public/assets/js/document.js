@@ -72,7 +72,7 @@ $(function () {
 		connOffset = connector.offset();
 
 		left = thisOffset.left + annotatedElement.width();
-		left += 10; /* Compensate for padding */
+		left += 2; /* Compensate for padding */
 
 		// Determine the topmost point.
 		t = thisOffset.top < annoOffset.top ? thisOffset.top : annoOffset.top;
