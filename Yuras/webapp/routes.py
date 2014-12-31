@@ -12,7 +12,7 @@ from Crypto import Random
 templatesFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)),"./templates")
 assetsFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)),"./public/assets")
 app = Flask(__name__, template_folder=templatesFolder)
-app.secret_key = "tVblvH7yuM6P5tBT8D9DFI6bvHX3xu5U"
+app.secret_key = Random.new().read(32)
 
 # LOAD TEMPLATE TOOLS #
 tools = TemplateTools()
@@ -56,15 +56,21 @@ def stopRequestTime(response):
 
 @app.errorhandler(403)
 def page_not_found(e):
-    return render_template('errors/403.html'), 403
+    return render_template('errors/403.html',name="403 - Forbidden"), 403
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('errors/404.html'), 404
+    return render_template('errors/404.html',name="404 - Not found"), 404
+
+@app.errorhandler(405)
+def page_not_found(e):
+    return render_template('errors/405.html',name="405 - Method not allowed"), 405
 
 @app.errorhandler(500)
 def page_not_found(e):
-    return render_template('errors/500.html'), 500
+    return render_template('errors/500.html',name="500 - Server error"), 500
+
+
 # AUTHENTICATION #
 @app.route("/login")
 def login():
@@ -132,8 +138,25 @@ def documentViewer(id):
 	
 	annotations = Annotation().getObjectsByKey("document", id)
 	
-	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf8")).decode("utf8")
+	markedContainer = ("<samp type='marked'>","</samp>")
+	#markedContainer = ("[[[[","]]]]")
+	#markedContainer = ("","")
+	markedContainerLength = sum([len(mC) for mC in markedContainer])-1
+	
+	annotations.sort(key=lambda a: a.location[0])
+	
+	for a,annotation in enumerate(annotations):
+		start, length = annotation.location
+		start += markedContainerLength*a
 		
+		before_string = document.contents[:start]
+		after_string = document.contents[start+length:]
+		
+		document.contents = "".join([before_string, markedContainer[0], document.contents[start:start+length], markedContainer[1],after_string ])
+		
+	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf8")).decode("utf8")
+	document.contents = document.contents.replace(markedContainer[0], "<span class='marked'>").replace(markedContainer[1], "</span>")
+	
 	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, active="documents")
 
 @app.route("/documents/<id>/save",methods=["POST"])
@@ -157,8 +180,6 @@ def documentSave(id):
 		document.save()
 	
 	annotations = urllib2.unquote( request.form.get("annotations","").encode('ascii') )
-	print contents_md
-	print annotations
 	
 	if annotations is not "":
 		annotations = json.loads(annotations)
@@ -167,10 +188,49 @@ def documentSave(id):
 				a = Annotation().getObjectsByKey("_id", anno_id)[0]
 			except:
 				a = Annotation()
-			a.contents = annotation
+				
+			
+			a.contents = annotation["text"]
+			a.location = [int(i) for i in annotation["location"].split(",")]
 			a.document = id
-			a.documentTitle = document.title
+			a.document_title = document.title
+			a.selected_text = annotation["selected_text"].encode('ascii')
+			
+			# Correct location parameter
+
+			if contents_md[a.location[0]:a.location[0]+a.location[1]] != a.selected_text:
+				i = contents_md.index(a.selected_text,0)
+				d = -1
+
+				while i >= 0:
+					delta = abs(i-a.location[0])
+					print i,d,delta
+					if d >= 0 and d < delta:
+						break
+					
+					if d > delta or d < 0:
+						d = delta
+					
+					try:
+						ni = contents_md.index(a.selected_text,i+1)
+						print ni
+					except Exception as e:
+						print e
+						break
+						
+					if i == ni:
+						break
+					else:
+						i = ni
+						
+				print contents_md[i:i+a.location[1]]
+				a.location[0] = int(i)
+			
 			a.save()
+			
+			print contents_md[a.location[0]:a.location[0]+a.location[1]]
+			
+			print a.location
 	
 	if contents is not "":
 		return json.dumps( { 

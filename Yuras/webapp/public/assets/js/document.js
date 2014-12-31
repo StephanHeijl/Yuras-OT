@@ -57,7 +57,6 @@ $(function () {
 		doc.appendTo($(".document-wrapper"));
 		addToPages($(".document-body").first().children());
 		$(".document").eq(0).remove();
-		//$(".document").eq(0).remove();
 	}
 
 	reflowPages()
@@ -210,14 +209,17 @@ $(function () {
 		annotations = {};
 		
 		$(".annotation").each(function() {
-			annotations[$(this).data("annotation-id")] = $(this).html().trim();
+			annotations[$(this).data("annotation-id")] = { 
+														 	"text": $(this).html().trim(),
+														  	"location": $(this).data("location"), 
+															"selected_text":$(this).data("selected_text")
+														 };
 		});
 		
 		console.log(annotations)
 		console.log(JSON.stringify(annotations))
 		annotations = encodeURIComponent( JSON.stringify(annotations) );
-		console.log(annotations)
-		
+		console.log(annotations)		
 
 		$.post(url, {
 			"contents": contents,
@@ -242,22 +244,26 @@ $(function () {
 		}
 	});
 	
-	function addAnnotation() {
+	function addAnnotation(start,length,text) {		
 		annotation = $("<div>");
 		annotation.addClass("annotation");
 		annotation.attr("contenteditable","true")
 		annotation.appendTo(".annotation-page");
-		annotation.html("<em>Add annotation text here</em>")
+		annotation.html("Add annotation text here")
+		annotation.data("location", start+","+length)
+		annotation.data("selected_text", text)
 		annotation.click(function() { $(this).html(""); $(this).unbind("click") })
 	}
 	
 	$("#annotate-selection").click(function(e) {
 		e.preventDefault()
-		var sel = window.getSelection(),
-			text = sel.anchorNode.data.substr(sel.baseOffsset, (sel.extentOffset-sel.baseOffset))
+		
+		var sel = window.getSelection();
+		
 		if (sel.getRangeAt && sel.rangeCount) {
             range = sel.getRangeAt(0);
-			console.log(range)
+			text = sel.anchorNode.data.substr(range.startOffset, (range.endOffset-range.startOffset))
+						
             range.deleteContents();
 			markerContainer = document.createElement("span");
 			markerContainer.className = "marked";
@@ -265,7 +271,7 @@ $(function () {
             range.insertNode( markerContainer );
         }
 		
-		addAnnotation();
+		addAnnotation(range.startOffset, text.length, text);
 	});
 	
 	$("#annotate-word").click(function(e) {
@@ -297,7 +303,7 @@ $(function () {
             range.insertNode( markerContainer );
         }
 		
-		addAnnotation();
+		addAnnotation(range.startOffset, text.length,text);
 		
 	});
 	
@@ -328,7 +334,7 @@ $(function () {
             range.insertNode( markerContainer );
         }
 		
-		addAnnotation();
+		addAnnotation(range.startOffset, text.length,text);
 		
 	});
 	

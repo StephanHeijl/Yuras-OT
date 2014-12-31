@@ -63,7 +63,7 @@
 					</div>
 
 					{% for annotation in annotations %}
-						<div class="annotation" contenteditable="true" data-annotation-id="{{ annotation._id }}">
+						<div class="annotation" contenteditable="true" data-selected_text="{{ annotation.selected_text }}" data-annotation-id="{{ annotation._id }}" data-location="{{ annotation.location[0]}},{{ annotation.location[1]}}">
 							{{annotation.contents | safe}}
 						</div>
 					{% endfor %}

@@ -21,7 +21,7 @@
 						{% for annotation in annotations %} 
 						<tr>
 							<td>{{ annotation.contents[:30] }}</td>
-							<td><a href="/documents/{{ annotation.document }}" class="document-link">{{ annotation.documentTitle }}</a></td>
+							<td><a href="/documents/{{ annotation.document }}" class="document-link">{{ annotation.document_title }}</a></td>
 							<td>{{ annotation._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
 							<td>
 								<a href="/annotations/{{ annotation._id }}/delete" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
