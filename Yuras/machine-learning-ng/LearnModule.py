@@ -4,10 +4,11 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from sklearn.linear_model import SGDClassifier
-from sklearn.linear_model import SGDClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn import metrics
+
+import cPickle as pickle
 
 class LearnModule():
 	def __init__(self):
@@ -104,6 +105,7 @@ class LearnModule():
 	
 	def xfoldMachine(self, x):
 		for i in range(x):
+			print "%s out of %s" % (i,x)
 			trainData = {}
 			testData = {}
 			for category in self.categorizedData:
@@ -124,7 +126,7 @@ class LearnModule():
 
 			labels = self.__uniqify(testCategories)
 
-			self.classifier = SGDClassifier(shuffle=True, n_iter=math.ceil(10**6/(len(self.categorizedData.values())*(1-(1./x)))) })
+			self.classifier = SGDClassifier(shuffle=True, n_jobs=-1, penalty='elasticnet', n_iter=math.ceil(10**6/(len(self.categorizedData.values())*(1-(1./x)))) )
 			classifier = self.teachMachine(trainDocuments, trainCategories)
 
 			predictedTest = classifier.predict(testDocuments)
@@ -132,6 +134,14 @@ class LearnModule():
 			print metrics.f1_score(testCategories, predictedTest, average='weighted'),
 			metrics.accuracy_score(testCategories, predictedTest)
 			
+	def fullTraining(self):
+		print "Performing a full training."
+		trainDocuments, trainCategories = self.processDocuments(self.categorizedData)
+		self.classifier = SGDClassifier(shuffle=True, n_jobs=-1, penalty='elasticnet', n_iter=1000 )
+		classifier = self.teachMachine(trainDocuments, trainCategories)
+		
+		with open("Classifier.cpic","wb") as classifierStorage:
+			pickle.dump(classifier, classifierStorage)
 	
 if __name__ == "__main__":
 	lm = LearnModule()
@@ -140,5 +150,6 @@ if __name__ == "__main__":
 		lm.getStopWords(args.get("stopwords",""))
 	
 	lm.analyzeJSON(args.get("in", None))
-	lm.xfoldMachine(5)
+	lm.fullTraining()
+	#lm.xfoldMachine(10)
 	

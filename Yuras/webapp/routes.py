@@ -1,4 +1,4 @@
-import os, re, base64, urllib2, json, time
+import os, re, base64, urllib2, json, time, random, chardet
 from flask import Flask,render_template,abort, Response, request, session, redirect, g
 from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
@@ -141,7 +141,7 @@ def documentViewer(id):
 	markedContainer = ("<samp type='marked'>","</samp>")
 	#markedContainer = ("[[[[","]]]]")
 	#markedContainer = ("","")
-	markedContainerLength = sum([len(mC) for mC in markedContainer])-1
+	markedContainerLength = sum([len(mC) for mC in markedContainer])
 	
 	annotations.sort(key=lambda a: a.location[0])
 	
@@ -154,7 +154,7 @@ def documentViewer(id):
 		
 		document.contents = "".join([before_string, markedContainer[0], document.contents[start:start+length], markedContainer[1],after_string ])
 		
-	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf8")).decode("utf8")
+	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf-8"))
 	document.contents = document.contents.replace(markedContainer[0], "<span class='marked'>").replace(markedContainer[1], "</span>")
 	
 	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, active="documents")
@@ -169,37 +169,38 @@ def documentSave(id):
 	if request.method != "POST":
 		return abort(405)
 	
-	contents = urllib2.unquote( request.form.get("contents","").encode('ascii') )
-	contents_escaped = contents.strip(" \n\t")
-	contents_md = Pandoc().convert("html","markdown_github",contents_escaped)
-	title = urllib2.unquote( request.form.get("title","").encode('ascii') )
+	contents = urllib2.unquote( request.form.get("contents","").encode('utf-8') )
+	contents_escaped = contents
+	contents_md = unicode(Pandoc().convert("html","markdown_github",contents_escaped))
+	title = urllib2.unquote( request.form.get("title","").encode('utf-8') )
 	
 	if contents is not "":
-		document.contents = contents_md
+		document.contents = contents_md.encode('utf-8')
 		document.title = title
 		document.save()
 	
-	annotations = urllib2.unquote( request.form.get("annotations","").encode('ascii') )
+	annotations = urllib2.unquote( request.form.get("annotations","").encode('utf-8') )
 	
 	if annotations is not "":
 		annotations = json.loads(annotations)
+		
 		for anno_id, annotation in annotations.items():
 			try:
 				a = Annotation().getObjectsByKey("_id", anno_id)[0]
 			except:
 				a = Annotation()
 				
-			
-			a.contents = annotation["text"]
+			a.contents = annotation["text"].encode('utf-8')
 			a.location = [int(i) for i in annotation["location"].split(",")]
 			a.document = id
 			a.document_title = document.title
-			a.selected_text = annotation["selected_text"].encode('ascii')
+			a.selected_text = annotation["selected_text"].encode('utf-8')
 			
 			# Correct location parameter
-
+			print contents_md[a.location[0]:a.location[0]+a.location[1]], a.selected_text
 			if contents_md[a.location[0]:a.location[0]+a.location[1]] != a.selected_text:
-				i = contents_md.index(a.selected_text,0)
+				
+				i = contents_md.index(annotation["selected_text"],0)
 				d = -1
 
 				while i >= 0:
@@ -212,7 +213,7 @@ def documentSave(id):
 						d = delta
 					
 					try:
-						ni = contents_md.index(a.selected_text,i+1)
+						ni = contents_md.index(annotation["selected_text"],i+1)
 						print ni
 					except Exception as e:
 						print e
@@ -227,10 +228,6 @@ def documentSave(id):
 				a.location[0] = int(i)
 			
 			a.save()
-			
-			print contents_md[a.location[0]:a.location[0]+a.location[1]]
-			
-			print a.location
 	
 	if contents is not "":
 		return json.dumps( { 
@@ -273,7 +270,7 @@ def documentDownload(id, filetype):
 	}
 	
 	if filetype in filetypes:
-		responseContents = Pandoc().convert("markdown_github", filetype, document.contents.encode("utf8"))
+		responseContents = Pandoc().convert("markdown_github", filetype, document.contents.encode("utf-8"))
 		response = Response(responseContents, mimetype=filetypes[filetype])
 		
 		filename = document.title + "." + filetype
@@ -356,6 +353,23 @@ def userDelete(id):
 	
 	return abort(403)
 
+
+# USERS - PASSWORD #
+with open(os.path.join(assetsFolder, "words.txt")) as wordsFile:
+	wordList = [ w.strip("\r ") for w in wordsFile.read().split("\n") if (len(w) > 4 and len(w) < 8) ]
+	
+@app.route("/users/get-random-words/<n>")
+def getRandomWords(n):
+	return json.dumps(random.sample(wordList,int(n)))	
+	
+@app.route("/users/<id>/password/edit")
+def userPasswordEdit(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+			
+	return render_template("users/password-edit.html", name="Respin password", user=user, active="users")
 
 
 	

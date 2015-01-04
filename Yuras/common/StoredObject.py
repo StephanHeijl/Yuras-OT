@@ -59,7 +59,6 @@ class StoredObject():
 			storage.saveDocument(document)
 		else:
 			storage.insertDocument(document)
-			print document
 			self._id = document["_id"]
 	
 	def loadFromRawData(self, data):

@@ -133,8 +133,7 @@ class Storage(Singleton):
 :returns: A padded string with type included.
 		"""
 		objType = type(obj)
-		
-		objString = base64.b64encode(str(obj))			
+		objString = base64.b64encode(str(obj))
 		
 		paddingChar = "{"
 		blockSize = AES.block_size

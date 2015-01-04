@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import subprocess, tempfile, os
 
 class Pandoc():
@@ -38,8 +39,7 @@ class Pandoc():
 			result = result[0]
 			
 		os.unlink(tmp.name)
-		
-		return result
+		return result.decode('utf-8')
 		
 # TESTING #
 def test_convert():
