@@ -1,4 +1,6 @@
-{% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }}
+{% extends "layout/master.html" %} {% block index %}
+{{ deferJS("/assets/js/yuras.js", 1) }}
+{{ deferJS("/assets/js/validator.min.js", 2) }}
 <div class="container">
 
 	<div class="row">
@@ -8,31 +10,31 @@
 		</div>
 
 		<div class="col-lg-8">
-			<form class="form-horizontal">
+			<form class="form-horizontal" action="save" method="post" role="form" data-toggle="validator">
 				<div class="form-group">
 					<label for="firstname" class="col-sm-2 control-label">First name</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="firstname" placeholder="First name">
+						<input type="text" class="form-control" id="firstname" placeholder="First name" name="firstname" value="{{ user.firstname }}" required>
 					</div>
 				</div>
 				<div class="form-group">
 					<label for="lastname" class="col-sm-2 control-label">Last name</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="lastname" placeholder="Last name">
+						<input type="text" class="form-control" id="lastname" placeholder="Last name" name="lastname" value="{{ user.lastname }}" required>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label for="lastname" class="col-sm-2 control-label">Username</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="username" placeholder="Username">
+						<input type="text" class="form-control" id="username" placeholder="Username" name="username" value="{{ user.username }}" required>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label for="email" class="col-sm-2 control-label">Email</label>
 					<div class="col-sm-10">
-						<input type="email" class="form-control" id="email" placeholder="Email">
+						<input type="email" class="form-control" id="email" placeholder="Email" name="email" value="{{ user.email }}" required>
 					</div>
 				</div>
 
@@ -45,7 +47,7 @@
 						<label class="col-sm-2 control-label">Password</label>
 						<div class="col-sm-10">
 							<p class="form-control-static">
-								<input type="text" class="form-control" readonly=readonly value="****************" />
+								<input type="password" class="form-control" readonly=readonly value="****************" name="password-placeholder"/>
 							</p>
 							<button class="btn btn-danger pull-right">Reset password</button>
 
@@ -58,20 +60,21 @@
 							<input type="checkbox" id="removeUserSure" onchange="javascript:$('#removeUser').attr('disabled',!$('#removeUserSure').prop('checked'))">
 							<label for="removeUserSure"> I'm sure I would like to remove this user.</label>
 							<button class="btn btn-danger pull-right" id="removeUser" disabled=true>Remove user</button>
-
 						</div>
 					</div>
 				</div>
-
-
 
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
 						<button type="submit" class="btn btn-success">Save user</button>
 					</div>
 				</div>
+				
+				<!-- CSRF token -->
+				<input type="hidden" class="hidden" name="_csrf_token" value={{ csrf_token() }} />
 			</form>
 		</div>
+		
 
 		<div class="col-lg-4">
 			<div class="panel panel-default">

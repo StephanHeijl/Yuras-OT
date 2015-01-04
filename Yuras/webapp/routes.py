@@ -24,11 +24,8 @@ for attribute in dir(tools):
 @app.before_request
 def csrf_protect(*args, **kwargs):
    	if request.method == "POST":
-		token = session.pop('_csrf_token', None)
-		print token
-		
+		token = session.pop('_csrf_token', None)		
 		givenToken = urllib2.unquote( request.form.get('_csrf_token',False) )
-		print givenToken
 		if not token or token != givenToken:
 			abort(403)
 			
@@ -80,7 +77,7 @@ def login():
 
 @app.route("/dashboard")
 def index():
-	users = ["Jan", "Piet", "Klaas", "Yuri"]
+	users = User().matchObjects({}, limit=5)
 	documents = Document().matchObjects(
 		{},
 		limit=10)
@@ -334,6 +331,24 @@ def userEdit(id):
 			
 	return render_template("users/edit.html", name="Edit user", user=user, active="users")
 
+@app.route("/users/<id>/save",methods=["POST"])
+def userSave(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	data = dict(request.form)
+		
+	user.username = data["username"][0]
+	user.firstname = data["firstname"][0]
+	user.lastname = data["lastname"][0]
+	user.email = data["email"][0]
+	user.save()
+	
+	return redirect("/users/%s/edit" % id)
+	
+
 @app.route("/users/<id>/delete",methods=["POST"])
 def userDelete(id):
 	try:
@@ -370,6 +385,7 @@ def userPasswordEdit(id):
 		return abort(404)
 			
 	return render_template("users/password-edit.html", name="Respin password", user=user, active="users")
+
 
 
 	
