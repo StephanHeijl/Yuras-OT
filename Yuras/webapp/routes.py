@@ -364,7 +364,25 @@ def userEdit(id):
 	except Exception as e:
 		return abort(404)
 			
+	try:
+		user.public_key = base64.b64decode(user.public_key)
+	except:
+		pass # Skip over new users
 	return render_template("users/edit.html", name="Edit user", user=user, active="users")
+
+@app.route("/users/<id>")
+def userView(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	try:
+		user.public_key = base64.b64decode(user.public_key)
+	except:
+		pass # Skip over new users
+			
+	return render_template("users/view.html", name="View user", user=user, active="users")
 
 @app.route("/users/<id>/save",methods=["POST"])
 def userSave(id):
