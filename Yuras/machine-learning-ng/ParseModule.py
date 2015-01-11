@@ -73,7 +73,6 @@ class ParseModule():
 			markdown = pandoc.convert("html","plain",contents)
 			
 			md[path] = markdown
-					
 	
 	def export(self, out=None, pretty=False):		
 		indent = None

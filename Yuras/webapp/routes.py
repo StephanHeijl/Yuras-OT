@@ -1,11 +1,16 @@
 import os, re, base64, urllib2, json, time, random, chardet
+from functools import wraps
+
 from flask import Flask,render_template,abort, Response, request, session, redirect, g
+from flask.ext.login import LoginManager, login_required
+
 from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
 
 from Yuras.webapp.models.Document import Document
 from Yuras.webapp.models.Annotation import Annotation
 from Yuras.webapp.models.User import User
+from Yuras.webapp.models.Category import Category
 
 from Crypto import Random
 
@@ -13,6 +18,32 @@ templatesFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)),"./tem
 assetsFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)),"./public/assets")
 app = Flask(__name__, template_folder=templatesFolder)
 app.secret_key = Random.new().read(32)
+
+
+# AUTH #
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "/login"
+
+@login_manager.user_loader
+def load_user(userid):
+	try:
+		return User().getObjectsByKey("_id", _id)[0]
+	except:
+		return None
+	
+@app.route("/login", methods=["GET", "POST"])
+def login():
+	if request.method == "POST":
+		try:
+			user = User().getObjectsByKey("username", request.form.get("username"))[0]
+		except:
+			user = None
+		
+		if user is not None and user.checkPassword( urllib2.unquote( request.form.get("password").encode('utf-8') ) ):
+			return redirect(request.form.get("next") or "/dashboard")
+		
+	return render_template("/users/login.html", name="Log in")
 
 # LOAD TEMPLATE TOOLS #
 tools = TemplateTools()
@@ -36,7 +67,6 @@ def generate_csrf_token():
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
 
-
 # REQUEST TIME #
 @app.before_request
 def startRequestTimer():
@@ -46,7 +76,7 @@ def startRequestTimer():
 def stopRequestTime(response):
 	#print "Request took %s ms." % ((time.time() - g.start_time)*1000), request.endpoint, request.view_args
 	return response
-		
+
 # ROUTES #
 
 # ERROR PAGES #
@@ -68,14 +98,10 @@ def page_not_found(e):
     return render_template('errors/500.html',name="500 - Server error"), 500
 
 
-# AUTHENTICATION #
-@app.route("/login")
-def login():
-	return render_template("users/login.html", name="Login", active=None)
-
-# AFTER AUTH #
+# ROUTES #
 
 @app.route("/dashboard")
+@login_required
 def index():
 	users = User().matchObjects({}, limit=5)
 	documents = Document().matchObjects(
@@ -111,7 +137,6 @@ def assets(assettype, filename):
 	return Response( assetContents, mimetype=mimeTypes.get(filename.split(".")[-1], "text/plain") )
 
 # DOCUMENTS #
-
 @app.route("/documents/")
 def documentsIndex():
 	documents = Document().matchObjects(
@@ -134,6 +159,7 @@ def documentViewer(id):
 		return abort(404)
 	
 	annotations = Annotation().getObjectsByKey("document", id)
+	categories = Category().matchObjects({},limit=25)
 	
 	markedContainer = ("<samp type='marked'>","</samp>")
 	#markedContainer = ("[[[[","]]]]")
@@ -153,8 +179,8 @@ def documentViewer(id):
 		
 	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf-8"))
 	document.contents = document.contents.replace(markedContainer[0], "<span class='marked'>").replace(markedContainer[1], "</span>")
-	
-	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, active="documents")
+
+	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, categories=categories)
 
 @app.route("/documents/<id>/save",methods=["POST"])
 def documentSave(id):
@@ -171,10 +197,17 @@ def documentSave(id):
 	contents_md = unicode(Pandoc().convert("html","markdown_github",contents_escaped))
 	title = urllib2.unquote( request.form.get("title","").encode('utf-8') )
 	
-	if contents is not "":
-		document.contents = contents_md.encode('utf-8')
-		document.title = title
-		document.save()
+	document.contents = contents_md.encode('utf-8')
+	document.title = title
+	category = urllib2.unquote( request.form.get("category","").encode('utf-8') )
+	if len(Category().getObjectsByKey("name", category)) == 0:
+		c = Category()
+		c.name = category
+		c.save()
+
+	document.category = category
+	document.save()
+		
 	
 	annotations = urllib2.unquote( request.form.get("annotations","").encode('utf-8') )
 	
@@ -277,6 +310,8 @@ def documentDownload(id, filetype):
 	else:
 		return abort(405)
 	
+
+	
 # ANNOTATIONS #
 
 @app.route("/annotations/")
@@ -339,6 +374,10 @@ def userSave(id):
 		return abort(404)
 	
 	data = dict(request.form)
+	
+	rawPassword = urllib2.unquote( data["password"][0].decode("utf-8") )
+	
+	user.setPassword(rawPassword)
 		
 	user.username = data["username"][0]
 	user.firstname = data["firstname"][0]

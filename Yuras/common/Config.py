@@ -12,10 +12,11 @@ class Config(Singleton):
 		if self.instantiated:
 			return 
 		currentDir = os.path.dirname(__file__)
+		print currentDir
 		
 		# guardStore.conf is the configuration file that is loaded for guardStore
 		if configurationPath == None:
-			guardStoreConfName = "../GuardStore.conf"
+			guardStoreConfName = "../configs/GuardStore.conf"
 			guardStoreConfPath = os.path.abspath(os.path.join(currentDir,guardStoreConfName))
 		else:
 			guardStoreConfPath = os.path.abspath(configurationPath)

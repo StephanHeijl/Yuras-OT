@@ -1,85 +1,114 @@
-{% extends "layout/viewer.html" %} 
-{% block index %}
+{% extends "layout/viewer.html" %} {% block index %}
 <svg id="annotation-connector"></svg>
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="#" id="document-title">{{ document.title }}</a>
-		</div>
+	<div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</button>
+		<a class="navbar-brand" href="#" id="document-title">{{ document.title }}</a>
+	</div>
 
-		<!-- Collect the nav links, forms, and other content for toggling -->
-		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-			<ul class="nav navbar-nav">
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">File <span class="caret"></span></a>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#" id="new-document">New</a></li>
-						<li><a href="#" id="open-document">Open</a></li>
-						<li><a href="#" id="save-document" data-csrf={{ csrf_token() }}>Save</a></li>
-						<li class="divider"></li>
-						<li><a href="#" id="secure-document" data-csrf={{ csrf_token() }}>Secure document</a></li>
-						<li class="divider"></li>
-						<li><a href="/documents">Exit</a></li>
-					</ul>
-				</li>
-				
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Annotate <span class="caret"></span></a>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="#" id="annotate-selection">Selection</a></li>
-						<li><a href="#" id="annotate-word">Word</a></li>
-						<li><a href="#" id="annotate-sentence">Sentence</a></li>
-						<li><a href="#" id="annotate-paragraph">Paragraph</a></li>
-					</ul>
-				</li>
-				
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Download as... <span class="caret"></span></a>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="{{ document._id }}/download/docx">Word Document</a></li>
-						<li class="disabled"><a href="{{ document._id }}/download/pdf">PDF</a></li>
-						<li class="disabled"><a href="{{ document._id }}/download/txt">Plain text</a></li>
-					</ul>
-				</li>
-			</ul>
-		</div>
-		<!-- /.navbar-collapse -->
+	<!-- Collect the nav links, forms, and other content for toggling -->
+	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+		<ul class="nav navbar-nav">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">File <span class="caret"></span></a>
+				<ul class="dropdown-menu" role="menu">
+					<li><a href="#" id="new-document">New</a>
+					</li>
+					<li><a href="#" id="open-document">Open</a>
+					</li>
+					<li><a href="#" id="save-document" data-csrf={{ csrf_token() }}>Save</a>
+					</li>
+					<li class="divider"></li>
+					<li><a href="#" id="secure-document" data-csrf={{ csrf_token() }}>Secure document</a>
+					</li>
+					<li class="divider"></li>
+					<li><a href="/documents">Exit</a>
+					</li>
+				</ul>
+			</li>
+
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Annotate <span class="caret"></span></a>
+				<ul class="dropdown-menu" role="menu">
+					<li><a href="#" id="annotate-selection">Selection</a>
+					</li>
+					<li><a href="#" id="annotate-word">Word</a>
+					</li>
+					<li><a href="#" id="annotate-sentence">Sentence</a>
+					</li>
+					<li><a href="#" id="annotate-paragraph">Paragraph</a>
+					</li>
+				</ul>
+			</li>
+
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Download as... <span class="caret"></span></a>
+				<ul class="dropdown-menu" role="menu">
+					<li><a href="{{ document._id }}/download/docx">Word Document</a>
+					</li>
+					<li class="disabled"><a href="{{ document._id }}/download/pdf">PDF</a>
+					</li>
+					<li class="disabled"><a href="{{ document._id }}/download/txt">Plain text</a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+	<!-- /.navbar-collapse -->
 </nav>
 
-		<div class="annotation-wrapper">
-			<div class="annotation-wrapper-padding">
+<div class="annotation-wrapper">
+	<div class="annotation-wrapper-padding">
+		<div class="category-container">
+			<div class="category-dropdown btn btn-lg btn-default dropdown-toggle" data-toggle="dropdown" data-value="">
+				<span id="category">{{ document.category if document.category is not none and document.category is not undefined else "Category" }}</span>
+				<span class="caret"></span>
+			</div>
+			<ul class="dropdown-menu" role="menu">
+				{% for category in categories %}
+				<li role="presentation">
+					<a role="menuitem" tabindex="-1" href="#" class="category-menu-option">{{category.name}}</a>
+				</li>
+				{% endfor %}
+				<li class="divider"></li>
+				<li role="presentation">
+					<a role="menuitem" tabindex="-1" href="#" id="create-new-category">New category</a>
+				</li>
+			</ul>
 
-				<div class="annotation-page">
-					<div class="search-bar-container">
-						<div class="search-bar" contenteditable="true">
-							Search
-						</div>
-						<span class="glyphicon glyphicon-search"></span>
-					</div>
+		</div>
 
-					{% for annotation in annotations %}
-						<div class="annotation" contenteditable="true" data-selected_text="{{ annotation.selected_text }}" data-annotation-id="{{ annotation._id }}" data-location="{{ annotation.location[0]}},{{ annotation.location[1]}}">
-							{{annotation.contents | safe}}
-						</div>
-					{% endfor %}
+		<br/>
 
+		<div class="input-group input-group-lg">
+			<input type="text" class="form-control" placeholder="Search">
+			<span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+		</div>
+
+		<div class="annotation-page">
+			{% for annotation in annotations %}
+			<div class="annotation" contenteditable="true" data-selected_text="{{ annotation.selected_text }}" data-annotation-id="{{ annotation._id }}" data-location="{{ annotation.location[0]}},{{ annotation.location[1]}}">
+				{{annotation.contents | safe}}
+			</div>
+			{% endfor %}
+
+		</div>
+
+	</div>
+</div>
+<div class="document-wrapper">
+	<div class="document">
+		<div class="document-content">
+			<div class="document-content-padding">
+				<div class="document-body markdown" contenteditable="true">
+					{{document.contents|safe}}
 				</div>
-
 			</div>
 		</div>
-		<div class="document-wrapper">
-			<div class="document">
-				<div class="document-content">
-					<div class="document-content-padding">
-						<div class="document-body markdown" contenteditable="true">
-{{document.contents|safe}}
-						</div>
-					</div>
-				</div>
-			</div>
-{% endblock %}
+	</div>
+	{% endblock %}

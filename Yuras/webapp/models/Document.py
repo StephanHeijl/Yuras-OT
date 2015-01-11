@@ -8,6 +8,9 @@ class Document(StoredObject):
 		self.contents = ""
 		self.tags = []
 		self.annotations = []
+		self.category = None
+		
+		self.accessible = True
 		
 		self.secure = False
 		

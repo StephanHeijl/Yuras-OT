@@ -1,4 +1,7 @@
 Flask==0.10.1
+Flask-Login>=0.2.11
+bcrypt>=1.1.0
+scrypt>=0.6.1
 Jinja2==2.7.2
 Werkzeug==0.9.4
 requests==2.2.1

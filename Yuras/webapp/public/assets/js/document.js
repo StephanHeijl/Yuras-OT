@@ -206,6 +206,8 @@ $(function () {
 		contents = encodeURIComponent(html);
 		title = encodeURIComponent($("#document-title").text());
 		url = window.location.href.replace("#", "") + "/save"
+		category = $("#category").text()
+		
 		annotations = {};
 		
 		$(".annotation").each(function() {
@@ -216,14 +218,12 @@ $(function () {
 														 };
 		});
 		
-		console.log(annotations)
-		console.log(JSON.stringify(annotations))
-		annotations = encodeURIComponent( JSON.stringify(annotations) );
-		console.log(annotations)		
+		annotations = encodeURIComponent( JSON.stringify(annotations) );		
 
 		$.post(url, {
 			"contents": contents,
 			"annotations": annotations,
+			"category": category,
 			"title": title,
 			"_csrf_token": csrfToken
 		}, function (response) {
@@ -365,6 +365,30 @@ $(function () {
 		})
 		titleInput.focus()
 		
+	});
+	
+	$("#create-new-category").click(function(e) {
+		e.preventDefault();
+		
+		currentCategory = $("#category").text()
+		$(".category-dropdown").hide(0)
+		categoryInput = $("<input>").addClass("form-control input-lg");
+		categoryInput.appendTo( $(".category-container") ) 
+		categoryInput.focus()
+		
+		categoryInput.blur(function() {
+			$(".category-dropdown").show(0)
+			$("#category").text($(this).val())
+			$(this).hide(0,function() {
+				$(this).remove();
+			});
+		})
+		
+	});
+	
+	$(".category-menu-option").click(function(e) {
+		e.preventDefault()
+		$("#category").text($(this).text())
 	});
 	
 	$("body").on("change input",".document-body", function(e) {

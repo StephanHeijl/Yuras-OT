@@ -16,12 +16,16 @@ class StoredObject():
 	def __init__(self, database=None, collection=None, name = ""):
 		""" Sets up the object
 		
-		:param database: Optional, the database where this object is to be stored.
+		:param database: Optional, the database where this object is to be stored. Defaults to the database stored in Config.
 		:param collection: Optional, the collecion where this object is to be stored.
 		:param name: The pretty name of this object.
 		"""
-		self._database = Config().database
+		if database is None:
+			self._database = Config().database
+		else:
+			self._database = database
 		self._collection = collection
+		self.storage = Storage()
 		self.name = name
 		self._created = datetime.datetime.now()
 		self._type = self.__class__.__name__
@@ -51,7 +55,7 @@ class StoredObject():
 			document[key] = value
 		
 		# Let's store this object
-		storage = Storage()
+		storage = self.storage
 		storage.getDatabase(self._database)
 		storage.getCollection(self._collection)
 		
@@ -91,7 +95,7 @@ class StoredObject():
 :param limit: The maximum amount of objects to return. Will return all results by default.
 :rtype: All the matching objects stored in the database.
 		"""
-		storage = Storage()
+		storage = self.storage
 		database = self._database
 		collection = self._collection
 		
@@ -108,7 +112,7 @@ class StoredObject():
 		
 	def remove(self):
 		""" Removes this object from the database. It will still remain in memory, however, and can be resaved at a later time provided that the original reference is maintained."""
-		storage = Storage()
+		storage = self.storage
 		database = self._database
 		collection = self._collection
 		

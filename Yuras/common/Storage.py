@@ -1,5 +1,5 @@
 """
-This module was originally programmed for GuardStore, but can now be used as a component for Yuras.
+This module was originally programmed for Olympus, but can now be used as a component for Yuras.
 It has also been extended with encryption and decryption on save and restore respectively.
 """
 
@@ -20,7 +20,7 @@ class Storage(Singleton):
 		This will allow us to, if needed, exchange the databases without breaking countless modules 
 		that are dependent on database access.
 		
-		**A note on IV usage in this library:**
+		**A note on IV usage in this module:**
 		While it is considered bad practice to use the same IV values across a whole database, this mode of 
 		operation is still preferable to ECB mode.
 		It should be taken into account that the encrypted data should *AT NO TIME* be exposed to the public.
@@ -358,8 +358,7 @@ class Storage(Singleton):
 					
 		# Auto fix id requests
 		if "_id" in match and (isinstance(match["_id"], str) or isinstance(match["_id"], unicode)):
-			match["_id"] = ObjectId(match["_id"])
-			
+			match["_id"] = ObjectId(match["_id"])			
 			
 		if self.__encryptDocuments:
 			match = self.__encryptDocument(match)
@@ -381,7 +380,7 @@ class Storage(Singleton):
 # Testing Plain Database
 		
 def test_Storage(encryptDocuments=False):
-	storage1 = Storage(encryptDocuments=False)
+	storage1 = Storage(encryptDocuments=True)
 	storage2 = Storage(encryptDocuments=False)
 	assert storage1 == storage2, "Storage is not a singleton"
 	
@@ -415,11 +414,11 @@ def test_getCollection():
 	storage.getDatabase("test_database")
 	storage.getCollection("test_collection")
 	
-def test_insertDocuments():
+def test_insertDocument():
 	storage = Storage(encryptDocuments=False)
 	storage.getDatabase("test_database")
 	storage.getCollection("test_collection")
-	storage.insertDocuments({"name":"test_document"})
+	storage.insertDocument({"name":"test_document"})
 	
 def test_getDocuments():
 	storage = Storage(encryptDocuments=False)
@@ -433,7 +432,7 @@ def test_saveDocument():
 	storage.getCollection("test_collection")
 	
 	doc = {"name":"test_document_save", "version":1}
-	storage.insertDocuments(doc)
+	storage.insertDocument(doc)
 	ndoc = storage.getDocuments({"name":"test_document_save"})[0]
 	ndoc["version"] = 2
 	storage.saveDocument(ndoc)
@@ -472,11 +471,11 @@ def test_unpadString():
 	assert storage._Storage__unpadString("1{<type 'int'>{{") == 1
 	assert storage._Storage__unpadString("1.0{<type 'float'>{{{{{{{{{{{{{{") == 1.0
 
-def test_Encrypted_insertDocuments():
+def test_Encrypted_insertDocument():
 	storage = Storage()
 	storage.getDatabase("test_Encrypted_database")
 	storage.getCollection("test_Encrypted_collection")
-	storage.insertDocuments({"name":"test_Encrypted_document"})
+	storage.insertDocument({"name":"test_Encrypted_document"})
 	
 def test_Encrypted_getDocuments():
 	storage = Storage()
@@ -490,7 +489,7 @@ def test_Encrypted_saveDocument():
 	storage.getCollection("test_Encrypted_collection")
 	
 	doc = {"name":"test_Encrypted_document_save", "version":1, "list-test":[1,2,3,4,5,"six"]}
-	storage.insertDocuments(doc)
+	storage.insertDocument(doc)
 	ndoc = storage.getDocuments({"name":"test_Encrypted_document_save"})[0]
 	ndoc["version"] = 2
 	storage.saveDocument(ndoc)

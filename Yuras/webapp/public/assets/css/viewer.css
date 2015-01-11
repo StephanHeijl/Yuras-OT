@@ -77,21 +77,18 @@ body {
 }
 /* Annotation styling */
 
+.category-container {
+	position: relative;
+}
+
+.category-dropdown {
+	width: 100%;
+	text-align: left;
+}
+
 .annotation-page {
 	height: 100%;
 	width: 100%;
-}
-.search-bar-container {
-	position: relative;
-	margin-bottom: 15px;
-	background: #999;
-	color: white;
-	padding: 5%;
-}
-.search-bar {
-	width: 95%;
-	display: inline-block;
-	outline: 0;
 }
 .annotation {
 	padding: 5%;
@@ -101,11 +98,6 @@ body {
 }
 .annotation:hover {
 	background: #1abc9c;
-}
-.search-bar-container > .glyphicon-search {
-	position: absolute;
-	top: 50%;
-	margin-top: -0.5em;
 }
 #annotation-connector {
 	position: absolute;
