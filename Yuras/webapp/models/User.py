@@ -1,5 +1,5 @@
 from Yuras.common.StoredObject import StoredObject
-import bcrypt, scrypt, base64
+import bcrypt, scrypt, base64, time
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES
@@ -42,7 +42,11 @@ class User(StoredObject):
 	def createUserKeyPair(self, password):
 		password = password.encode('utf-8')
 		salt = Random.new().read(32)
-		derived_key = scrypt.hash(password, salt)[:32]
+		
+		print "Generating Scrypt hash"
+		t = time.time()
+		derived_key = scrypt.hash(password, salt, N=1<<Config().scryptDifficulty)[:32]
+		print "Took %s s." % (time.time()-t)
 		
 		rsakey = RSA.generate(2048, Random.new().read)
 		
