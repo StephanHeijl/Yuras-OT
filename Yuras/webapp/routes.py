@@ -74,7 +74,7 @@ def startRequestTimer():
 	
 @app.after_request
 def stopRequestTime(response):
-	#print "Request took %s ms." % ((time.time() - g.start_time)*1000), request.endpoint, request.view_args
+	print "Request took %s ms." % ((time.time() - g.start_time)*1000), request.endpoint, request.view_args
 	return response
 
 # ROUTES #
