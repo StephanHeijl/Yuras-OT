@@ -163,6 +163,7 @@ def documentsIndex():
 @login.login_required
 def documentNew():
 	doc = Document()
+	doc.author = login.current_user.username
 	doc.save()
 	_id = doc._id
 	return redirect("/documents/%s" % _id)
