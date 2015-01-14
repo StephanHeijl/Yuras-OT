@@ -88,6 +88,11 @@ def stopRequestTime(response):
 		pass
 	return response
 
+# ADD USER TO G #
+@app.before_request
+def addCurrentUser():
+    g.current_user = login.current_user
+
 # ROUTES #
 
 # ERROR PAGES #

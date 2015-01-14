@@ -13,6 +13,7 @@
 				<table class="table table-striped">
 					<thead>
 						<tr>
+							<th> </th>
 							<th> Username </th>
 							<th> Email </th>
 							<th> Created </th>
@@ -22,7 +23,18 @@
 					<tbody>
 						{% for user in users %} 
 						<tr>
-							<td><a href="/users/{{user._id}}">{{ user.username }}</a></td>
+							<td width=10>
+								{% if user._id == current_user._id %}
+									<span title="This is you" class="glyphicon glyphicon-star" style="opacity:0.5;"></span>
+								{% endif %}
+							</td>
+							<td>
+								
+								<a href="/users/{{user._id}}">
+								{{ user.username }}
+								</a>
+								
+							</td>
 							<td>{{ user.email }}</td>
 							<td>{{ user._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
 							<td>
