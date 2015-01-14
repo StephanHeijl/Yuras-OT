@@ -1,8 +1,8 @@
 import os, re, base64, urllib2, json, time, random, chardet
 from functools import wraps
 
-from flask import Flask,render_template,abort, Response, request, session, redirect, g
-from flask.ext.login import LoginManager, login_required
+from flask import Flask,render_template,abort, Response, request, session, redirect, g, url_for
+from flask.ext import login
 
 from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
@@ -21,29 +21,37 @@ app.secret_key = Random.new().read(32)
 
 
 # AUTH #
-login_manager = LoginManager()
+login_manager = login.LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = "/login"
+login_manager.login_view = "do_login"
 
 @login_manager.user_loader
 def load_user(userid):
 	try:
-		return User().getObjectsByKey("_id", _id)[0]
+		return User().getObjectsByKey("_id", userid)[0]
 	except:
 		return None
 	
 @app.route("/login", methods=["GET", "POST"])
-def login():
+def do_login():
+	if login.current_user.is_authenticated():
+		print "Redirecting to dashboard"
+		return redirect(request.args.get('next') or url_for('index'))
+	
 	if request.method == "POST":
 		try:
 			user = User().getObjectsByKey("username", request.form.get("username"))[0]
 		except:
 			user = None
-		
+				
 		if user is not None and user.checkPassword( urllib2.unquote( request.form.get("password").encode('utf-8') ) ):
-			return redirect(request.form.get("next") or "/dashboard")
-		
-	return render_template("/users/login.html", name="Log in")
+			print "Username and password correct"
+			login.login_user(user)
+			return redirect(request.args.get('next') or url_for('index'))
+			
+		return render_template("/users/login.html", name="Log in", error="This username/password combination does not exist.")
+	else:
+		return render_template("/users/login.html", name="Log in")
 
 # LOAD TEMPLATE TOOLS #
 tools = TemplateTools()
@@ -74,13 +82,15 @@ def startRequestTimer():
 	
 @app.after_request
 def stopRequestTime(response):
-	print "Request took %s ms." % ((time.time() - g.start_time)*1000), request.endpoint, request.view_args
+	try:
+		print "Request took %s ms." % ((time.time() - g.start_time)*1000), request.endpoint, request.view_args
+	except:
+		pass
 	return response
 
 # ROUTES #
 
 # ERROR PAGES #
-
 @app.errorhandler(403)
 def page_not_found(e):
     return render_template('errors/403.html',name="403 - Forbidden"), 403
@@ -99,9 +109,8 @@ def page_not_found(e):
 
 
 # ROUTES #
-
 @app.route("/dashboard")
-@login_required
+@login.login_required
 def index():
 	users = User().matchObjects({}, limit=5)
 	documents = Document().matchObjects(
@@ -138,6 +147,7 @@ def assets(assettype, filename):
 
 # DOCUMENTS #
 @app.route("/documents/")
+@login.login_required
 def documentsIndex():
 	documents = Document().matchObjects(
 		{},
@@ -145,6 +155,7 @@ def documentsIndex():
 	return render_template("documents/index.html", name="Documents overview", documents=documents, active="documents")
 
 @app.route("/documents/new")
+@login.login_required
 def documentNew():
 	doc = Document()
 	doc.save()
@@ -152,6 +163,7 @@ def documentNew():
 	return redirect("/documents/%s" % _id)
 
 @app.route("/documents/<id>")
+@login.login_required
 def documentViewer(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -183,6 +195,7 @@ def documentViewer(id):
 	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, categories=categories)
 
 @app.route("/documents/<id>/save",methods=["POST"])
+@login.login_required
 def documentSave(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -268,6 +281,7 @@ def documentSave(id):
 	return abort(403)
 
 @app.route("/documents/<id>/delete",methods=["POST"])
+@login.login_required
 def documentDelete(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -287,6 +301,7 @@ def documentDelete(id):
 	return abort(403)
 
 @app.route("/documents/<id>/download/<filetype>")
+@login.login_required
 def documentDownload(id, filetype):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -315,6 +330,7 @@ def documentDownload(id, filetype):
 # ANNOTATIONS #
 
 @app.route("/annotations/")
+@login.login_required
 def annotationsIndex():
 	annotations = Annotation().matchObjects(
 		{},
@@ -323,6 +339,7 @@ def annotationsIndex():
 	return render_template("annotations/index.html", name="Annotations overview", annotations=annotations, active="annotations")
 	
 @app.route("/annotations/<id>/delete",methods=["POST"])
+@login.login_required
 def annotationDelete(id):
 	try:
 		annotation = Annotation().getObjectsByKey("_id", id)[0]
@@ -343,6 +360,7 @@ def annotationDelete(id):
 
 # USERS #
 @app.route("/users/")
+@login.login_required
 def usersIndex():
 	users = User().matchObjects(
 		{},
@@ -351,6 +369,7 @@ def usersIndex():
 	return render_template("users/index.html", name="Users overview", users=users, active="users")
 
 @app.route("/users/new")
+@login.login_required
 def userCreate():
 	user = User()
 	user.save()
@@ -358,6 +377,7 @@ def userCreate():
 	return redirect("/users/%s/edit" % _id)
 
 @app.route("/users/<id>/edit")
+@login.login_required
 def userEdit(id):
 	try:
 		user = User().getObjectsByKey("_id", id)[0]
@@ -371,6 +391,7 @@ def userEdit(id):
 	return render_template("users/edit.html", name="Edit user", user=user, active="users")
 
 @app.route("/users/<id>")
+@login.login_required
 def userView(id):
 	try:
 		user = User().getObjectsByKey("_id", id)[0]
@@ -385,6 +406,7 @@ def userView(id):
 	return render_template("users/view.html", name="View user", user=user, active="users")
 
 @app.route("/users/<id>/save",methods=["POST"])
+@login.login_required
 def userSave(id):
 	try:
 		user = User().getObjectsByKey("_id", id)[0]
@@ -407,6 +429,7 @@ def userSave(id):
 	
 
 @app.route("/users/<id>/delete",methods=["POST"])
+@login.login_required
 def userDelete(id):
 	try:
 		user = User().getObjectsByKey("_id", id)[0]
@@ -431,10 +454,12 @@ with open(os.path.join(assetsFolder, "words.txt")) as wordsFile:
 	wordList = [ w.strip("\r ") for w in wordsFile.read().split("\n") if (len(w) > 4 and len(w) < 8) ]
 	
 @app.route("/users/get-random-words/<n>")
+@login.login_required
 def getRandomWords(n):
 	return json.dumps(random.sample(wordList,int(n)))	
 	
 @app.route("/users/<id>/password/edit")
+@login.login_required
 def userPasswordEdit(id):
 	try:
 		user = User().getObjectsByKey("_id", id)[0]
