@@ -18,7 +18,7 @@ h1 {
 }
 .usp-callout {
 	text-align: center;
-	margin: 50px 0;
+	margin: 50px 0 10px;
 	background: #222;
 	color: #eee;
 	box-shadow: inset black 0 0 50px;

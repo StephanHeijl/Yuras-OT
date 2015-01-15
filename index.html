@@ -27,7 +27,7 @@
 			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 				<ul class="nav navbar-nav">
 					<li class="active">
-						<a href="#" data-to="start">Start<span class="sr-only">(current)</span></a>
+						<a href="#" data-to="start">Start</a>
 					</li>
 					<li>
 						<a href="#" data-to="features">Features</a>
@@ -36,10 +36,10 @@
 						<a href="#" data-to="plans-and-pricing">Plans &amp; Pricing</a>
 					</li>
 					<li>
-						<a href="#">Sign up</a>
+						<a href="#" data-to="sign-up">Sign up</a>
 					</li>
 					<li>
-						<a href="#">Contact</a>
+						<a href="#" data-to="contact">Contact</a>
 					</li>
 				</ul>
 			</div>
@@ -135,47 +135,17 @@
 	<div class="jumbotron usp-callout" data-target="plans-and-pricing">
 		<div class="container">
 			<h2>Plans &amp; Pricing</h2>
-			<span class="quote">We believe that people should only pay for what they actually need.<br/> Our basic plans can always be <span class="marked">suited to your needs</span> and fitted with features that are relevant to your business.</span>
+			<span class="quote">
+                We believe in a <span class="marked">simple pricing plan</span> that reflects the value of our
+                product to the user.
+            </span>
 			<span class="quote-author">Saman Khanpour, Chief Exective Officer</span>
 		</div>
 	</div>
 
 	<div class="container">
 		<div class="row">
-			<div class="col-lg-3 col-sm-6 price-table">
-				<h3>Single user</h3>
-				<table class="table table-striped">
-					<tr>
-						<td>Users</td>
-						<td>1</td>
-					</tr>
-					<tr>
-						<td>Documents stored</td>
-						<td>100</td>
-					</tr>
-					<tr>
-						<td>U2F two factor authentication**</td>
-						<td>No</td>
-					</tr>
-					<tr>
-						<td>Share documents</td>
-						<td>No</td>
-					</tr>
-					<tr>
-						<td>Fast access*</td>
-						<td width=95px>7-23h</td>
-					</tr>
-					<tr>
-						<td class="price" colspan=2>
-							&euro; 19<small>/month</small>
-						</td>
-					</tr>
-				</table>
-				<div class="btn btn-yuras">
-					Sign up now - 30 days free!
-				</div>
-			</div>
-			<div class="col-lg-3 col-sm-6 price-table">
+			<div class="col-lg-4 col-sm-12 price-table">
 				<h3>Small company</h3>
 				<table class="table table-striped">
 					<tr>
@@ -187,16 +157,12 @@
 						<td>500</td>
 					</tr>
 					<tr>
-						<td>U2F two factor authentication**</td>
+						<td>U2F two factor authentication</td>
 						<td>&euro; 25/user</td>
 					</tr>
 					<tr>
 						<td>Share documents</td>
 						<td>Yes</td>
-					</tr>
-					<tr>
-						<td>Fast access</td>
-						<td width=95px>Always</td>
 					</tr>
 					<tr>
 						<td class="price" colspan=2>
@@ -208,7 +174,7 @@
 					Sign up now - 30 days free!
 				</div>
 			</div>
-			<div class="col-lg-3 col-sm-6 price-table">
+			<div class="col-lg-4 col-sm-12 price-table">
 				<h3>Medium company</h3>
 				<table class="table table-striped">
 					<tr>
@@ -220,16 +186,12 @@
 						<td>1000</td>
 					</tr>
 					<tr>
-						<td>U2F two factor authentication**</td>
+						<td>U2F two factor authentication</td>
 						<td>&euro; 20/user</td>
 					</tr>
 					<tr>
 						<td>Share documents</td>
 						<td>Yes</td>
-					</tr>
-					<tr>
-						<td>Fast access</td>
-						<td width=95px>Always</td>
 					</tr>
 					<tr>
 						<td class="price" colspan=2>
@@ -242,8 +204,8 @@
 				</div>
 
 			</div>
-			<div class="col-lg-3 col-sm-6 price-table">
-				<h3>Large company</h3>
+			<div class="col-lg-4 col-sm-12 price-table">
+				<h3>Enterprise</h3>
 				<table class="table table-striped">
 					<tr>
 						<td>Users</td>
@@ -254,16 +216,12 @@
 						<td>Unlimited</td>
 					</tr>
 					<tr>
-						<td>U2F two factor authentication**</td>
+						<td>U2F two factor authentication</td>
 						<td>&euro; 18/user</td>
 					</tr>
 					<tr>
 						<td>Share documents</td>
 						<td>Yes</td>
-					</tr>
-					<tr>
-						<td>Fast access</td>
-						<td width=95px>Always</td>
 					</tr>
 					<tr>
 						<td class="price" colspan=2>
@@ -275,19 +233,45 @@
 					Contact us
 				</div>
 			</div>
+        </div>
+	</div>
+
+    <div class="jumbotron usp-callout" data-target="sign-up">
+		<div class="container">
+			<h2>Signing up</h2>
 		</div>
 	</div>
+
+	<div class="container" >
+		<div class="row">
+            <div class="col-md-6 col-md-offset-3 col-xs-12 col-xs-offset-0">
+                <p> If we've piqued your interest, please leave us your email address below. We believe in a personal
+                touch and get into contact as soon as possible, to discuss what Yuras can offer you and your company. </p>
+                <div class="form-group">
+                    <input type="email" class="form-control input-lg" id="email" placeholder="Enter your email">
+                </div>
+            </div>
+        </div>
+	</div>
+
+    <div class="jumbotron usp-callout" data-target="contact">
+		<div class="container">
+			<h2>Contact</h2>
+		</div>
+	</div>
+    <div class="container">
+
+		<div class="row">
+            <div class="col-md-12">
+                <p> If you'd like to contact us directly, please email <span class="marked">info@yuras.com.</span>  </p>
+            </div>
+        </div>
+	</div>
+
 
 	<div class="container">
 		<div class="row">
 			<footer>
-				<p>
-					* When Yuras is used outside Fast Access hours you might experience some delay when connecting. This allows us to keep computing costs down by only requisitioning computer power when it is actually needed, in turn providing a lower charge for our customers.
-				</p>
-				<p>
-					** Two factor authentication is always implemented with your smartphone. U2F Authentication will provide you with a separate key, allowing for more advanced and secure logins. This is not a recurring charge. In case your U2F token is lost, it will be replaced for the rate your program allows and your previous token will be blocked.
-				</p>
-
 				<center>
 					&copy; Yuras, 2014
 				</center>
