@@ -133,7 +133,10 @@ class Storage(Singleton):
 :returns: A padded string with type included.
 		"""
 		objType = type(obj)
-		objString = base64.b64encode(str(obj))
+		try:
+			objString = base64.b64encode( str(obj)  )
+		except:
+			objString = base64.b64encode( obj.encode('utf-8') )
 		
 		paddingChar = "{"
 		blockSize = AES.block_size
@@ -177,7 +180,7 @@ class Storage(Singleton):
 		if type_ == "datetime.datetime":
 			return datetime.datetime.strptime(value,'%Y-%m-%d %H:%M:%S.%f')
 		if type_ == "str":
-			return value.decode("utf8")
+			return value.decode('utf-8')
 				
 		try:
 			# Check if it's a builtin type

@@ -1,4 +1,4 @@
-import os, re, base64, urllib2, json, time, random, chardet
+import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections
 from functools import wraps
 
 from flask import Flask,render_template,abort, Response, request, session, redirect, g, url_for
@@ -6,6 +6,7 @@ from flask.ext import login
 
 from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
+from Yuras.common.Config import Config
 
 from Yuras.webapp.models.Document import Document
 from Yuras.webapp.models.Annotation import Annotation
@@ -91,26 +92,26 @@ def stopRequestTime(response):
 # ADD USER TO G #
 @app.before_request
 def addCurrentUser():
-    g.current_user = login.current_user
+	g.current_user = login.current_user
 
 # ROUTES #
 
 # ERROR PAGES #
 @app.errorhandler(403)
 def page_not_found(e):
-    return render_template('errors/403.html',name="403 - Forbidden"), 403
+	return render_template('errors/403.html',name="403 - Forbidden"), 403
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('errors/404.html',name="404 - Not found"), 404
+	return render_template('errors/404.html',name="404 - Not found"), 404
 
 @app.errorhandler(405)
 def page_not_found(e):
-    return render_template('errors/405.html',name="405 - Method not allowed"), 405
+	return render_template('errors/405.html',name="405 - Method not allowed"), 405
 
 @app.errorhandler(500)
 def page_not_found(e):
-    return render_template('errors/500.html',name="500 - Server error"), 500
+	return render_template('errors/500.html',name="500 - Server error"), 500
 
 
 # ROUTES #
@@ -174,6 +175,7 @@ def documentViewer(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
 	except Exception as e:
+		print e
 		return abort(404)
 	
 	annotations = Annotation().getObjectsByKey("document", id)
@@ -195,7 +197,7 @@ def documentViewer(id):
 		
 		document.contents = "".join([before_string, markedContainer[0], document.contents[start:start+length], markedContainer[1],after_string ])
 		
-	document.contents = Pandoc().convert("markdown_github", "html", document.contents.encode("utf-8"))
+	document.contents = Pandoc().convert("markdown_github", "html", document.contents)
 	document.contents = document.contents.replace(markedContainer[0], "<span class='marked'>").replace(markedContainer[1], "</span>")
 
 	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, categories=categories)
@@ -226,7 +228,6 @@ def documentSave(id):
 
 	document.category = category
 	document.save()
-		
 	
 	annotations = urllib2.unquote( request.form.get("annotations","").encode('utf-8') )
 	
@@ -278,8 +279,20 @@ def documentSave(id):
 			
 			a.save()
 	
+	# Counting words
+	words = re.findall("[a-z]{2,}", contents_md.lower())
+	wordCount = collections.defaultdict(int)
+	for word in words:
+		wordCount[word] += 1
+		
+	hashedWordCount = collections.defaultdict(int)
+	for word, count in wordCount.items():
+		hashedWordCount[scrypt.hash(str(word), str(Config().database), N=1<<10)] = count
+	print wordCount
+	#print hashedWordCount
+	
 	if contents is not "":
-		return json.dumps( { 
+		return json.dumps( {
 				"success":"true",
 				"new_csrf":generate_csrf_token()
 			} );
@@ -330,8 +343,51 @@ def documentDownload(id, filetype):
 		return response
 	else:
 		return abort(405)
-	
 
+	
+def flatten(d, parent_key='', sep='_'):
+	items = []
+	for k, v in d.items():
+		new_key = parent_key + sep + k if parent_key else k
+		if isinstance(v, collections.MutableMapping):
+			items.extend(flatten(v, new_key, sep=sep).items())
+		else:
+			items.append((new_key, v))
+	return dict(items)
+	
+@app.route("/documents/add-jurisprudence")
+def addJurisprudenceDocuments():
+	try:
+		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
+	except Exception as e:
+		print e
+		return abort(404)
+	
+	categorized = {}
+	
+	wiki = jurisprudence["Yuras"]["wiki"]
+	for key, document in flatten(wiki).items():
+		title = key.split("_")[-1].strip(".html").split("/")[-1].replace("-"," ")
+		key = key.split("_")[0]
+		
+		if key not in categorized:
+			categorized[key] = []
+			if len(Category().getObjectsByKey("name", key)) == 0:
+				c = Category()
+				c.name = key
+				c.save()
+		
+		if len(Document().getObjectsByKey("title", title)) == 0:
+			print title, "::", key
+			d = Document()
+			d.title = title
+			d.category = key
+			d.contents = document
+			d.author = "Yuras"
+			d.save()
+		categorized[key].append(document)
+	
+	return abort(404)
 	
 # ANNOTATIONS #
 
@@ -340,7 +396,8 @@ def documentDownload(id, filetype):
 def annotationsIndex():
 	annotations = Annotation().matchObjects(
 		{},
-		limit=25)
+		limit=25
+	)
 	
 	return render_template("annotations/index.html", name="Annotations overview", annotations=annotations, active="annotations")
 	
