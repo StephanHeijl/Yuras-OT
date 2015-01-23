@@ -580,7 +580,7 @@ def installYuras():
 	
 	user = User()
 	username = "AccountOne"
-	password = " ".join(random.sample(wordList,4))
+	password = "AccountOne"
 	user.username = username
 	user.setPassword(password)
 	user.save()
