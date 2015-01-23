@@ -24,7 +24,6 @@ assetsFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)),"./public
 app = Flask(__name__, template_folder=templatesFolder)
 app.secret_key = Random.new().read(32)
 
-
 # AUTH #
 login_manager = login.LoginManager()
 login_manager.init_app(app)
@@ -554,7 +553,6 @@ def userDelete(id):
 	
 	return abort(403)
 
-
 # USERS - PASSWORD #
 with open(os.path.join(assetsFolder, "words.txt")) as wordsFile:
 	wordList = [ w.strip("\r ") for w in wordsFile.read().split("\n") if (len(w) > 4 and len(w) < 8) ]
@@ -562,7 +560,7 @@ with open(os.path.join(assetsFolder, "words.txt")) as wordsFile:
 @app.route("/users/get-random-words/<n>")
 @login.login_required
 def getRandomWords(n):
-	return json.dumps(random.sample(wordList,int(n)))	
+	return json.dumps(random.sample(wordList,int(n)))
 	
 @app.route("/users/<id>/password/edit")
 @login.login_required
@@ -574,8 +572,18 @@ def userPasswordEdit(id):
 			
 	return render_template("users/password-edit.html", name="Respin password", user=user, active="users")
 
-
-
+# INSTALLING
+@app.route("/install")
+def installYuras():
+	if len(User().matchObjects({})) > 0:
+		return abort(500)
 	
+	user = User()
+	username = "AccountOne"
+	password = " ".join(random.sample(wordList,4))
+	user.username = username
+	user.setPassword(password)
+	user.save()
 	
+	return json.dumps([username, password])
 	
