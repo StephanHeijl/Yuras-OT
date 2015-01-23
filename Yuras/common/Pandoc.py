@@ -17,7 +17,11 @@ class Pandoc():
 		"""
 		
 		tmp = tempfile.NamedTemporaryFile(delete=False)
-		tmp.write( text )
+		try:
+			tmp.write( text )
+		except:
+			tmp.write( text.encode('utf-8') )
+			
 		tmp.close()
 		
 		formatDict = {"from":from_, "to":to_, "text":tmp.name}
@@ -39,8 +43,10 @@ class Pandoc():
 			result = result[0]
 			
 		os.unlink(tmp.name)
-		return result.decode('utf-8')
-		
+		try:
+			return result.decode('utf-8')
+		except:
+			return result
 # TESTING #
 def test_convert():
 	p = Pandoc()

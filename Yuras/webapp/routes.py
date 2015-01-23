@@ -334,7 +334,7 @@ def documentDownload(id, filetype):
 	}
 	
 	if filetype in filetypes:
-		responseContents = Pandoc().convert("markdown_github", filetype, document.contents.encode("utf-8"))
+		responseContents = Pandoc().convert("markdown_github", filetype, document.contents)
 		response = Response(responseContents, mimetype=filetypes[filetype])
 		
 		filename = document.title + "." + filetype
