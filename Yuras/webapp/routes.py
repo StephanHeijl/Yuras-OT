@@ -1,5 +1,9 @@
-import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections
+from __future__ import division
+
+import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math
 from functools import wraps
+
+from textblob import TextBlob
 
 from flask import Flask,render_template,abort, Response, request, session, redirect, g, url_for
 from flask.ext import login
@@ -343,7 +347,45 @@ def documentDownload(id, filetype):
 		return response
 	else:
 		return abort(405)
+	
+	
+def tf(word, blob):
+	return blob.words.count(word) / len(blob.words)
 
+def n_containing(word, bloblist):
+	return sum(1 for blob in bloblist if word in blob)
+
+def idf(word, bloblist):
+	return math.log(len(bloblist) / (1 + n_containing(word, bloblist)))
+
+def tfidf(word, blob, bloblist):
+	return tf(word, blob) * idf(word, bloblist)
+
+@app.route("/documents/<id>/tfidf")
+#@login.login_required
+def documentTFIDF(id):
+	try:
+		document = Document().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		print e
+		return abort(404)
+	
+	allDocuments = Document().matchObjects(
+		{"category":document.category},
+		limit=250
+	)
+	
+	bloblist = []
+	for d in allDocuments:
+		bloblist.append( TextBlob(Pandoc().convert("markdown_github","plain",d.contents.lower())) )
+	
+	blob = TextBlob(Pandoc().convert("markdown_github","plain",document.contents.lower()))
+	print "Top words in document"
+	scores = {word: tfidf(word, blob, bloblist) for word in blob.words}
+	sorted_words = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+	
+	return json.dumps(sorted_words, indent=4)
+	
 	
 def flatten(d, parent_key='', sep='_'):
 	items = []
@@ -356,6 +398,7 @@ def flatten(d, parent_key='', sep='_'):
 	return dict(items)
 	
 @app.route("/documents/add-jurisprudence")
+@login.login_required
 def addJurisprudenceDocuments():
 	try:
 		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
