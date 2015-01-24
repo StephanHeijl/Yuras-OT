@@ -579,8 +579,8 @@ def installYuras():
 		return abort(500)
 	
 	user = User()
-	username = "AccountOne"
-	password = "AccountOne"
+	username = "accountone"
+	password = "accountone"
 	user.username = username
 	user.setPassword(password)
 	user.save()
