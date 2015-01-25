@@ -1,0 +1,77 @@
+{% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }} {{ deferJS("/assets/js/validator.min.js", 2) }}
+<div class="container">
+
+	<div class="row">
+
+		<div class="col-lg-12">
+			<h2>User {{user.username}}</h2>	
+		</div>
+
+		<div class="col-lg-8">
+			<form class="form-horizontal" action="save" method="post" role="form" data-toggle="validator">
+				<div class="form-group">
+					<label for="firstname" class="col-sm-2 control-label">First name</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">{{user.firstname}}</p>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="lastname" class="col-sm-2 control-label">Last name</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">{{user.lastname}}</p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="lastname" class="col-sm-2 control-label">Username</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">{{user.username}}</p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="email" class="col-sm-2 control-label">Email</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">{{user.email}}</p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="" class="col-sm-2 control-label">Password (Hashed)</label>
+					<div class="col-sm-10">
+						<p class="form-control-static">{{user.password}}</p>
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label for="" class="col-sm-2 control-label">Public key</label>
+					<div class="col-sm-10">
+						<textarea type="text" class="form-control" disabled rows=5>{{ user.public_key }}</textarea>
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<label for="" class="col-sm-2 control-label">Private key (Encrypted, b64)</label>
+					<div class="col-sm-10">
+						<textarea type="text" class="form-control" disabled rows=5>{{ user.private_key }}</textarea>
+					</div>
+				</div>
+
+			</form>
+		</div>
+
+
+		<div class="col-lg-4">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					This is basic user information.
+				</div>
+
+			</div>
+		</div>
+
+	</div>
+
+</div>
+{% endblock %}

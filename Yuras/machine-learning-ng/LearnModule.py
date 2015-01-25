@@ -4,8 +4,9 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from sklearn.linear_model import SGDClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.naive_bayes import GaussianNB,MultinomialNB,BernoulliNB
+
 from sklearn import metrics
 
 import cPickle as pickle
@@ -103,7 +104,7 @@ class LearnModule():
 		   result.append(item)
 	   return result
 	
-	def xfoldMachine(self, x):
+	def xfoldMachine(self, x, classifier=None):
 		for i in range(x):
 			print "%s out of %s" % (i,x)
 			trainData = {}
@@ -126,13 +127,13 @@ class LearnModule():
 
 			labels = self.__uniqify(testCategories)
 
-			self.classifier = SGDClassifier(shuffle=True, n_jobs=-1, penalty='elasticnet', n_iter=math.ceil(10**6/(len(self.categorizedData.values())*(1-(1./x)))) )
+			#self.classifier = SGDClassifier(shuffle=True, n_jobs=-1, penalty='elasticnet', n_iter=math.ceil(10**6/(len(self.categorizedData.values())*(1-(1./x)))) )
+			self.classifier = classifier
 			classifier = self.teachMachine(trainDocuments, trainCategories)
 
 			predictedTest = classifier.predict(testDocuments)
 
-			print metrics.f1_score(testCategories, predictedTest, average='weighted'),
-			metrics.accuracy_score(testCategories, predictedTest)
+			print metrics.f1_score(testCategories, predictedTest, average='weighted'), metrics.accuracy_score(testCategories, predictedTest)
 			
 	def fullTraining(self):
 		print "Performing a full training."
@@ -150,6 +151,38 @@ if __name__ == "__main__":
 		lm.getStopWords(args.get("stopwords",""))
 	
 	lm.analyzeJSON(args.get("in", None))
-	lm.fullTraining()
-	#lm.xfoldMachine(10)
+	#lm.fullTraining()
+	
+	print "Starting"
+	clfs = [
+		SVC(kernel="rbf", gamma=0.0),
+		SVC(kernel="rbf", gamma=1.0),
+		SVC(kernel="rbf", gamma=5.0),
+		SVC(kernel="rbf", gamma=10.0),
+		SVC(kernel="poly", gamma=0.0),
+		SVC(kernel="poly", gamma=1.0),
+		SVC(kernel="poly", gamma=5.0),
+		SVC(kernel="poly", gamma=10.0),
+		SVC(kernel="sigmoid", gamma=0.0),
+		SVC(kernel="sigmoid", gamma=1.0),
+		SVC(kernel="sigmoid", gamma=5.0),
+		SVC(kernel="sigmoid", gamma=10.0),
+		SGDClassifier(shuffle=True,loss='perceptron',alpha=0.0001,n_iter=100),
+		SGDClassifier(shuffle=True,loss='perceptron',alpha=0.001,n_iter=100),
+		SGDClassifier(shuffle=True,loss='perceptron',alpha=0.01,n_iter=100),
+		SGDClassifier(shuffle=True,loss='hinge',alpha=0.0001,n_iter=100),
+		SGDClassifier(shuffle=True,loss='hinge',alpha=0.001,n_iter=100),
+		SGDClassifier(shuffle=True,loss='hinge',alpha=0.01,n_iter=100),
+		SGDClassifier(shuffle=True,loss='log',alpha=0.0001,n_iter=100),
+		SGDClassifier(shuffle=True,loss='log',alpha=0.001,n_iter=100),
+		SGDClassifier(shuffle=True,loss='log',alpha=0.01,n_iter=100),
+		MultinomialNB(alpha=0.1),
+		MultinomialNB(alpha=1.0),
+		MultinomialNB(alpha=10.0),
+		MultinomialNB(alpha=100.0)
+	]
+	
+	for clf in clfs:
+		print repr(clf)
+		lm.xfoldMachine(10, classifier=clf)
 	
