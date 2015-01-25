@@ -44,9 +44,11 @@ def do_login():
 	
 	if request.method == "POST":
 		try:
-			user = User().getObjectsByKey("username", request.form.get("username"))[0]
-		except:
+			user = User().getObjectsByKey("username", unicode(request.form.get("username")),limit=1)[0]
+		except Exception as e:
+			print e
 			user = None
+			print "user not found"
 				
 		if user is not None and user.checkPassword( urllib2.unquote( request.form.get("password").encode('utf-8') ) ):
 			print "Username and password correct"
@@ -579,11 +581,15 @@ def installYuras():
 		return abort(500)
 	
 	user = User()
-	username = "accountone"
-	password = "accountone"
-	user.username = username
-	user.setPassword(password)
 	user.save()
+	
+	username = u"accountone"
+	password = unicode(" ".join(random.sample(wordList,4)))
+	
+	user.setPassword(password)
+	user.username = username	
+	
+	user.save()		
 	
 	return json.dumps([username, password])
 	
