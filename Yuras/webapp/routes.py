@@ -72,6 +72,7 @@ def csrf_protect(*args, **kwargs):
 		token = session.pop('_csrf_token', None)		
 		givenToken = urllib2.unquote( request.form.get('_csrf_token',False) )
 		if not token or token != givenToken:
+			print "Incorrect CSRF", token, givenToken
 			abort(403)
 			
 def generate_csrf_token():
