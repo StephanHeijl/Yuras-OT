@@ -301,7 +301,7 @@ def documentSave(id):
 	print wordCount
 	#print hashedWordCount
 	
-	if contents is not "":
+	if contents_escaped is not "":
 		return json.dumps( {
 				"success":"true",
 				"new_csrf":generate_csrf_token()
