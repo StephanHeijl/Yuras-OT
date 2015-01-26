@@ -8,7 +8,7 @@ sudo cabal update
 sudo cabal install pandoc
 
 # add pandoc dir to path
-#export PATH=$PATH:~/.cabal/bin 
+export PATH=$PATH:~/.cabal/bin
 
 sudo mkdir /data
 sudo mkdir /data/db
