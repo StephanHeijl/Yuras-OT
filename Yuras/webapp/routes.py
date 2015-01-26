@@ -211,6 +211,7 @@ def documentViewer(id):
 @app.route("/documents/<id>/save",methods=["POST"])
 @login.login_required
 def documentSave(id):
+	print "Retrieving/creating document"
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
@@ -219,9 +220,12 @@ def documentSave(id):
 	if request.method != "POST":
 		return abort(405)
 	
-	contents = urllib2.unquote( request.form.get("contents","").encode('utf-8') )
-	contents_escaped = contents
+	print "Converting contents"
+	
+	contents_escaped = urllib2.unquote( request.form.get("contents","").encode('utf-8') )
+	print contents_escaped
 	contents_md = unicode(Pandoc().convert("html","markdown_github",contents_escaped))
+	print contents_md
 	title = urllib2.unquote( request.form.get("title","").encode('utf-8') )
 	
 	document.contents = contents_md.encode('utf-8')
