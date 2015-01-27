@@ -32,14 +32,15 @@ login_manager.login_view = "do_login"
 @login_manager.user_loader
 def load_user(userid):
 	try:
+		print "Getting user", userid
 		return User().getObjectsByKey("_id", userid)[0]
-	except:
+	except Exception as e:
+		print e
 		return None
 	
 @app.route("/login", methods=["GET", "POST"])
 def do_login():
 	if login.current_user.is_authenticated():
-		print "Redirecting to dashboard"
 		return redirect(request.args.get('next') or url_for('index'))
 	
 	if request.method == "POST":
@@ -48,13 +49,15 @@ def do_login():
 		except Exception as e:
 			print e
 			user = None
-			print "user not found"
+			print "User not found"
 				
 		if user is not None and user.checkPassword( urllib2.unquote( request.form.get("password").encode('utf-8') ) ):
 			print "Username and password correct"
 			login.login_user(user)
 			return redirect(request.args.get('next') or url_for('index'))
-			
+		
+		print "Password incorrect"
+		
 		return render_template("/users/login.html", name="Log in", error="This username/password combination does not exist.")
 	else:
 		return render_template("/users/login.html", name="Log in")
@@ -121,13 +124,18 @@ def page_not_found(e):
 
 
 # ROUTES #
+@app.route("/")
+def rootRedirect():
+	return redirect(url_for('index'))
+
 @app.route("/dashboard")
 @login.login_required
 def index():
 	users = User().matchObjects({}, limit=5)
 	documents = Document().matchObjects(
 		{},
-		limit=10)
+		limit=10,
+		fields={"title":True, "created":True, "author":True, "secure":True})
 	news = ["First mockup released"]
 	return render_template("homepage/index.html", name="Dashboard", users=users, documents=documents, news=news, active="dashboard")
 
@@ -163,8 +171,14 @@ def assets(assettype, filename):
 def documentsIndex():
 	documents = Document().matchObjects(
 		{},
-		limit=25)
+		limit=25,
+		fields={"title":True, "created":True, "author":True, "secure":True}
+		)
 	return render_template("documents/index.html", name="Documents overview", documents=documents, active="documents")
+
+@app.route("/documents/json/<page>/<amount>")
+def documentsJSON():
+	return json.dumps("Hey")
 
 @app.route("/documents/new")
 @login.login_required

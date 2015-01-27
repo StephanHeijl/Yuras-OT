@@ -77,23 +77,26 @@ class StoredObject():
 			
 		return newObject
 	
-	def getObjectsByKey(self, key, value, limit=None):
+	def getObjectsByKey(self, key, value, limit=None, skip=0):
 		""" This will retrieve documents from the database and collection specified by this object based on one of their keys and convert them to their proper Python object state.
 		
 		:param key: The key to select on.
 		:param value: The value to search for.
 		:param limit: The maximum amount of objects to return. Will return all results by default.
+		:param skip: The amount of objects to skip, basically an offset.
 		:rtype: All the matching objects stored in the database.
 		"""
 		
-		return self.matchObjects({key:value}, limit)
+		return self.matchObjects({key:value}, limit, skip)
 	
-	def matchObjects(self, match, limit=None):
+	def matchObjects(self, match, limit=None, skip=0, fields={}):
 		""" This method allows you to match a StoredOject directly. It allows for more advanced queries.
 		
-:param match: A query dictionary.
-:param limit: The maximum amount of objects to return. Will return all results by default.
-:rtype: All the matching objects stored in the database.
+		:param match: A query dictionary.
+		:param limit: The maximum amount of objects to return. Will return all results by default.
+		:param skip: The amount of objects to skip, basically an offset.
+		:param fields: The fields to return for this object.
+		:rtype: All the matching objects stored in the database.
 		"""
 		storage = self.storage
 		database = self._database
@@ -104,7 +107,7 @@ class StoredObject():
 		
 		storage.getDatabase(database)
 		storage.getCollection(collection)
-		documents = storage.getDocuments(match, limit)
+		documents = storage.getDocuments(match, limit, skip, fields)
 				
 		objects = [ self.loadFromRawData( data ) for data in documents ]
 		return objects

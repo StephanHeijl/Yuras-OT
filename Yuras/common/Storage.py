@@ -345,7 +345,7 @@ class Storage(Singleton):
 		self.__currentCollection.remove(match)
 		return True
 		
-	def getDocuments(self, match, limit=None):
+	def getDocuments(self, match, limit=None, skip=0, fields={}):
 		""" Returns all documents that match the give query, up until `limit` is reached. By default, this will return every single result.
 		Refer to the [MongoDB documentation](http://docs.mongodb.org/manual/tutorial/query-documents) on this subject for more information on queries.
 		This method will also work if documents are encrypted.
@@ -366,10 +366,14 @@ class Storage(Singleton):
 		if self.__encryptDocuments:
 			match = self.__encryptDocument(match)
 			
-		if limit is None:
-			documents = self.__currentCollection.find(match)
+		if fields == {}:
+			documents = self.__currentCollection.find(match, skip=skip)
 		else:
-			documents = self.__currentCollection.find(match).limit(limit)
+			documents = self.__currentCollection.find(match, fields=fields, skip=0)
+			
+		if limit is not None:
+			documents = documents.limit(limit)
+		
 		
 		if self.__encryptDocuments:
 			return [self.__decryptDocument(d) for d in documents]
