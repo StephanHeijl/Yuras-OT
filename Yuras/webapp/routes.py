@@ -167,18 +167,37 @@ def assets(assettype, filename):
 
 # DOCUMENTS #
 @app.route("/documents/")
-@login.login_required
+#@login.login_required
 def documentsIndex():
 	documents = Document().matchObjects(
 		{},
-		limit=25,
-		fields={"title":True, "created":True, "author":True, "secure":True}
+		limit=10,
+		fields={"title":True, "_created":True, "author":True, "secure":True, "_id":True}
 		)
 	return render_template("documents/index.html", name="Documents overview", documents=documents, active="documents")
 
-@app.route("/documents/json/<page>/<amount>")
-def documentsJSON():
-	return json.dumps("Hey")
+@app.route("/documents/json/<amount>/<page>")
+@login.login_required
+def documentsJSON(amount,page):
+	fields = {"title":True, "_created":True, "author":True, "secure":True, "_id":True}
+	documents = Document().matchObjects(
+		{},
+		limit=int(amount),
+		skip=int(page)*int(amount),	
+		fields=fields
+		)
+	return json.dumps([dict([ (f,str(getattr(d,f,None))) for f in fields if fields[f]]) for d in  documents])
+
+@app.route("/documents/table/<amount>/<page>")
+def documentsTable(amount,page):
+	fields = {"title":True, "_created":True, "author":True, "secure":True, "_id":True}
+	documents = Document().matchObjects(
+		{},
+		limit=int(amount),
+		skip=int(page)*int(amount),		
+		fields=fields
+		)
+	return render_template("documents/table.html", documents=documents)
 
 @app.route("/documents/new")
 @login.login_required

@@ -15,17 +15,17 @@
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<th> Name </th>
-							<th> Author </th>
-							<th> Secure </th>
-							<th> Created </th>
+							<th data-key="title"> Title </th>
+							<th data-key="author"> Author </th>
+							<th data-key="secure"> Secure </th>
+							<th data-key="_created"> Created </th>
 							<th> Actions </th>
 						</tr>						
 					</thead>
 					<tbody>
 						{% for document in documents %} 
 						<tr>
-							<td><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a></td>
+							<td width="50%"><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a></td>
 							<td>{{ document.author }}</td>
 							<td>{{ document.secure }}</td>
 							<td>{{ document._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
@@ -37,6 +37,9 @@
 						{% endfor %}
 					</tbody>
 				</table>
+				
+				<a class="btn btn-default prev-page" disabled=disabled><span class="glyphicon glyphicon-arrow-left"></span> Previous page </a>
+				<a class="btn btn-default pull-right next-page"> Next page <span class="glyphicon glyphicon-arrow-right"></span></a>
 				
 			</div>
 

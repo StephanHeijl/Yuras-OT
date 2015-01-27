@@ -369,7 +369,7 @@ class Storage(Singleton):
 		if fields == {}:
 			documents = self.__currentCollection.find(match, skip=skip)
 		else:
-			documents = self.__currentCollection.find(match, fields=fields, skip=0)
+			documents = self.__currentCollection.find(match, fields=fields, skip=skip)
 			
 		if limit is not None:
 			documents = documents.limit(limit)

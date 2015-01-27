@@ -107,6 +107,7 @@ class StoredObject():
 		
 		storage.getDatabase(database)
 		storage.getCollection(collection)
+		print match, limit, skip, fields
 		documents = storage.getDocuments(match, limit, skip, fields)
 				
 		objects = [ self.loadFromRawData( data ) for data in documents ]
