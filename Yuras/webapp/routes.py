@@ -403,39 +403,57 @@ def flatten(d, parent_key='', sep='_'):
 	return dict(items)
 	
 @app.route("/documents/add-jurisprudence")
-@login.login_required
+#@login.login_required
 def addJurisprudenceDocuments():
-	try:
-		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
-	except Exception as e:
-		print e
-		return abort(404)
 	
-	categorized = {}
-	
-	wiki = jurisprudence["Yuras"]["wiki"]
-	for key, document in flatten(wiki).items():
-		title = key.split("_")[-1].strip(".html").split("/")[-1].replace("-"," ")
-		key = key.split("_")[0]
+	def generateJurisprudenceDocuments():
+		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )		
 		
-		if key not in categorized:
-			categorized[key] = []
-			if len(Category().getObjectsByKey("name", key)) == 0:
-				c = Category()
-				c.name = key
-				c.save()
-		
-		if len(Document().getObjectsByKey("title", title)) == 0:
-			print title, "::", key
-			d = Document()
-			d.title = title
-			d.category = key
-			d.contents = document
-			d.author = "Yuras"
-			d.save()
-		categorized[key].append(document)
-	
-	return abort(404)
+		categorized = {}
+		wiki = jurisprudence["Yuras"]["wiki"]
+		flatWiki = flatten(wiki)
+		dCounter = 1
+		dTotal = len(flatWiki)
+		for key, document in flatWiki.items():
+			title = key.split("_")[-1].strip(".html").split("/")[-1].replace("-"," ")
+			title = title[0].upper() + title[1:]
+			key = key.split("_")[0]
+
+			if key not in categorized:
+				categorized[key] = []
+				if len(Category().getObjectsByKey("name", key)) == 0:
+					c = Category()
+					c.name = key
+					c.save()
+
+			if len(Document().getObjectsByKey("title", title)) == 0:
+				d = Document()
+				d.title = title
+				d.category = key
+				d.contents = document
+				d.author = "Yuras"
+
+				# Counting words
+				words = re.findall("[a-z]{2,}", document.lower())
+				wordCount = collections.defaultdict(int)
+				for word in words:
+					wordCount[word] += 1
+
+				hashedWordCount = collections.defaultdict(int)
+				for word, count in wordCount.items():
+					k = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+					hashedWordCount[k] = count
+
+				d.wordcount = dict(hashedWordCount)
+				d.save()
+			
+			categorized[key].append(document)
+			print title, "saved", dCounter, "/", dTotal
+			dCounter += 1
+			yield title + "\n"
+			
+			
+	return Response(generateJurisprudenceDocuments(), mimetype='text/plain')
 
 def do_documentSearch(keywords):
 	wordCountList = []
