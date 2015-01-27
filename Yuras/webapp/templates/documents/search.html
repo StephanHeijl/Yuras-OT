@@ -1,0 +1,40 @@
+{% extends "layout/master.html" %} 
+{% block index %}
+{{ deferJS("/assets/js/yuras.js", 1) }}
+{{ deferJS("/assets/js/documents-popup.js", 1) }}
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-lg-12">
+				<h2>Search results for '{{ keywords.strip(" ") }}'</h2>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th> Name </th>
+							<th> Author </th>
+							<th> Created </th>
+							<th> Actions </th>
+						</tr>						
+					</thead>
+					<tbody>
+						{% for document in documents %} 
+						<tr>
+							<td><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a></td>
+							<td>{{ document.author }}</td>
+							<td>{{ document._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+							<td>
+								<a href="/documents/{{ document._id }}/delete" class="delete-document" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
+								<a href="/documents/{{ document._id }}/download/docx" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-download-alt"></span></a>
+							</td>
+						</tr>					
+						{% endfor %}
+					</tbody>
+				</table>
+				
+			</div>
+
+		</div>
+
+	</div>
+{% endblock %}

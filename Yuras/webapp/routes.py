@@ -1,6 +1,6 @@
 from __future__ import division
 
-import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math
+import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math, pprint
 from functools import wraps
 
 from textblob import TextBlob
@@ -211,7 +211,6 @@ def documentViewer(id):
 @app.route("/documents/<id>/save",methods=["POST"])
 @login.login_required
 def documentSave(id):
-	print "Retrieving/creating document"
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
@@ -220,12 +219,9 @@ def documentSave(id):
 	if request.method != "POST":
 		return abort(405)
 	
-	print "Converting contents"
 	
 	contents_escaped = urllib2.unquote( request.form.get("contents","").encode('utf-8') )
-	print contents_escaped
 	contents_md = unicode(Pandoc().convert("html","markdown_github",contents_escaped))
-	print contents_md
 	title = urllib2.unquote( request.form.get("title","").encode('utf-8') )
 	
 	document.contents = contents_md.encode('utf-8')
@@ -297,9 +293,13 @@ def documentSave(id):
 		
 	hashedWordCount = collections.defaultdict(int)
 	for word, count in wordCount.items():
-		hashedWordCount[scrypt.hash(str(word), str(Config().database), N=1<<10)] = count
+		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+		hashedWordCount[key] = count
+	
 	print wordCount
-	#print hashedWordCount
+	
+	document.wordcount = dict(hashedWordCount)
+	document.save()
 	
 	if contents_escaped is not "":
 		return json.dumps( {
@@ -354,7 +354,6 @@ def documentDownload(id, filetype):
 	else:
 		return abort(405)
 	
-	
 def tf(word, blob):
 	return blob.words.count(word) / len(blob.words)
 
@@ -368,7 +367,7 @@ def tfidf(word, blob, bloblist):
 	return tf(word, blob) * idf(word, bloblist)
 
 @app.route("/documents/<id>/tfidf")
-#@login.login_required
+@login.login_required
 def documentTFIDF(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -437,6 +436,32 @@ def addJurisprudenceDocuments():
 		categorized[key].append(document)
 	
 	return abort(404)
+
+def do_documentSearch(keywords):
+	wordCountList = []
+	keys = []
+	for word in keywords:
+		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+		keys.append(key)
+		wordCountList.append( {"wordcount."+key : { "$exists": True }} )
+		
+	matchArray = {"$or":wordCountList}
+	
+	results = Document().matchObjects(
+		matchArray,
+		limit=10
+	)
+	
+	results.sort(key=lambda r:r.wordcount.get(keys[0],0))
+	return results
+	
+@app.route("/documents/search")
+#@login.login_required
+def documentSearch():
+	keywords = request.args.get("keywords", "").split(" ") + request.form.get("keywords", "").split(" ")
+	results = do_documentSearch(keywords)
+	
+	return render_template("documents/search.html", name="Document search results", documents=results, keywords=" ".join(keywords), active="documents")
 	
 # ANNOTATIONS #
 

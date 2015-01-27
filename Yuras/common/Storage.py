@@ -104,7 +104,7 @@ class Storage(Singleton):
 		""" Sets the collection to the one specified. If it does not yet exist, it will be created when a document is inserted.
 		Will throw a ValueError if no database has been selected.
 		
-		:param collection: The name the collection that is to be accessed.
+		:param collection: The name of the collection that is to be accessed.
 		:rtype: The name of the collection that is currently being accessed.
 		"""
 		if self.__currentDatabase == None:
@@ -209,7 +209,7 @@ class Storage(Singleton):
 			
 			for value in document:
 				if isinstance(value, list) or isinstance(value, dict):
-					encryptedDocument[key] = self.__encryptDocument(value)
+					encryptedDocument.append(self.__encryptDocument(value))
 					continue
 				
 				cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
