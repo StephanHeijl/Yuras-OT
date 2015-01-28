@@ -515,6 +515,14 @@ def documentSearch():
 	results = do_documentSearch(keywords)
 	
 	return render_template("documents/search.html", name="Document search results", documents=results, keywords=" ".join(keywords), active="documents")
+
+@app.route("/documents/search/table")
+#@login.login_required
+def documentSearchTable():
+	keywords = request.args.get("keywords", "").split(" ") + request.form.get("keywords", "").split(" ")
+	results = do_documentSearch(keywords)
+	
+	return render_template("documents/search-table.html", documents=results)
 	
 # ANNOTATIONS #
 
