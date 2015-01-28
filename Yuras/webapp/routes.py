@@ -389,21 +389,12 @@ def documentDownload(id, filetype):
 		return response
 	else:
 		return abort(405)
-	
-def tf(word, blob):
-	return blob.words.count(word) / len(blob.words)
-
-def n_containing(word, bloblist):
-	return sum(1 for blob in bloblist if word in blob)
-
-def idf(word, bloblist):
-	return math.log(len(bloblist) / (1 + n_containing(word, bloblist)))
 
 def tfidf(word, blob, bloblist):
 	return tf(word, blob) * idf(word, bloblist)
 
 @app.route("/documents/<id>/tfidf")
-@login.login_required
+#@login.login_required
 def documentTFIDF(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -411,21 +402,44 @@ def documentTFIDF(id):
 		print e
 		return abort(404)
 	
+	# Cound words in this document
+	words = re.findall("[a-z]{2,}", document.contents.lower()) + re.findall("[a-z]{2,}", document.title.lower())
+	wordCount = collections.defaultdict(int)
+	for word in words:
+		wordCount[word] += 1
+		
+	termFrequencies = {}
+	for word in words:
+		termFrequencies[word] = (wordCount[word], wordCount[word]/len(words))
+		
 	allDocuments = Document().matchObjects(
 		{"category":document.category},
-		limit=250
+		fields={"wordcount":True}
 	)
 	
-	bloblist = []
+	documentCount = len(allDocuments)
+	
+	hashedWordCount = collections.defaultdict(int)
+	allDocuments = Document().matchObjects(
+		{"$and": [{"category":document.category}, {"wordcount" : { "$exists": True }}]},
+		fields={"wordcount":True}
+	)
+	
+	allWordCounts = []
 	for d in allDocuments:
-		bloblist.append( TextBlob(Pandoc().convert("markdown_github","plain",d.contents.lower())) )
+		allWordCounts += d.wordcount.keys()
+
+	tfidf = {}
 	
-	blob = TextBlob(Pandoc().convert("markdown_github","plain",document.contents.lower()))
-	print "Top words in document"
-	scores = {word: tfidf(word, blob, bloblist) for word in blob.words}
-	sorted_words = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-	
-	return json.dumps(sorted_words, indent=4)
+	for word, (count, tf) in termFrequencies.items():
+		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+		hashedWordCount[key] = (word, count,tf )
+		containWord = allWordCounts.count(key)
+		idf = math.log(documentCount / (1+containWord))
+		tfidf[word] = idf*tf
+		
+		
+	return json.dumps(tfidf)
 	
 	
 def flatten(d, parent_key='', sep='_'):
@@ -487,7 +501,6 @@ def addJurisprudenceDocuments():
 			print title, "saved", dCounter, "/", dTotal
 			dCounter += 1
 			yield title + "\n"
-			
 			
 	return Response(generateJurisprudenceDocuments(), mimetype='text/plain')
 
