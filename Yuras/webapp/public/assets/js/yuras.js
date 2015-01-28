@@ -79,7 +79,9 @@ $(function () {
 			changePage(-1)
 		})
 
-		// Set to the proper page
-		changePage(0);
+		// Set to the proper page if there are prev/next buttons
+		if($(".next-page, .prev-page").length >= 2) {
+			changePage(0);	
+		}
 	
 });

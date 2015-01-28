@@ -503,7 +503,7 @@ def do_documentSearch(keywords):
 		limit=10
 	)
 	
-	results.sort(key=lambda r:r.wordcount.get(keys[0],0))
+	#results.sort(key=lambda r:r.wordcount.get(keys[0],0))
 	return results
 	
 @app.route("/documents/search")
