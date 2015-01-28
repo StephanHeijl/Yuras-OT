@@ -178,7 +178,10 @@ class Storage(Singleton):
 		if type_ == "bool":
 			return type_ == "True"
 		if type_ == "datetime.datetime":
-			return datetime.datetime.strptime(value,'%Y-%m-%d %H:%M:%S.%f')
+			try:
+				return datetime.datetime.strptime(value,'%Y-%m-%d %H:%M:%S.%f')
+			except:
+				return datetime.datetime(*[ int(i) for i in value[:-1].split("(")[1].split(", ")])
 		if type_ == "str":
 			return value.decode('utf-8')
 				

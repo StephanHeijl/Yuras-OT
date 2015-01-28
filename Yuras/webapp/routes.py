@@ -174,7 +174,9 @@ def documentsIndex():
 		limit=10,
 		fields={"title":True, "_created":True, "author":True, "secure":True, "_id":True}
 		)
-	return render_template("documents/index.html", name="Documents overview", documents=documents, active="documents")
+	
+	categories = Category().matchObjects({})
+	return render_template("documents/index.html", name="Documents overview", documents=documents, categories=categories, active="documents")
 
 @app.route("/documents/json/<amount>/<page>")
 @login.login_required
