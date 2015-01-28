@@ -321,7 +321,7 @@ def documentSave(id):
 			a.save()
 	
 	# Counting words
-	words = re.findall("[a-z]{2,}", contents_md.lower())
+	words = re.findall("[a-z]{2,}", contents_md.lower()) + re.findall("[a-z]{2,}", title.lower())
 	wordCount = collections.defaultdict(int)
 	for word in words:
 		wordCount[word] += 1
@@ -469,7 +469,7 @@ def addJurisprudenceDocuments():
 				d.author = "Yuras"
 
 				# Counting words
-				words = re.findall("[a-z]{2,}", document.lower())
+				words = re.findall("[a-z]{2,}", document.lower()) + re.findall("[a-z]{2,}", title.lower())
 				wordCount = collections.defaultdict(int)
 				for word in words:
 					wordCount[word] += 1
