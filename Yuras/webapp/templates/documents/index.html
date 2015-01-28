@@ -22,9 +22,14 @@
 					<span class="input-group-btn">
 						<!-- Category picker -->
 						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false">
-							<span class="category-dropdown-text">Category</span> <span class="caret"></span>
+							<span class="category-dropdown-text"> Any category</span> <span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu" role="menu">
+							<li>
+								<a href="#" class="category-option" data-value="">
+									Any category
+								</a>
+							</li>
 							{% for category in categories %}
 							<li>
 								<a href="#" data-value="{{ category.name }}" onclick="$('.category-dropdown-text').text($(this).data('value'));$('.category-input').val($(this).data('value')); ">

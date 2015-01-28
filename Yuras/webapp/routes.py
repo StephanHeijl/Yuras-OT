@@ -167,7 +167,7 @@ def assets(assettype, filename):
 
 # DOCUMENTS #
 @app.route("/documents/")
-#@login.login_required
+@login.login_required
 def documentsIndex():
 	documents = Document().matchObjects(
 		{},
@@ -191,6 +191,7 @@ def documentsJSON(amount,page):
 	return json.dumps([dict([ (f,str(getattr(d,f,None))) for f in fields if fields[f]]) for d in  documents])
 
 @app.route("/documents/table/<amount>/<page>")
+@login.login_required
 def documentsTable(amount,page):
 	fields = {"title":True, "_created":True, "author":True, "secure":True, "_id":True}
 	documents = Document().matchObjects(
@@ -438,7 +439,7 @@ def flatten(d, parent_key='', sep='_'):
 	return dict(items)
 	
 @app.route("/documents/add-jurisprudence")
-#@login.login_required
+@login.login_required
 def addJurisprudenceDocuments():
 	
 	def generateJurisprudenceDocuments():
@@ -490,37 +491,62 @@ def addJurisprudenceDocuments():
 			
 	return Response(generateJurisprudenceDocuments(), mimetype='text/plain')
 
-def do_documentSearch(keywords):
+def do_documentSearch(keywords, category=None, skip=0, limit=10):
 	wordCountList = []
 	keys = []
 	for word in keywords:
+		if len(word) == 0:
+			continue
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		keys.append(key)
 		wordCountList.append( {"wordcount."+key : { "$exists": True }} )
-		
-	matchArray = {"$or":wordCountList}
+	
+	if len(wordCountList) > 0:
+		matchArray = {"$or":wordCountList}
+	
+		if category is not None:
+			orValues = matchArray["$or"]
+			del matchArray["$or"]
+			matchArray["$and"] = [{"category":category}, {"$or":orValues}]
+			
+	else:
+		if category is not None:
+			matchArray = {"category":category}
 	
 	results = Document().matchObjects(
 		matchArray,
-		limit=10
+		limit=limit,
+		skip=skip
 	)
 	
 	#results.sort(key=lambda r:r.wordcount.get(keys[0],0))
 	return results
 	
 @app.route("/documents/search")
-#@login.login_required
+@login.login_required
 def documentSearch():
-	keywords = request.args.get("keywords", "").split(" ") + request.form.get("keywords", "").split(" ")
-	results = do_documentSearch(keywords)
+	keywords = request.args.get("keywords", "").split(" ")
+	category = request.args.get("category", None)
+	results = do_documentSearch(keywords,category=category if len(category)>0 else None)
 	
-	return render_template("documents/search.html", name="Document search results", documents=results, keywords=" ".join(keywords), active="documents")
+	categories = Category().matchObjects({})
+	return render_template("documents/search.html", 
+						   name="Document search results", 
+						   category=category,
+						   categories=categories,
+						   documents=results,
+						   keywords=" ".join(keywords),
+						   active="documents")
 
-@app.route("/documents/search/table")
-#@login.login_required
-def documentSearchTable():
-	keywords = request.args.get("keywords", "").split(" ") + request.form.get("keywords", "").split(" ")
-	results = do_documentSearch(keywords)
+@app.route("/documents/search/table/<amount>/<page>")
+@login.login_required
+def documentSearchTable(amount, page):
+	keywords = request.args.get("keywords", "").split(" ")
+	category = request.args.get("category", None)
+	results = do_documentSearch(keywords,
+								category=category if len(category)>0 else None,
+								skip=int(amount)*int(page),
+								limit=int(amount))
 	
 	return render_template("documents/search-table.html", documents=results)
 	
