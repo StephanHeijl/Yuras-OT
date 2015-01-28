@@ -218,6 +218,8 @@ $(function () {
 														 };
 		});
 		
+		console.log(annotations)
+		
 		annotations = encodeURIComponent( JSON.stringify(annotations) );		
 
 		$.post(url, {
@@ -244,15 +246,25 @@ $(function () {
 		}
 	});
 	
-	function addAnnotation(start,length,text) {		
+	function addAnnotation(start,length,text, annotationContents) {
 		annotation = $("<div>");
 		annotation.addClass("annotation");
-		annotation.attr("contenteditable","true")
+		if (typeof annotationContents === "undefined") {
+			annotation.attr("contenteditable","true");	
+			annotation.html("Add annotation text here");
+		} else {
+			annotation.html(annotationContents);
+		}
 		annotation.appendTo(".annotation-page");
-		annotation.html("Add annotation text here")
+		console.log("Adding location and selected_text")
 		annotation.data("location", start+","+length)
 		annotation.data("selected_text", text)
-		annotation.click(function() { $(this).html(""); $(this).unbind("click") })
+		annotation.data("annotation-id", $(".annotation").length+1)
+		annotation.click(function() { 
+			if($(this).attr("contenteditable")) { 
+				$(this).html("");
+				$(this).unbind("click")
+			}})
 	}
 	
 	$("#annotate-selection").click(function(e) {
@@ -407,11 +419,20 @@ $(function () {
 		console.log("Analyzing...")
 		$.getJSON(window.location.href+"/tfidf", function(data) {
 			console.log(data)
-			$.each(data, function(word,score) {
-				console.log(word,score);
-				regex = RegExp(word, "gi")
+			$.each(data, function(word,related) {
+				console.log(word,related)
+				regex = RegExp(word, "i")
+				
+				contents = ""
+				$.each(related, function(i,r) {
+					console.log(r)
+					contents += "<a target='_new' href='/documents/"+r._id+"'>"+r.title+"</a><br/>"
+				})
+				
 				$(".document-body").each(function() {
-					$(this).html( 
+					start = $(this).text().search(regex)
+					addAnnotation( start, word.length, word, contents )
+					$(this).html(
 						$(this).html().replace(regex, "<span class='marked'>"+word+"</span>")
 					)
 				});

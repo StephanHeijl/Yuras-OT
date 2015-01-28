@@ -4,6 +4,8 @@ import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections
 from functools import wraps
 from collections import defaultdict
 
+from bson.objectid import ObjectId
+
 from flask import Flask,render_template,abort, Response, request, session, redirect, g, url_for
 from flask.ext import login
 
@@ -290,8 +292,10 @@ def documentSave(id):
 			# Correct location parameter
 			print contents_md[a.location[0]:a.location[0]+a.location[1]], a.selected_text
 			if contents_md[a.location[0]:a.location[0]+a.location[1]] != a.selected_text:
-				
-				i = contents_md.index(annotation["selected_text"],0)
+				try:
+					i = contents_md.index(annotation["selected_text"],0)
+				except:
+					continue
 				d = -1
 
 				while i >= 0:
@@ -435,10 +439,32 @@ def documentTFIDF(id):
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		hashedWordCount[key] = (word, count,tf )
 		idf = math.log(documentCount / (1+wordCountsByKey[key]))
-		tfidf[word] = idf*tf		
+		tfidf[word] = (idf*tf, key)		
 		
-		
-	return json.dumps(dict([(key,score) for key,score in tfidf.items() if score>=0.015]))
+	results = {}
+	for word,(score,key) in tfidf.items():
+		if score >= 0.015:
+			related = Document().matchObjects(
+				{"$and": [
+						{"wordcount."+key : { "$exists": True }}, 
+						{"_id": {"$ne": ObjectId(id)}} # A conversion to ObjectId is needed for Mongo/Toku
+					]},
+				limit = 3,
+				fields = {"title":True, "_id":True}
+			)
+			relatedResults = []
+			for r in related:
+				relatedResults.append( 
+					{
+						"title":r.title,
+						"_id":str(r._id)
+					}
+				)
+				
+			results[word] = relatedResults
+			
+			
+	return json.dumps(results)
 	
 	
 def flatten(d, parent_key='', sep='_'):
@@ -663,7 +689,6 @@ def userSave(id):
 	
 	return redirect("/users/%s/edit" % id)
 	
-
 @app.route("/users/<id>/delete",methods=["POST"])
 @login.login_required
 def userDelete(id):

@@ -106,3 +106,9 @@ body {
 	z-index: 99;
 	pointer-events: none;
 }
+
+.annotation a {
+	color: white;
+	opacity: 0.9;
+	cursor: pointer;
+}
