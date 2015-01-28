@@ -2,8 +2,7 @@ from __future__ import division
 
 import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math, pprint
 from functools import wraps
-
-from textblob import TextBlob
+from collections import defaultdict
 
 from flask import Flask,render_template,abort, Response, request, session, redirect, g, url_for
 from flask.ext import login
@@ -390,9 +389,6 @@ def documentDownload(id, filetype):
 	else:
 		return abort(405)
 
-def tfidf(word, blob, bloblist):
-	return tf(word, blob) * idf(word, bloblist)
-
 @app.route("/documents/<id>/tfidf")
 #@login.login_required
 def documentTFIDF(id):
@@ -428,16 +424,17 @@ def documentTFIDF(id):
 	allWordCounts = []
 	for d in allDocuments:
 		allWordCounts += d.wordcount.keys()
-
+		
+	wordCountsByKey = defaultdict(int)
+	for k in allWordCounts:
+		wordCountsByKey[k] += 1
 	tfidf = {}
 	
 	for word, (count, tf) in termFrequencies.items():
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		hashedWordCount[key] = (word, count,tf )
-		containWord = allWordCounts.count(key)
-		idf = math.log(documentCount / (1+containWord))
-		tfidf[word] = idf*tf
-		
+		idf = math.log(documentCount / (1+wordCountsByKey[key]))
+		tfidf[word] = idf*tf		
 		
 	return json.dumps(tfidf)
 	
