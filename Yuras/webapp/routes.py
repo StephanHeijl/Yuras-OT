@@ -428,6 +428,7 @@ def documentTFIDF(id):
 	wordCountsByKey = defaultdict(int)
 	for k in allWordCounts:
 		wordCountsByKey[k] += 1
+	
 	tfidf = {}
 	
 	for word, (count, tf) in termFrequencies.items():
@@ -436,7 +437,8 @@ def documentTFIDF(id):
 		idf = math.log(documentCount / (1+wordCountsByKey[key]))
 		tfidf[word] = idf*tf		
 		
-	return json.dumps(tfidf)
+		
+	return json.dumps(reversed(sorted( tfidf.items(), key=lambda i: i[1] )))
 	
 	
 def flatten(d, parent_key='', sep='_'):
