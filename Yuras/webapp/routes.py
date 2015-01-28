@@ -438,7 +438,7 @@ def documentTFIDF(id):
 		tfidf[word] = idf*tf		
 		
 		
-	return json.dumps(reversed(sorted( tfidf.items(), key=lambda i: i[1] )))
+	return json.dumps(dict([(key,score) for key,score in tfidf.items() if score>=0.015]))
 	
 	
 def flatten(d, parent_key='', sep='_'):

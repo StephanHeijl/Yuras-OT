@@ -400,5 +400,23 @@ $(function () {
 		e.preventDefault()
 		saveDocument()
 	});
+	
+	// Handle document analysis
+	$("#analyze-document").click(function(e) {
+		e.preventDefault()
+		console.log("Analyzing...")
+		$.getJSON(window.location.href+"/tfidf", function(data) {
+			console.log(data)
+			$.each(data, function(word,score) {
+				console.log(word,score);
+				regex = RegExp(word, "gi")
+				$(".document-body").each(function() {
+					$(this).html( 
+						$(this).html().replace(regex, "<span class='marked'>"+word+"</span>")
+					)
+				});
+			})
+		});
+	});
 
 });
