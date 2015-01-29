@@ -403,7 +403,7 @@ def loopTermFrequencies( termFrequencies, tfidf, documentCount, wordCountsByKey 
 		
 
 @app.route("/documents/<id>/tfidf")
-#@login.login_required
+@login.login_required
 def documentTFIDF(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -622,6 +622,12 @@ def documentSearchTable(amount, page):
 								limit=int(amount))
 	
 	return render_template("documents/search-table.html", documents=results)
+	
+	
+@app.route("/documents/upload")
+@login.login_required
+def documentsUpload():
+	render_template("documents/upload.html", active="documents", name="Upload document")
 	
 # ANNOTATIONS #
 
