@@ -459,6 +459,23 @@ $(function () {
 					}
 				});
 			})
+			
+			// Sort the annotations on each page
+			$(".annotation-page").each(function() {
+				annotations = $(this).children(".annotation")
+				annotations.sort( function(a,b) {
+					al = parseInt($(a).data("location").split(",")[0])
+					bl = parseInt($(b).data("location").split(",")[0])
+					if( al > bl ) {
+						return 1
+					} else if (al < bl) {
+						return -1
+					}
+					return 0
+				})
+				annotations.detach().appendTo($(this));
+				
+			})
 		});
 	});
 
