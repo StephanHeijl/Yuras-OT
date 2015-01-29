@@ -60,19 +60,19 @@ $(function () {
 	}
 
 	reflowPages()
-
+		
 	/* Annotation connector behaviour */
 	function calculateConnectorPoints(annotatedElement) {
 		var documentIndex = annotatedElement.parents(".document").index(".document"),
-			markedIndex = annotatedElement.index(".marked"),
+			markedLinkedTo = annotatedElement.data("linked-to"),
 			connector = $("#annotation-connector"),
-			annotation = $(".annotation-page").eq(documentIndex).find(".annotation").eq(markedIndex)
+			annotation = $(".annotation-page").eq(documentIndex).find(".annotation[data-linked-to="+markedLinkedTo+"]")
 		thisOffset = annotatedElement.offset(),
 		annoOffset = annotation.offset(),
 		connOffset = connector.offset();
 
 		left = thisOffset.left + annotatedElement.width();
-		left += 2; /* Compensate for padding */
+		left += 2.5; /* Compensate for padding */
 
 		// Determine the topmost point.
 		t = thisOffset.top < annoOffset.top ? thisOffset.top : annoOffset.top;
@@ -155,7 +155,7 @@ $(function () {
 		var st = $("body").scrollTop();
 		tmpCurrentPage = -1;
 		$(".document").each(function () {
-			var distance = st - $(this).offset().top;
+			var distance = st - $(this).offset().top + $(".navbar").height();
 			if (distance > 0) {
 				tmpCurrentPage++;
 			}
@@ -175,7 +175,7 @@ $(function () {
 			console.log(" Annotations available. ")
 			var annotationPage = $(".annotation-page").eq(currentPage);
 			var paddingTop = parseInt($(".annotation-wrapper-padding").css("padding-top"));
-
+						
 			$(".annotation-wrapper").animate({
 				scrollTop: annotationPage.position().top - paddingTop
 			}, {
@@ -214,7 +214,8 @@ $(function () {
 			annotations[$(this).data("annotation-id")] = { 
 														 	"text": $(this).html().trim(),
 														  	"location": $(this).data("location"), 
-															"selected_text":$(this).data("selected_text")
+															"selected_text":$(this).data("selected_text"),
+															"linked-to":$(this).data("linked-to")
 														 };
 		});
 		
@@ -246,25 +247,36 @@ $(function () {
 		}
 	});
 	
-	function addAnnotation(start,length,text, annotationContents) {
+	function addAnnotation(start,length,text,annotationContents,page) {
 		annotation = $("<div>");
 		annotation.addClass("annotation");
+		if (typeof page === "undefined") {
+			page = 0;
+		}
 		if (typeof annotationContents === "undefined") {
 			annotation.attr("contenteditable","true");	
 			annotation.html("Add annotation text here");
 		} else {
 			annotation.html(annotationContents);
 		}
-		annotation.appendTo(".annotation-page");
-		console.log("Adding location and selected_text")
+		
+		pages = $(".annotation-page").length 
+		while( pages <= page ) {
+			$(".annotation-wrapper-padding").append("<div class='annotation-page'></div>")
+			pages = $(".annotation-page").length
+		}
+		
+		$(".annotation-page").eq(page).append(annotation)
 		annotation.data("location", start+","+length)
 		annotation.data("selected_text", text)
-		annotation.data("annotation-id", $(".annotation").length+1)
+		annotation.attr("data-linked-to", $(".annotation-page .annotation").length)
 		annotation.click(function() { 
 			if($(this).attr("contenteditable")) { 
 				$(this).html("");
 				$(this).unbind("click")
-			}})
+			}
+		})
+		
 	}
 	
 	$("#annotate-selection").click(function(e) {
@@ -310,7 +322,7 @@ $(function () {
             range.deleteContents();
 			markerContainer = document.createElement("span");
 			markerContainer.className = "marked";
-			markerContainer.setAttribute("data-annotation",$(".annotation").length);
+			markerContainer.setAttribute("data-annotation",$(".annotation").length-1);
 			markerContainer.appendChild( document.createTextNode(text) )
             range.insertNode( markerContainer );
         }
@@ -417,7 +429,7 @@ $(function () {
 	$("#analyze-document").click(function(e) {
 		e.preventDefault()
 		console.log("Analyzing...")
-		$.getJSON(window.location.href+"/tfidf", function(data) {
+		$.getJSON(window.location.href.replace("#","")+"/tfidf", function(data) {
 			console.log(data)
 			$.each(data, function(word,related) {
 				console.log(word,related)
@@ -426,15 +438,25 @@ $(function () {
 				contents = ""
 				$.each(related, function(i,r) {
 					console.log(r)
-					contents += "<a target='_new' href='/documents/"+r._id+"'>"+r.title+"</a><br/>"
-				})
+					contents += "<a target='_blank' href='/documents/"+r._id+"'>"+r.title+"</a><br/>"
+				});
 				
-				$(".document-body").each(function() {
+				if( contents == "") {
+					contents = "No related articles found."
+				}
+				
+				$(".document-body").each(function(page) {
 					start = $(this).text().search(regex)
-					addAnnotation( start, word.length, word, contents )
-					$(this).html(
-						$(this).html().replace(regex, "<span class='marked'>"+word+"</span>")
-					)
+					if( start >= 0 ) {
+						console.log("Adding annotation for word "+word+" to page "+page)
+						addAnnotation( start, word.length, word, contents, page)
+						$(this).html(
+							$(this).html().replace(regex, "<span class='marked' data-linked-to='"+$(".annotation").length+"'>"+word+"</span>")
+						)
+						return true
+					} else {
+						return false
+					}
 				});
 			})
 		});

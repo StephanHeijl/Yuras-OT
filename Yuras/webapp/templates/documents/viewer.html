@@ -95,7 +95,7 @@
 
 		<div class="annotation-page">
 			{% for annotation in annotations %}
-			<div class="annotation" data-selected_text="{{ annotation.selected_text }}" data-annotation-id="{{ annotation._id }}" data-location="{{ annotation.location[0]}},{{ annotation.location[1]}}">
+			<div class="annotation" data-selected_text="{{ annotation.selected_text }}" data-annotation-id="{{ annotation._id }}" data-location="{{ annotation.location[0]}},{{ annotation.location[1]}}" data-linked-to="{{ annotation.linked_to }}">
 				{{annotation.contents | safe}}
 			</div>
 			{% endfor %}

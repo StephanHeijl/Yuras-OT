@@ -1,6 +1,7 @@
 from __future__ import division
 
 import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math, pprint
+import multiprocessing
 from functools import wraps
 from collections import defaultdict
 
@@ -256,7 +257,6 @@ def documentSave(id):
 	if request.method != "POST":
 		return abort(405)
 	
-	
 	contents_escaped = urllib2.unquote( request.form.get("contents","").encode('utf-8') )
 	contents_md = unicode(Pandoc().convert("html","markdown_github",contents_escaped))
 	title = urllib2.unquote( request.form.get("title","").encode('utf-8') )
@@ -288,6 +288,7 @@ def documentSave(id):
 			a.document = id
 			a.document_title = document.title
 			a.selected_text = annotation["selected_text"].encode('utf-8')
+			a.linked_to = int(annotation["linked-to"])				
 			
 			# Correct location parameter
 			print contents_md[a.location[0]:a.location[0]+a.location[1]], a.selected_text
@@ -393,6 +394,14 @@ def documentDownload(id, filetype):
 	else:
 		return abort(405)
 
+def loopTermFrequencies( termFrequencies, tfidf, documentCount, wordCountsByKey ):
+	# This function is paralellezied due to the large amount of words and long CPU times.
+	for word, (count, tf) in termFrequencies:
+		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+		idf = math.log(documentCount / (1+wordCountsByKey[key]))
+		tfidf[word] = (idf*tf, key)		
+		
+
 @app.route("/documents/<id>/tfidf")
 #@login.login_required
 def documentTFIDF(id):
@@ -401,6 +410,9 @@ def documentTFIDF(id):
 	except Exception as e:
 		print e
 		return abort(404)
+	
+	# initialize manager for multiprocessing
+	manager = multiprocessing.Manager()
 	
 	# Cound words in this document
 	words = re.findall("[a-z]{2,}", document.contents.lower()) + re.findall("[a-z]{2,}", document.title.lower())
@@ -419,7 +431,6 @@ def documentTFIDF(id):
 	
 	documentCount = len(allDocuments)
 	
-	hashedWordCount = collections.defaultdict(int)
 	allDocuments = Document().matchObjects(
 		{"$and": [{"category":document.category}, {"wordcount" : { "$exists": True }}]},
 		fields={"wordcount":True}
@@ -433,15 +444,23 @@ def documentTFIDF(id):
 	for k in allWordCounts:
 		wordCountsByKey[k] += 1
 	
-	tfidf = {}
+	tfidf = manager.dict()
+	managerWordCountsByKey = manager.dict(wordCountsByKey)
+		
+	cores = multiprocessing.cpu_count()
+	chunkSize = len(termFrequencies)/cores
 	
-	for word, (count, tf) in termFrequencies.items():
-		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
-		hashedWordCount[key] = (word, count,tf )
-		idf = math.log(documentCount / (1+wordCountsByKey[key]))
-		tfidf[word] = (idf*tf, key)		
+	pool = []
+	for core in range(cores):
+		pool.append( multiprocessing.Process(target=loopTermFrequencies, args=(termFrequencies.items()[int(chunkSize*core):int(chunkSize*(core+1))], tfidf, documentCount, managerWordCountsByKey)) )
+	
+	for p in pool:
+		p.start()
+	for p in pool:
+		p.join()
 		
 	results = {}
+	
 	for word,(score,key) in tfidf.items():
 		if score >= 0.015:
 			related = Document().matchObjects(
