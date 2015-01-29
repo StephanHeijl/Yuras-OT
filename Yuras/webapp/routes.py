@@ -694,6 +694,11 @@ def userEdit(id):
 		pass # Skip over new users
 	return render_template("users/edit.html", name="Edit user", user=user, active="users")
 
+@app.route("/users/profile")
+@login.login_required
+def userProfile():
+	return render_template("users/profile.html", name="Your profile page", user=login.current_user, active="profile")
+
 @app.route("/users/<id>")
 @login.login_required
 def userView(id):
