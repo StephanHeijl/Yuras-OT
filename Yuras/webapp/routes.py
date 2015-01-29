@@ -410,6 +410,8 @@ def documentTFIDF(id):
 	except Exception as e:
 		print e
 		return abort(404)
+
+	startTime = time.time()
 	
 	# initialize manager for multiprocessing
 	manager = multiprocessing.Manager()
@@ -420,44 +422,57 @@ def documentTFIDF(id):
 	for word in words:
 		wordCount[word] += 1
 		
+	print time.time()-startTime
+		
 	termFrequencies = {}
 	for word in words:
 		termFrequencies[word] = (wordCount[word], wordCount[word]/len(words))
+		
+	print time.time()-startTime
 		
 	allDocuments = Document().matchObjects(
 		{"category":document.category},
 		fields={"wordcount":True}
 	)
 	
+	print time.time()-startTime
+	
 	documentCount = len(allDocuments)
 	
-	allDocuments = Document().matchObjects(
-		{"$and": [{"category":document.category}, {"wordcount" : { "$exists": True }}]},
-		fields={"wordcount":True}
-	)
+	print time.time()-startTime
 	
 	allWordCounts = []
 	for d in allDocuments:
 		allWordCounts += d.wordcount.keys()
 		
+	print time.time()-startTime
+		
 	wordCountsByKey = defaultdict(int)
 	for k in allWordCounts:
 		wordCountsByKey[k] += 1
+		
+	print time.time()-startTime
 	
 	tfidf = manager.dict()
 	managerWordCountsByKey = manager.dict(wordCountsByKey)
 		
 	cores = multiprocessing.cpu_count()
+	#cores = 1
 	chunkSize = len(termFrequencies)/cores
 	
 	pool = []
 	for core in range(cores):
-		pool.append( multiprocessing.Process(target=loopTermFrequencies, args=(termFrequencies.items()[int(chunkSize*core):int(chunkSize*(core+1))], tfidf, documentCount, managerWordCountsByKey)) )
-	
-	for p in pool:
+		print core, int(chunkSize*core),int(chunkSize*(core+1))
+		p = multiprocessing.Process(target=loopTermFrequencies, args=(termFrequencies.items()[int(chunkSize*core):int(chunkSize*(core+1))], tfidf, documentCount, managerWordCountsByKey))
 		p.start()
+		print "Starting", p
+		pool.append( p )
+
 	for p in pool:
+		print "Joining", p
 		p.join()
+		
+	print time.time()-startTime
 		
 	results = {}
 	
@@ -481,8 +496,9 @@ def documentTFIDF(id):
 				)
 				
 			results[word] = relatedResults
-			
-			
+		
+	print time.time()-startTime
+		
 	return json.dumps(results)
 	
 	
