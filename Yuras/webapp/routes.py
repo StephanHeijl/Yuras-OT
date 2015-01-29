@@ -625,9 +625,10 @@ def documentSearchTable(amount, page):
 	
 	
 @app.route("/documents/upload")
-@login.login_required
+#@login.login_required
 def documentsUpload():
-	render_template("documents/upload.html", active="documents", name="Upload document")
+	categories = Category().matchObjects({})
+	return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document")
 	
 # ANNOTATIONS #
 

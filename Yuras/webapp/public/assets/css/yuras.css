@@ -81,3 +81,10 @@ td.price small {
 	width: 100%;
 	font-size: 14pt;
 }
+
+/* Fix bootstrap dropdowns to be scrollable */
+.dropdown-menu {
+    height: auto;
+    max-height: 240px;
+    overflow-x: hidden;
+}
