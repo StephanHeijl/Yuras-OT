@@ -1,6 +1,6 @@
 from __future__ import division
 
-import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math, pprint
+import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math, pprint, random
 import multiprocessing
 from functools import wraps
 from collections import defaultdict
@@ -52,6 +52,7 @@ def do_login():
 			print e
 			user = None
 			print "User not found"
+			time.sleep(1 + random.random()) # Wait for some time to make sure we don't reveal that the username is not known
 				
 		if user is not None and user.checkPassword( urllib2.unquote( request.form.get("password").encode('utf-8') ) ):
 			print "Username and password correct"
@@ -370,7 +371,7 @@ def documentDelete(id):
 	return abort(403)
 
 @app.route("/documents/<id>/download/<filetype>")
-@login.login_required
+#@login.login_required
 def documentDownload(id, filetype):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -383,8 +384,16 @@ def documentDownload(id, filetype):
 		"txt":"text/plain",
 	}
 	
+	pandoc_filetypes = {
+		"docx":"docx",
+		"pdf":"latex --latex-engine=pdflatex",
+		"txt":"plain"
+	}
+	
 	if filetype in filetypes:
-		responseContents = Pandoc().convert("markdown_github", filetype, document.contents)
+		print document.contents
+		print document.contents.count("  ")
+		responseContents = Pandoc().convert("markdown_github+escaped_line_breaks", pandoc_filetypes[filetype], document.contents, filetype=filetype)
 		response = Response(responseContents, mimetype=filetypes[filetype])
 		
 		filename = document.title + "." + filetype

@@ -7,7 +7,7 @@ class Pandoc():
 		self.baseCommand = "~/.cabal/bin/pandoc -f {from} -t {to} < {text}"
 		self.fileOutputCommand = "~/.cabal/bin/pandoc -f {from} -t {to} -o {outputpath} < {text}"
 		
-	def convert(self, from_, to_, text):
+	def convert(self, from_, to_, text, filetype=None):
 		""" Converts a string from one format to another, returns the result.
 		
 :param from_: The initial format.
@@ -25,12 +25,14 @@ class Pandoc():
 		tmp.close()
 		
 		formatDict = {"from":from_, "to":to_, "text":tmp.name}
-		command = self.baseCommand.format(**formatDict)
-		pdp = subprocess.Popen(command,shell=True,executable='/bin/bash',stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-		result = pdp.communicate()
+		if filetype is None:
+			command = self.baseCommand.format(**formatDict)
+			pdp = subprocess.Popen(command,shell=True,executable='/bin/bash',stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			result = pdp.communicate()
 		
-		if "pandoc: Cannot write {to} output to stdout.".format(**formatDict) in result[1]:
-			tmpout = tempfile.NamedTemporaryFile(delete=False)
+		if filetype is not None or "pandoc: Cannot write {to} output to stdout.".format(**formatDict) in result[1]:
+			suffix = '' if filetype is None else '.' + (filetype.strip('.')) # Needs a . before the extension
+			tmpout = tempfile.NamedTemporaryFile(delete=False, suffix=suffix)
 			tmpout.close()
 			formatDict["outputpath"] = tmpout.name
 			command = self.fileOutputCommand.format(**formatDict)
