@@ -492,11 +492,12 @@ def documentTFIDF(id):
 						{"wordcount."+key : { "$exists": True }}, 
 						{"_id": {"$ne": ObjectId(id)}} # A conversion to ObjectId is needed for Mongo/Toku
 					]},
-				limit = 3,
-				fields = {"title":True, "_id":True}
+				fields = {"title":True, "_id":True,"wordcount."+key:True},
+				sort = "wordcount."+key,
+				reverse=True
 			)
 			relatedResults = []
-			for r in related:
+			for r in related[:3]:
 				relatedResults.append( 
 					{
 						"title":r.title,

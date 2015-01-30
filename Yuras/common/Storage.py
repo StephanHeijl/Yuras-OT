@@ -355,6 +355,9 @@ class Storage(Singleton):
 		
 		:param match: A query for the database to match documents to.
 		:param limit: The maximum amount of documents to return.
+		:param skip: Defaults to 0, amount of documents to skip.
+		:param fields: Fields of the document that will be returned. All are returned by default.
+		:rtype: A list with documents
 		"""
 		if self.__currentDatabase == None:
 			raise ValueError, "There was no database selected"
@@ -376,7 +379,6 @@ class Storage(Singleton):
 			
 		if limit is not None:
 			documents = documents.limit(limit)
-		
 		
 		if self.__encryptDocuments:
 			return [self.__decryptDocument(d) for d in documents]

@@ -21,6 +21,6 @@ class Document(StoredObject):
 		
 		super(Document, self).save()
 		
-	def matchObjects(self, match, limit=None, skip=0, fields={"wordcount":0}):
+	def matchObjects(self, match, limit=None, skip=0, fields={"wordcount":0}, sort=None,reverse=False):
 		# Does not return wordcount by default
-		return super(Document, self).matchObjects(match,limit,skip,fields)
+		return super(Document, self).matchObjects(match,limit,skip,fields,sort,reverse)

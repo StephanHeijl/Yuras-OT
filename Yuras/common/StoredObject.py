@@ -89,7 +89,27 @@ class StoredObject():
 		
 		return self.matchObjects({key:value}, limit, skip)
 	
-	def matchObjects(self, match, limit=None, skip=0, fields={}):
+	def __multi_get(self, d, attr, default = None):
+		""" Get a the value of a nested key in a dictionary
+		
+		:param obj: Object to get attrs from.
+		:param attr: Attribute (chain) should be a string.
+		:param default: The default return value for this operation.
+		:rtype: The nested attribute
+
+		"""
+		attributes = attr.split(".")
+		for i in attributes:
+			try:
+				d = d.get(i)
+			except AttributeError as e:
+				if default is not None:
+					return default
+				else:
+					raise
+		return d
+	
+	def matchObjects(self, match, limit=None, skip=0, fields={}, sort=None, reverse=False):
 		""" This method allows you to match a StoredOject directly. It allows for more advanced queries.
 		
 		:param match: A query dictionary.
@@ -107,10 +127,14 @@ class StoredObject():
 		
 		storage.getDatabase(database)
 		storage.getCollection(collection)
-		print match, limit, skip, fields
+		#print match, limit, skip, fields
 		documents = storage.getDocuments(match, limit, skip, fields)
-				
+		
+		if sort is not None:
+			documents.sort(key=lambda d: self.__multi_get(d, sort, default=""), reverse=reverse)
+		
 		objects = [ self.loadFromRawData( data ) for data in documents ]
+		
 		return objects
 		
 		
@@ -168,13 +192,13 @@ class StoredObject():
 		
 		For example::
 			
-		    ProteinOne = Protein()
-		    ProteinTwo = Protein()
-		    ProteinOne.setAttribute("attribute", "source", "ValueOne")
-		    ProteinOne.setAttribute("attribute", "source", "ValueTwo")
+			ProteinOne = Protein()
+			ProteinTwo = Protein()
+			ProteinOne.setAttribute("attribute", "source", "ValueOne")
+			ProteinOne.setAttribute("attribute", "source", "ValueTwo")
 			
-		    ProteinMerged = ProteinOne + ProteinTwo
-		    ProteinMerged.getAttribute("attribute","source") == "ValueOne" # Yields True
+			ProteinMerged = ProteinOne + ProteinTwo
+			ProteinMerged.getAttribute("attribute","source") == "ValueOne" # Yields True
 		
 		The original two objects will not be affected.
 		
