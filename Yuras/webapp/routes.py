@@ -224,27 +224,10 @@ def documentViewer(id):
 		return abort(404)
 	
 	annotations = Annotation().getObjectsByKey("document", id)
-	categories = Category().matchObjects({},limit=25)
-	
-	markedContainer = ("<samp type='marked'>","</samp>")
-	#markedContainer = ("[[[[","]]]]")
-	#markedContainer = ("","")
-	markedContainerLength = sum([len(mC) for mC in markedContainer])
-	
-	annotations.sort(key=lambda a: a.location[0])
-	
-	for a,annotation in enumerate(annotations):
-		start, length = annotation.location
-		start += markedContainerLength*a
-		
-		before_string = document.contents[:start]
-		after_string = document.contents[start+length:]
-		
-		document.contents = "".join([before_string, markedContainer[0], document.contents[start:start+length], markedContainer[1],after_string ])
-		
+	categories = Category().matchObjects({})
+	annotations.sort(key=lambda a: a.location[0])		
 	document.contents = Pandoc().convert("markdown_github", "html", document.contents)
-	document.contents = document.contents.replace(markedContainer[0], "<span class='marked'>").replace(markedContainer[1], "</span>")
-
+	
 	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, categories=categories)
 
 @app.route("/documents/<id>/save",methods=["POST"])
@@ -278,6 +261,8 @@ def documentSave(id):
 	if annotations is not "":
 		annotations = json.loads(annotations)
 		
+		pprint.pprint(annotations)
+		
 		for anno_id, annotation in annotations.items():
 			try:
 				a = Annotation().getObjectsByKey("_id", anno_id)[0]
@@ -287,42 +272,10 @@ def documentSave(id):
 			a.contents = annotation["text"].encode('utf-8')
 			a.location = [int(i) for i in annotation["location"].split(",")]
 			a.document = id
+			a.page = int(annotation.get("page",0))
 			a.document_title = document.title
 			a.selected_text = annotation["selected_text"].encode('utf-8')
-			a.linked_to = int(annotation["linked-to"])				
-			
-			# Correct location parameter
-			print contents_md[a.location[0]:a.location[0]+a.location[1]], a.selected_text
-			if contents_md[a.location[0]:a.location[0]+a.location[1]] != a.selected_text:
-				try:
-					i = contents_md.index(annotation["selected_text"],0)
-				except:
-					continue
-				d = -1
-
-				while i >= 0:
-					delta = abs(i-a.location[0])
-					print i,d,delta
-					if d >= 0 and d < delta:
-						break
-					
-					if d > delta or d < 0:
-						d = delta
-					
-					try:
-						ni = contents_md.index(annotation["selected_text"],i+1)
-						print ni
-					except Exception as e:
-						print e
-						break
-						
-					if i == ni:
-						break
-					else:
-						i = ni
-						
-				print contents_md[i:i+a.location[1]]
-				a.location[0] = int(i)
+			a.linked_to = int(annotation["linked-to"])
 			
 			a.save()
 	

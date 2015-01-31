@@ -59,7 +59,7 @@ $(function () {
 		$(".document").eq(0).remove();
 	}
 
-	reflowPages()
+	//reflowPages()
 		
 	/* Annotation connector behaviour */
 	function calculateConnectorPoints(annotatedElement) {
@@ -141,11 +141,29 @@ $(function () {
 			})
 		}
 	}
+	
+	scrollToSelectedAnnotation = function( annotatedElement ) {
+		var markedLinkedTo = annotatedElement.data("linked-to"),
+			annotation = $(".annotation[data-linked-to="+markedLinkedTo+"]"),
+			paddingTop = parseInt($(".annotation-wrapper-padding").css("padding-top"));
+		$(".annotation-wrapper").animate({
+			scrollTop: annotation.position().top - paddingTop
+		}, {
+			"duration": 500,
+			"step": function () {
+				/* Scrolling the annotation marker, called on each step of the animation to provide a smooth transition*/
+				if (typeof selectedAnnotation !== "undefined") {
+					moveAnnotationConnector(selectedAnnotation);
+				}
+			}
+		});
+	}
 
 	s = Snap("#annotation-connector");
 
 	$("body").on("click", ".marked", function () {
 		moveAnnotationConnector($(this));
+		scrollToSelectedAnnotation($(this))
 		selectedAnnotation = $(this);
 	});
 
@@ -267,13 +285,14 @@ $(function () {
 		}
 		
 		$(".annotation-page").eq(page).append(annotation)
+		annotation.data("annotation-id", "undefined-"+$(".annotation").length)
 		annotation.data("location", start+","+length)
 		annotation.data("selected_text", text)
 		annotation.attr("data-linked-to", $(".annotation-page .annotation").length)
 		annotation.click(function() { 
 			if($(this).attr("contenteditable")) { 
 				$(this).html("");
-				$(this).unbind("click")
+				$(this).unbind("click");
 			}
 		})
 		
