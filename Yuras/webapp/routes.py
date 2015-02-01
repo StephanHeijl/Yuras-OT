@@ -604,9 +604,10 @@ def documentsUpload():
 			"txt":"plain",
 			"pdf":"plain"
 		}
-
+		
+		file = request.files["file"]
 		data = dict(request.form)
-		filename = data["file"][0]
+		filename = file.filename
 		extension = filename.split(".")[-1]
 		if extension not in filetypes.keys():
 			error = "Not an allowed format."
@@ -615,9 +616,13 @@ def documentsUpload():
 		print "Storing document", data["title"][0]
 		document = Document()
 		document.title = data["title"][0]
-		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", request.files["file"].read())
+		print document.title
+		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", file.read())
+		print document.contents
 		document.category = data["category"][0]
+		print document.category
 		document.author = login.current_user.username
+		print document.author
 		document.save()
 		print "Document saved", document._id
 
