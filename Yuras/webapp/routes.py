@@ -439,7 +439,7 @@ def documentTFIDF(id):
 	results = {}
 	
 	for word,(score,key) in tfidf.items():
-		if score >= 0.015:
+		if score >= 0.01:
 			related = Document().matchObjects(
 				{"$and": [
 						{"wordcount."+key : { "$exists": True }}, 
