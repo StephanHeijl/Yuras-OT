@@ -587,17 +587,18 @@ def documentSearchTable(amount, page):
 	return render_template("documents/search-table.html", documents=results)
 
 
-def returnUploadError(error):
-	return return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document", error=error)
+def returnUploadError(error, categories):
+	return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document", error=error)
 
 @app.route("/documents/upload", methods=["GET","POST"])
 #@login.login_required
 def documentsUpload():
+	categories = Category().matchObjects({})
+	error = None
+
 	if request.method == "GET":
-		categories = Category().matchObjects({})
 		return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document", error=None)
 	else:
-		error = None
 		filetypes = {
 			"docx":"docx",
 			"txt":"plain",
@@ -605,23 +606,28 @@ def documentsUpload():
 		}
 
 		data = dict(request.form)
-		filename = data["file"]
-
-		if filename.split(".")[-1] not in filetypes.keys():
+		filename = data["file"][0]
+		extension = filename.split(".")[-1]
+		if extension not in filetypes.keys():
 			error = "Not an allowed format."
-			return returnUploadError(error)
-
+			return returnUploadError(error,categories)
+		
+		print "Storing document", data["title"][0]
 		document = Document()
-		document.title = data["title"]
+		document.title = data["title"][0]
 		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", request.files["file"].read())
-		document.category = data["category"]
+		document.category = data["category"][0]
 		document.author = login.current_user.username
 		document.save()
+		print "Document saved", document._id
 
 		if error is None:
 			return "Upload complete"
 		else:
-			return returnUploadError(error)
+			return returnUploadError(error,categories)
+	
+	return returnUploadError(error,categories)
+	
 
 
 # ANNOTATIONS #
