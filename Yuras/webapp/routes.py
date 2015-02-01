@@ -39,12 +39,12 @@ def load_user(userid):
 	except Exception as e:
 		print e
 		return None
-	
+
 @app.route("/login", methods=["GET", "POST"])
 def do_login():
 	if login.current_user.is_authenticated():
 		return redirect(request.args.get('next') or url_for('index'))
-	
+
 	if request.method == "POST":
 		try:
 			user = User().getObjectsByKey("username", unicode(request.form.get("username")),limit=1)[0]
@@ -53,14 +53,14 @@ def do_login():
 			user = None
 			print "User not found"
 			time.sleep(1 + random.random()) # Wait for some time to make sure we don't reveal that the username is not known
-				
+
 		if user is not None and user.checkPassword( urllib2.unquote( request.form.get("password").encode('utf-8') ) ):
 			print "Username and password correct"
 			login.login_user(user)
 			return redirect(request.args.get('next') or url_for('index'))
-		
+
 		print "Password incorrect"
-		
+
 		return render_template("/users/login.html", name="Log in", error="This username/password combination does not exist.")
 	else:
 		return render_template("/users/login.html", name="Log in")
@@ -75,12 +75,12 @@ for attribute in dir(tools):
 @app.before_request
 def csrf_protect(*args, **kwargs):
    	if request.method == "POST":
-		token = session.pop('_csrf_token', None)		
+		token = session.pop('_csrf_token', None)
 		givenToken = urllib2.unquote( request.form.get('_csrf_token',False) )
 		if not token or token != givenToken:
 			print "Incorrect CSRF", token, givenToken
 			abort(403)
-			
+
 def generate_csrf_token():
 	if '_csrf_token' not in session:
 		session['_csrf_token'] = base64.b64encode(Random.new().read(32))
@@ -92,7 +92,7 @@ app.jinja_env.globals['csrf_token'] = generate_csrf_token
 @app.before_request
 def startRequestTimer():
 	g.start_time = time.time()
-	
+
 @app.after_request
 def stopRequestTime(response):
 	try:
@@ -149,23 +149,23 @@ def assets(assettype, filename):
 		"js": "r",
 		"css": "r",
 	}
-	
+
 	mimeTypes = {
 		"css" : "text/css",
 		"js" : "text/javascript",
 		"png" : "image/png",
 		"jpg" : "image/jpeg"
 	}
-	
+
 	path = os.path.join(assetsFolder,assettype,filename)
-	
+
 	try:
 		with open(path, openModes[assettype]) as asset:
 			assetContents = asset.read()
 	except Exception as e:
 		print e
 		return abort(404);
-	
+
 	return Response( assetContents, mimetype=mimeTypes.get(filename.split(".")[-1], "text/plain") )
 
 # DOCUMENTS #
@@ -177,7 +177,7 @@ def documentsIndex():
 		limit=10,
 		fields={"title":True, "_created":True, "author":True, "secure":True, "_id":True}
 		)
-	
+
 	categories = Category().matchObjects({})
 	return render_template("documents/index.html", name="Documents overview", documents=documents, categories=categories, active="documents")
 
@@ -188,7 +188,7 @@ def documentsJSON(amount,page):
 	documents = Document().matchObjects(
 		{},
 		limit=int(amount),
-		skip=int(page)*int(amount),	
+		skip=int(page)*int(amount),
 		fields=fields
 		)
 	return json.dumps([dict([ (f,str(getattr(d,f,None))) for f in fields if fields[f]]) for d in  documents])
@@ -200,7 +200,7 @@ def documentsTable(amount,page):
 	documents = Document().matchObjects(
 		{},
 		limit=int(amount),
-		skip=int(page)*int(amount),		
+		skip=int(page)*int(amount),
 		fields=fields
 		)
 	return render_template("documents/table.html", documents=documents)
@@ -222,12 +222,12 @@ def documentViewer(id):
 	except Exception as e:
 		print e
 		return abort(404)
-	
+
 	annotations = Annotation().getObjectsByKey("document", id)
 	categories = Category().matchObjects({})
-	annotations.sort(key=lambda a: a.location[0])		
+	annotations.sort(key=lambda a: a.location[0])
 	document.contents = Pandoc().convert("markdown_github", "html", document.contents)
-	
+
 	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, categories=categories)
 
 @app.route("/documents/<id>/save",methods=["POST"])
@@ -237,14 +237,14 @@ def documentSave(id):
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
 		document = None
-	
+
 	if request.method != "POST":
 		return abort(405)
-	
+
 	contents_escaped = urllib2.unquote( request.form.get("contents","").encode('utf-8') )
 	contents_md = unicode(Pandoc().convert("html","markdown_github",contents_escaped))
 	title = urllib2.unquote( request.form.get("title","").encode('utf-8') )
-	
+
 	document.contents = contents_md.encode('utf-8')
 	document.title = title
 	category = urllib2.unquote( request.form.get("category","").encode('utf-8') )
@@ -255,20 +255,20 @@ def documentSave(id):
 
 	document.category = category
 	document.save()
-	
+
 	annotations = urllib2.unquote( request.form.get("annotations","").encode('utf-8') )
-	
+
 	if annotations is not "":
 		annotations = json.loads(annotations)
-		
+
 		pprint.pprint(annotations)
-		
+
 		for anno_id, annotation in annotations.items():
 			try:
 				a = Annotation().getObjectsByKey("_id", anno_id)[0]
 			except:
 				a = Annotation()
-				
+
 			a.contents = annotation["text"].encode('utf-8')
 			a.location = [int(i) for i in annotation["location"].split(",")]
 			a.document = id
@@ -276,31 +276,31 @@ def documentSave(id):
 			a.document_title = document.title
 			a.selected_text = annotation["selected_text"].encode('utf-8')
 			a.linked_to = int(annotation["linked-to"])
-			
+
 			a.save()
-	
+
 	# Counting words
 	words = re.findall("[a-z]{2,}", contents_md.lower()) + re.findall("[a-z]{2,}", title.lower())
 	wordCount = collections.defaultdict(int)
 	for word in words:
 		wordCount[word] += 1
-		
+
 	hashedWordCount = collections.defaultdict(int)
 	for word, count in wordCount.items():
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		hashedWordCount[key] = count
-	
+
 	print wordCount
-	
+
 	document.wordcount = dict(hashedWordCount)
 	document.save()
-	
+
 	if contents_escaped is not "":
 		return json.dumps( {
 				"success":"true",
 				"new_csrf":generate_csrf_token()
 			} );
-	
+
 	return abort(403)
 
 @app.route("/documents/<id>/delete",methods=["POST"])
@@ -310,17 +310,17 @@ def documentDelete(id):
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
 		return abort(404)
-	
+
 	if request.method != "POST":
 		return abort(405)
-	
+
 	document.remove()
-	
-	return json.dumps( { 
+
+	return json.dumps( {
 			"success":"true",
 			"new_csrf":generate_csrf_token()
 		} );
-	
+
 	return abort(403)
 
 @app.route("/documents/<id>/download/<filetype>")
@@ -330,27 +330,27 @@ def documentDownload(id, filetype):
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
 		return abort(404)
-	
+
 	filetypes = {
 		"docx":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 		"pdf":"application/pdf",
 		"txt":"text/plain",
 	}
-	
+
 	pandoc_filetypes = {
 		"docx":"docx",
 		"pdf":"latex --latex-engine=pdflatex",
 		"txt":"plain"
 	}
-	
+
 	if filetype in filetypes:
 		print document.contents
 		print document.contents.count("  ")
 		responseContents = Pandoc().convert("markdown_github+escaped_line_breaks", pandoc_filetypes[filetype], document.contents, filetype=filetype)
 		response = Response(responseContents, mimetype=filetypes[filetype])
-		
+
 		filename = document.title + "." + filetype
-		
+
 		response.headers['Content-Disposition'] = "attachment; filename=%s" % filename
 		return response
 	else:
@@ -361,8 +361,8 @@ def loopTermFrequencies( termFrequencies, tfidf, documentCount, wordCountsByKey 
 	for word, (count, tf) in termFrequencies:
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		idf = math.log(documentCount / (1+wordCountsByKey[key]))
-		tfidf[word] = (idf*tf, key)		
-		
+		tfidf[word] = (idf*tf, key)
+
 
 @app.route("/documents/<id>/tfidf")
 @login.login_required
@@ -374,54 +374,54 @@ def documentTFIDF(id):
 		return abort(404)
 
 	startTime = time.time()
-	
+
 	# initialize manager for multiprocessing
 	manager = multiprocessing.Manager()
-	
+
 	# Cound words in this document
 	words = re.findall("[a-z]{2,}", document.contents.lower()) + re.findall("[a-z]{2,}", document.title.lower())
 	wordCount = collections.defaultdict(int)
 	for word in words:
 		wordCount[word] += 1
-		
+
 	print time.time()-startTime
-		
+
 	termFrequencies = {}
 	for word in words:
 		termFrequencies[word] = (wordCount[word], wordCount[word]/len(words))
-		
+
 	print time.time()-startTime
-		
+
 	allDocuments = Document().matchObjects(
 		{"category":document.category},
 		fields={"wordcount":True}
 	)
-	
+
 	print time.time()-startTime
-	
+
 	documentCount = len(allDocuments)
-	
+
 	print time.time()-startTime
-	
+
 	allWordCounts = []
 	for d in allDocuments:
 		allWordCounts += d.wordcount.keys()
-		
+
 	print time.time()-startTime
-		
+
 	wordCountsByKey = defaultdict(int)
 	for k in allWordCounts:
 		wordCountsByKey[k] += 1
-		
+
 	print time.time()-startTime
-	
+
 	tfidf = manager.dict()
 	managerWordCountsByKey = manager.dict(wordCountsByKey)
-		
+
 	cores = multiprocessing.cpu_count()
 	#cores = 1
 	chunkSize = len(termFrequencies)/cores
-	
+
 	pool = []
 	for core in range(cores):
 		print core, int(chunkSize*core),int(chunkSize*(core+1))
@@ -433,16 +433,16 @@ def documentTFIDF(id):
 	for p in pool:
 		print "Joining", p
 		p.join()
-		
+
 	print time.time()-startTime
-		
+
 	results = {}
-	
+
 	for word,(score,key) in tfidf.items():
 		if score >= 0.01:
 			related = Document().matchObjects(
 				{"$and": [
-						{"wordcount."+key : { "$exists": True }}, 
+						{"wordcount."+key : { "$exists": True }},
 						{"_id": {"$ne": ObjectId(id)}} # A conversion to ObjectId is needed for Mongo/Toku
 					]},
 				fields = {"title":True, "_id":True,"wordcount."+key:True},
@@ -451,20 +451,20 @@ def documentTFIDF(id):
 			)
 			relatedResults = []
 			for r in related[:3]:
-				relatedResults.append( 
+				relatedResults.append(
 					{
 						"title":r.title,
 						"_id":str(r._id)
 					}
 				)
-				
+
 			results[word] = relatedResults
-		
+
 	print time.time()-startTime
-		
+
 	return json.dumps(results)
-	
-	
+
+
 def flatten(d, parent_key='', sep='_'):
 	items = []
 	for k, v in d.items():
@@ -474,14 +474,14 @@ def flatten(d, parent_key='', sep='_'):
 		else:
 			items.append((new_key, v))
 	return dict(items)
-	
+
 @app.route("/documents/add-jurisprudence")
 @login.login_required
 def addJurisprudenceDocuments():
-	
+
 	def generateJurisprudenceDocuments():
-		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )		
-		
+		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
+
 		categorized = {}
 		wiki = jurisprudence["Yuras"]["wiki"]
 		flatWiki = flatten(wiki)
@@ -519,12 +519,12 @@ def addJurisprudenceDocuments():
 
 				d.wordcount = dict(hashedWordCount)
 				d.save()
-			
+
 			categorized[key].append(document)
 			print title, "saved", dCounter, "/", dTotal
 			dCounter += 1
 			yield title + "\n"
-			
+
 	return Response(generateJurisprudenceDocuments(), mimetype='text/plain')
 
 def do_documentSearch(keywords, category=None, skip=0, limit=10):
@@ -536,38 +536,38 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		keys.append(key)
 		wordCountList.append( {"wordcount."+key : { "$exists": True }} )
-	
+
 	if len(wordCountList) > 0:
 		matchArray = {"$or":wordCountList}
-	
+
 		if category is not None:
 			orValues = matchArray["$or"]
 			del matchArray["$or"]
 			matchArray["$and"] = [{"category":category}, {"$or":orValues}]
-			
+
 	else:
 		if category is not None:
 			matchArray = {"category":category}
-	
+
 	results = Document().matchObjects(
 		matchArray,
 		limit=limit,
 		skip=skip
 	)
-	
+
 	#results.sort(key=lambda r:r.wordcount.get(keys[0],0))
 	return results
-	
+
 @app.route("/documents/search")
 @login.login_required
 def documentSearch():
 	keywords = request.args.get("keywords", "").split(" ")
 	category = request.args.get("category", None)
 	results = do_documentSearch(keywords,category=category if len(category)>0 else None)
-	
+
 	categories = Category().matchObjects({})
-	return render_template("documents/search.html", 
-						   name="Document search results", 
+	return render_template("documents/search.html",
+						   name="Document search results",
 						   category=category,
 						   categories=categories,
 						   documents=results,
@@ -583,16 +583,47 @@ def documentSearchTable(amount, page):
 								category=category if len(category)>0 else None,
 								skip=int(amount)*int(page),
 								limit=int(amount))
-	
+
 	return render_template("documents/search-table.html", documents=results)
-	
-	
-@app.route("/documents/upload")
+
+
+def returnUploadError(error):
+	return return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document", error=error)
+
+@app.route("/documents/upload", methods=["GET","POST"])
 #@login.login_required
 def documentsUpload():
-	categories = Category().matchObjects({})
-	return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document")
-	
+	if request.method == "GET":
+		categories = Category().matchObjects({})
+		return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document", error=None)
+	else:
+		error = None
+		filetypes = {
+			"docx":"docx",
+			"txt":"plain",
+			"pdf":"plain"
+		}
+
+		data = dict(request.form)
+		filename = data["file"]
+
+		if filename.split(".")[-1] not in filetypes.keys():
+			error = "Not an allowed format."
+			return returnUploadError(error)
+
+		document = Document()
+		document.title = data["title"]
+		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", request.files["file"].read())
+		document.category = data["category"]
+		document.author = login.current_user.username
+		document.save()
+
+		if error is None:
+			return "Upload complete"
+		else:
+			return returnUploadError(error)
+
+
 # ANNOTATIONS #
 
 @app.route("/annotations/")
@@ -602,9 +633,9 @@ def annotationsIndex():
 		{},
 		limit=25
 	)
-	
+
 	return render_template("annotations/index.html", name="Annotations overview", annotations=annotations, active="annotations")
-	
+
 @app.route("/annotations/<id>/delete",methods=["POST"])
 @login.login_required
 def annotationDelete(id):
@@ -612,17 +643,17 @@ def annotationDelete(id):
 		annotation = Annotation().getObjectsByKey("_id", id)[0]
 	except:
 		return abort(404)
-	
+
 	if request.method != "POST":
 		return abort(405)
-	
+
 	annotation.remove()
-	
-	return json.dumps( { 
+
+	return json.dumps( {
 			"success":"true",
 			"new_csrf":generate_csrf_token()
 		} );
-	
+
 	return abort(403)
 
 # USERS #
@@ -632,7 +663,7 @@ def usersIndex():
 	users = User().matchObjects(
 		{},
 		limit=25)
-	
+
 	return render_template("users/index.html", name="Users overview", users=users, active="users")
 
 @app.route("/users/new")
@@ -650,7 +681,7 @@ def userEdit(id):
 		user = User().getObjectsByKey("_id", id)[0]
 	except Exception as e:
 		return abort(404)
-			
+
 	try:
 		user.public_key = base64.b64decode(user.public_key)
 	except:
@@ -669,12 +700,12 @@ def userView(id):
 		user = User().getObjectsByKey("_id", id)[0]
 	except Exception as e:
 		return abort(404)
-	
+
 	try:
 		user.public_key = base64.b64decode(user.public_key)
 	except:
 		pass # Skip over new users
-			
+
 	return render_template("users/view.html", name="View user", user=user, active="users")
 
 @app.route("/users/<id>/save",methods=["POST"])
@@ -684,21 +715,21 @@ def userSave(id):
 		user = User().getObjectsByKey("_id", id)[0]
 	except Exception as e:
 		return abort(404)
-	
+
 	data = dict(request.form)
-	
+
 	rawPassword = urllib2.unquote( data["password"][0].decode("utf-8") )
-	
+
 	user.setPassword(rawPassword)
-		
+
 	user.username = data["username"][0]
 	user.firstname = data["firstname"][0]
 	user.lastname = data["lastname"][0]
 	user.email = data["email"][0]
 	user.save()
-	
+
 	return redirect("/users/%s/edit" % id)
-	
+
 @app.route("/users/<id>/delete",methods=["POST"])
 @login.login_required
 def userDelete(id):
@@ -706,28 +737,28 @@ def userDelete(id):
 		user = User().getObjectsByKey("_id", id)[0]
 	except:
 		return abort(404)
-	
+
 	if request.method != "POST":
 		return abort(405)
-	
+
 	user.remove()
-	
-	return json.dumps( { 
+
+	return json.dumps( {
 			"success":"true",
 			"new_csrf":generate_csrf_token()
 		} );
-	
+
 	return abort(403)
 
 # USERS - PASSWORD #
 with open(os.path.join(assetsFolder, "words.txt")) as wordsFile:
 	wordList = [ w.strip("\r ") for w in wordsFile.read().split("\n") if (len(w) > 4 and len(w) < 8) ]
-	
+
 @app.route("/users/get-random-words/<n>")
 @login.login_required
 def getRandomWords(n):
 	return json.dumps(random.sample(wordList,int(n)))
-	
+
 @app.route("/users/<id>/password/edit")
 @login.login_required
 def userPasswordEdit(id):
@@ -735,7 +766,7 @@ def userPasswordEdit(id):
 		user = User().getObjectsByKey("_id", id)[0]
 	except Exception as e:
 		return abort(404)
-			
+
 	return render_template("users/password-edit.html", name="Respin password", user=user, active="users")
 
 # INSTALLING
@@ -743,17 +774,16 @@ def userPasswordEdit(id):
 def installYuras():
 	if len(User().matchObjects({})) > 0:
 		return abort(500)
-	
+
 	user = User()
 	user.save()
-	
+
 	username = u"accountone"
 	password = unicode(" ".join(random.sample(wordList,4)))
-	
+
 	user.setPassword(password)
-	user.username = username	
-	
-	user.save()		
-	
+	user.username = username
+
+	user.save()
+
 	return json.dumps([username, password])
-	
