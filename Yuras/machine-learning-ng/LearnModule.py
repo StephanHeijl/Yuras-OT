@@ -42,7 +42,6 @@ class LearnModule():
 						value = value.replace(sw, "")
 				categorizedData[strippedKey].append(value)
 				
-				
 		self.categorizedData = categorizedData
 		
 	def __flatten(self,d, parent_key='', sep='_'):
@@ -142,11 +141,15 @@ class LearnModule():
 	def fullTraining(self):
 		print "Performing a full training."
 		trainDocuments, trainCategories = self.processDocuments(self.categorizedData)
-		self.classifier = SGDClassifier(shuffle=True, n_jobs=-1, penalty='elasticnet', n_iter=1000 )
+		self.classifier = SVC(kernel="sigmoid", gamma=3.5, C=1)
 		classifier = self.teachMachine(trainDocuments, trainCategories)
 		
 		with open("Classifier.cpic","wb") as classifierStorage:
 			pickle.dump(classifier, classifierStorage)
+			
+		with open("Vectorizer.cpic","wb") as vectorizerStorage:
+			pickle.dump(self.tfidf, vectorizerStorage)
+			
 	
 if __name__ == "__main__":
 	lm = LearnModule()

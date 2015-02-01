@@ -2,6 +2,8 @@ from __future__ import division
 
 import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math, pprint, random
 import multiprocessing
+
+import cPickle as pickle
 from functools import wraps
 from collections import defaultdict
 
@@ -18,6 +20,8 @@ from Yuras.webapp.models.Document import Document
 from Yuras.webapp.models.Annotation import Annotation
 from Yuras.webapp.models.User import User
 from Yuras.webapp.models.Category import Category
+
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 from Crypto import Random
 
@@ -360,7 +364,7 @@ def loopTermFrequencies( termFrequencies, tfidf, documentCount, wordCountsByKey 
 	# This function is paralellezied due to the large amount of words and long CPU times.
 	for word, (count, tf) in termFrequencies:
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
-		idf = math.log(documentCount / (1+wordCountsByKey[key]))
+		idf = math.log(documentCount / (1+wordCountsByKey.get(key,0)))
 		tfidf[word] = (idf*tf, key)
 
 
@@ -503,7 +507,7 @@ def addJurisprudenceDocuments():
 				d = Document()
 				d.title = title
 				d.category = key
-				d.contents = document
+				d.contents = Pandoc().convert("html","markdown_github+escaped_line_breaks", document)
 				d.author = "Yuras"
 
 				# Counting words
@@ -616,9 +620,19 @@ def documentsUpload():
 		document = Document()
 		document.title = data["title"][0]
 		content = f.stream.read()
-		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", content, filetype=extension )
+		document.contents = Pandoc().convert( filetypes[extension], "markdown_github+escaped_line_breaks", content, filetype=extension )
 		document.category = data["category"][0]
 		document.author = login.current_user.username
+		
+		# Category detection
+		if document.category == "detect":
+			classifier = pickle.load( open(os.path.join( Config().WebAppDirectory, "../..", "Classifier.cpic"), "rb") )
+			vectorizer = pickle.load( open(os.path.join( Config().WebAppDirectory, "../..", "Vectorizer.cpic"), "rb") )
+			
+			plainContents = Pandoc().convert("markdown_github","plain",document.contents)
+			matrix = vectorizer.transform([plainContents])
+			print "Classifying"
+			document.category = classifier.predict( matrix )[0]
 		
 		# Counting words
 		words = re.findall("[a-z]{2,}", content.lower()) + re.findall("[a-z]{2,}", document.title.lower())
