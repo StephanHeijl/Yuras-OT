@@ -108,6 +108,8 @@ body {
 	left: -9999px;
 	z-index: 99;
 	pointer-events: none;
+	opacity: 1;
+	transition: opacity 0.3s;
 }
 
 .annotation a {

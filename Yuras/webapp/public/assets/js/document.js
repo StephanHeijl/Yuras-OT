@@ -116,7 +116,9 @@ $(function () {
 
 			connection.attr({
 				//"fill":annotatedElement.css("background-color"),
-				"fill": g,
+				"stroke": g,
+				"stroke-width": 2,
+				"fill": "transparent",
 				"points": points.join(",")
 			})
 		} else {

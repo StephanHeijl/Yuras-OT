@@ -47,7 +47,7 @@ def do_login():
 
 	if request.method == "POST":
 		try:
-			user = User().getObjectsByKey("username", unicode(request.form.get("username")),limit=1)[0]
+			user = User().getObjectsByKey("username", unicode(request.form.get("username")).lower(),limit=1)[0]
 		except Exception as e:
 			print e
 			user = None
@@ -591,7 +591,7 @@ def returnUploadError(error, categories):
 	return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document", error=error)
 
 @app.route("/documents/upload", methods=["GET","POST"])
-#@login.login_required
+@login.login_required
 def documentsUpload():
 	categories = Category().matchObjects({})
 	error = None
@@ -605,29 +605,39 @@ def documentsUpload():
 			"pdf":"plain"
 		}
 		
-		file = request.files["file"]
+		f = request.files["file"]
 		data = dict(request.form)
-		filename = file.filename
+		filename = f.filename
 		extension = filename.split(".")[-1]
 		if extension not in filetypes.keys():
 			error = "Not an allowed format."
 			return returnUploadError(error,categories)
 		
-		print "Storing document", data["title"][0]
 		document = Document()
 		document.title = data["title"][0]
-		print document.title
-		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", file.read())
-		print document.contents
+		content = f.stream.read()
+		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", content, filetype=extension )
 		document.category = data["category"][0]
-		print document.category
 		document.author = login.current_user.username
-		print document.author
+		
+		# Counting words
+		words = re.findall("[a-z]{2,}", content.lower()) + re.findall("[a-z]{2,}", document.title.lower())
+		wordCount = collections.defaultdict(int)
+		for word in words:
+			wordCount[word] += 1
+
+		hashedWordCount = collections.defaultdict(int)
+		for word, count in wordCount.items():
+			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+			hashedWordCount[key] = count
+
+		document.wordcount = dict(hashedWordCount)
+		
 		document.save()
 		print "Document saved", document._id
 
 		if error is None:
-			return "Upload complete"
+			return redirect("/documents/"+str(document._id))
 		else:
 			return returnUploadError(error,categories)
 	

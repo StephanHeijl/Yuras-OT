@@ -4,8 +4,10 @@ import subprocess, tempfile, os
 class Pandoc():
 	""" Provides basic integration with pandoc for text conversion."""
 	def __init__(self):
-		self.baseCommand = "~/.cabal/bin/pandoc -f {from} -t {to} < {text}"
-		self.fileOutputCommand = "~/.cabal/bin/pandoc -f {from} -t {to} -o {outputpath} < {text}"
+		self.baseCommand = "~/.cabal/bin/pandoc {text} -f {from} -t {to}"
+		self.fileOutputCommand = "~/.cabal/bin/pandoc {text} -f {from} -t {to} -o {outputpath}"
+		
+		
 		
 	def convert(self, from_, to_, text, filetype=None):
 		""" Converts a string from one format to another, returns the result.
@@ -37,12 +39,23 @@ class Pandoc():
 			formatDict["outputpath"] = tmpout.name
 			command = self.fileOutputCommand.format(**formatDict)
 			pdp = subprocess.Popen(command,shell=True,executable='/bin/bash',stdout=subprocess.PIPE)
-			pdp.communicate()[0]
+			print command
+			print pdp.communicate()
 			with open(tmpout.name,"rb") as tmpoutFile:
 				result = tmpoutFile.read()
 			os.unlink(tmpout.name)
 		else: 
 			result = result[0]
+			
+		if len(result) == 0:
+			# Retry with legacy commands
+			legacyBaseCommand = "~/.cabal/bin/pandoc -f {from} -t {to} < {text}"
+			legacyFileOutputCommand = "~/.cabal/bin/pandoc -f {from} -t {to} -o {outputpath} < {text}"
+			if self.baseCommand != legacyBaseCommand:			
+				self.baseCommand = legacyBaseCommand
+				self.fileOutputCommand = legacyFileOutputCommand
+			
+				result = self.convert(from_,to_,text, filetype)
 			
 		os.unlink(tmp.name)
 		try:
