@@ -443,7 +443,8 @@ def documentTFIDF(id):
 	results = {}
 
 	for word,(score,key) in tfidf.items():
-		if score >= 0.01:
+		print word,score,key
+		if score > 0.0:
 			related = Document().matchObjects(
 				{"$and": [
 						{"wordcount."+key : { "$exists": True }},
@@ -628,9 +629,15 @@ def documentsUpload():
 		if document.category == "detect":
 			classifier = pickle.load( open(os.path.join( Config().WebAppDirectory, "../..", "Classifier.cpic"), "rb") )
 			vectorizer = pickle.load( open(os.path.join( Config().WebAppDirectory, "../..", "Vectorizer.cpic"), "rb") )
+			stopwords = []
+			with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
+				stopwords = swf.read().split("\n")
 			
 			plainContents = Pandoc().convert("markdown_github","plain",document.contents)
+			for stopword in stopwords:
+				plainContents = plainContents.replace(stopword, "")
 			matrix = vectorizer.transform([plainContents])
+			print matrix
 			print "Classifying"
 			document.category = classifier.predict( matrix )[0]
 		

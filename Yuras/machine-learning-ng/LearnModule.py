@@ -59,8 +59,6 @@ class LearnModule():
 			self.stopWords = stopWords.read().split("\n")
 	
 	def processDocuments(self, data):
-		notwords = re.compile("[^a-z]")
-		allDocumentWords = []
 		allDocuments = []
 		categoryList = []
 		
