@@ -8,7 +8,7 @@
 		</div>
 
 		<div class="col-lg-8">
-			<form class="form-horizontal" action="save" method="post" role="form" data-toggle="validator">
+			<form class="form-horizontal" action="/users/{{ user._id }}/save?back=/users/profile" method="post" role="form" data-toggle="validator">
 				<div class="form-group">
 					<label for="firstname" class="col-sm-2 control-label">First name</label>
 					<div class="col-sm-10">
@@ -53,16 +53,42 @@
 				<!-- CSRF token -->
 				<input type="hidden" class="hidden" name="_csrf_token" value={{ csrf_token() }} />
 			</form>
+		
 		</div>
 
 
 		<div class="col-lg-4">
 			<div class="panel panel-default">
 				<div class="panel-body">
-					You can edit your profile here.
+					You can edit your profile here and see your documents.
 				</div>
 
 			</div>
+		</div>
+		<div class="col-lg-12">
+			<h2> Documents by {{ user.firstname }}</h2>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th data-key="title">Title</th>
+						<th data-key="_created">Created</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for document in documents %}
+					<tr>
+						<td width="60%"><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a>
+						</td>
+						<td>{{ document._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+						<td>
+							<a href="/documents/{{ document._id }}/delete" class="delete-document" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
+							<a href="/documents/{{ document._id }}/download/docx" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-download-alt"></span></a>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
 		</div>
 
 	</div>

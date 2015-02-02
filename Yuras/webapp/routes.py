@@ -726,7 +726,8 @@ def userEdit(id):
 @app.route("/users/profile")
 @login.login_required
 def userProfile():
-	return render_template("users/profile.html", name="Your profile page", user=login.current_user, active="profile")
+	documents = Document().getObjectsByKey("author", login.current_user.username, limit=10)
+	return render_template("users/profile.html", name="Your profile page", user=login.current_user, documents=documents, active="profile")
 
 @app.route("/users/<id>")
 @login.login_required
@@ -753,9 +754,9 @@ def userSave(id):
 
 	data = dict(request.form)
 
-	rawPassword = urllib2.unquote( data["password"][0].decode("utf-8") )
-
-	user.setPassword(rawPassword)
+	rawPassword = urllib2.unquote( data.get("password", [""])[0].decode("utf-8") )
+	if len(rawPassword) > 0:
+		user.setPassword(rawPassword)
 
 	user.username = data["username"][0]
 	user.firstname = data["firstname"][0]
@@ -763,7 +764,7 @@ def userSave(id):
 	user.email = data["email"][0]
 	user.save()
 
-	return redirect("/users/%s/edit" % id)
+	return redirect(request.args.get("back", "/users/%s/edit" % id))
 
 @app.route("/users/<id>/delete",methods=["POST"])
 @login.login_required
