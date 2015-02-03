@@ -267,6 +267,12 @@ $(function () {
 		}
 	});
 	
+	function zoomInAnnotation(annotation, delay) {
+		setTimeout(function(){
+			annotation.css({"transform":"scale(1)"})
+		}, delay);
+	}
+	
 	function addAnnotation(start,length,text,annotationContents,page) {
 		annotation = $("<div>");
 		annotation.addClass("annotation");
@@ -280,13 +286,17 @@ $(function () {
 			annotation.html(annotationContents);
 		}
 		
-		pages = $(".annotation-page").length 
+		pages = $(".annotation-page").length
 		while( pages <= page ) {
 			$(".annotation-wrapper-padding").append("<div class='annotation-page'></div>")
 			pages = $(".annotation-page").length
 		}
 		
-		$(".annotation-page").eq(page).append(annotation)
+		annotation.appendTo( $(".annotation-page").eq(page) )
+		annotation.css({"transform":"scale(0)"})
+		zoomInAnnotation(annotation, $(".annotation").length*10)
+		
+		
 		annotation.data("annotation-id", "undefined-"+$(".annotation").length)
 		annotation.data("location", start+","+length)
 		annotation.data("selected_text", text)
@@ -297,6 +307,7 @@ $(function () {
 				$(this).unbind("click");
 			}
 		})
+		console.log("Scaled to 1")
 		
 	}
 	
@@ -450,10 +461,31 @@ $(function () {
 	$("#analyze-document").click(function(e) {
 		e.preventDefault()
 		console.log("Analyzing...")
+		
+		// Add overlay
+		overlay = $("<div>")
+		overlay.addClass("document-overlay");
+		overlay.css({"display":"none"})
+		loader = $("<div>").addClass("document-loader")
+		loader.appendTo(overlay)
+		overlay.appendTo( $("body") )
+		
+		loader.css({"transform":"scale(0)"})
+		overlay.fadeIn(300, function() {
+			loader.css({"transform":"scale(1)"})
+		})
+		
+		
 		$.getJSON(window.location.href.replace("#","")+"/tfidf", function(data) {
-			console.log(data)
+			console.log(data);
+			
+			loader.css({"transform":"scale(0)"})
+			
+			setTimeout(function() {
+				overlay.fadeOut(300);
+			},500)
+			
 			$.each(data, function(word,related) {
-				console.log(word,related)
 				regex = RegExp(word, "i")
 				
 				contents = ""
