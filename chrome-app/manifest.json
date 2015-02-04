@@ -1,0 +1,18 @@
+{
+	"name": "Yuras",
+	"description": "My first Chrome App.",
+	"version": "0.1",
+	"manifest_version": 2,
+	"app": {
+		"background": {
+			"scripts": ["background.js"]
+		}
+	},
+	"permissions": [
+          "webview"
+    ],
+	"icons": {
+		"16": "yuras-16.png",
+		"128": "yuras-128.png"
+	}
+}
