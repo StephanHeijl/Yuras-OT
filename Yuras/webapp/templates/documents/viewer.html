@@ -25,7 +25,6 @@
 					</li>
 					<li class="divider"></li>
 					<li><a href="#" id="secure-document" data-csrf={{ csrf_token() }}>Secure document</a>
-					<li><a href="#" id="analyze-document" data-csrf={{ csrf_token() }}>Analyze document</a>
 					</li>
 					<li class="divider"></li>
 					<li><a href="/documents">Exit</a>
@@ -33,6 +32,7 @@
 				</ul>
 			</li>
 
+			<!--
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Annotate <span class="caret"></span></a>
 				<ul class="dropdown-menu" role="menu">
@@ -46,6 +46,7 @@
 					</li>
 				</ul>
 			</li>
+			-->
 
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Download as... <span class="caret"></span></a>
@@ -57,6 +58,10 @@
 					<li><a href="{{ document._id }}/download/txt">Plain text</a>
 					</li>
 				</ul>
+			</li>
+			
+			<li>
+				<a href="#" id="analyze-document" data-csrf={{ csrf_token() }}><span class="glyphicon glyphicon-eye-open"></span> Analyze document</a>
 			</li>
 		</ul>
 	</div>

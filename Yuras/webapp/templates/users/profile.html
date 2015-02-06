@@ -1,4 +1,7 @@
-{% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }} {{ deferJS("/assets/js/validator.min.js", 2) }}
+{% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }} 
+{{ deferJS("/assets/js/validator.min.js", 2) }}
+{{ deferJS("chrome-extension://pfboblefjcgdjicmnffhdgionmgcdmne/u2f-api.js", 3) }}
+{{ deferJS("/assets/js/u2f.js", 4) }}
 <div class="container">
 
 	<div class="row">
@@ -58,13 +61,10 @@
 
 
 		<div class="col-lg-4">
-			<div class="panel panel-default">
-				<div class="panel-body">
-					You can edit your profile here and see your documents.
-				</div>
-
-			</div>
+			<button class="btn btn-default btn-lg" id="enrollU2F" data-user-id="{{ user._id }}"> Click here to enroll your U2F device. </button>
 		</div>
+		
+		
 		<div class="col-lg-12">
 			<h2> Documents by {{ user.firstname }}</h2>
 			<table class="table table-striped">

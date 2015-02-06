@@ -25,6 +25,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 from Crypto import Random
 
+from u2flib_server.jsapi import DeviceRegistration
+from u2flib_server.u2f import start_register, complete_register, start_authenticate, verify_authenticate
+
 templatesFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)),"./templates")
 assetsFolder = os.path.join(os.path.abspath(os.path.dirname(__file__)),"./public/assets")
 app = Flask(__name__, template_folder=templatesFolder)
@@ -350,7 +353,7 @@ def documentDownload(id, filetype):
 	if filetype in filetypes:
 		print document.contents
 		print document.contents.count("  ")
-		responseContents = Pandoc().convert("markdown_github+escaped_line_breaks", pandoc_filetypes[filetype], document.contents, filetype=filetype)
+		responseContents = Pandoc().convert("markdown_github", pandoc_filetypes[filetype], document.contents, filetype=filetype)
 		response = Response(responseContents, mimetype=filetypes[filetype])
 
 		filename = document.title + "." + filetype
@@ -507,7 +510,7 @@ def addJurisprudenceDocuments():
 				d = Document()
 				d.title = title
 				d.category = key
-				d.contents = Pandoc().convert("html","markdown_github+escaped_line_breaks", document)
+				d.contents = Pandoc().convert("html","markdown_github", document)
 				d.author = "Yuras"
 
 				# Counting words
@@ -620,7 +623,7 @@ def documentsUpload():
 		document = Document()
 		document.title = data["title"][0]
 		content = f.stream.read()
-		document.contents = Pandoc().convert( filetypes[extension], "markdown_github+escaped_line_breaks", content, filetype=extension )
+		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", content, filetype=extension )
 		document.category = data["category"][0]
 		document.author = login.current_user.username
 		
@@ -810,6 +813,86 @@ def userPasswordEdit(id):
 		return abort(404)
 
 	return render_template("users/password-edit.html", name="Respin password", user=user, active="users")
+
+# USERS - U2F AUTHENTICATION #
+
+@app.route("/users/<id>/u2f/enroll")
+def userEnroll(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	try:
+		devices = map(DeviceRegistration.wrap, user.u2f_devices)
+	except:
+		devices = []
+	
+	app_id = "http://127.0.0.1"
+	print app_id
+	enroll = start_register(app_id, devices)
+	user.u2f_enroll = enroll.json
+	return enroll.json
+
+@app.route("/users/<id>/u2f/bind")
+def userBind(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	data = request.data.get("data", None)
+	enroll = user.u2f_enroll
+	binding, cert = complete_register(enroll, data, [])
+	
+	try:
+		devices = map(DeviceRegistration.wrap, user.u2f_devices)
+	except:
+		devices = []
+		
+	devices.append(binding)
+	user.u2f_devices = [d.json for d in devices]
+	
+	print "U2F device enrolled. Username: %s" % user.username
+	print "Attestation certificate:\n%s" % cert.as_text()
+	
+	return json.dumps(True)
+
+@app.route("/users/<id>/u2f/sign")
+def userSign(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	try:
+		devices = map(DeviceRegistration.wrap, user.u2f_devices)
+	except:
+		devices = []
+		
+	challenge = start_authenticate(devices)
+	user.u2f_challenge = challenge.json
+	return challenge.json
+
+@app.route("/users/<id>/u2f/verify")
+def userVerify(id):
+	try:
+		user = User().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	try:
+		devices = map(DeviceRegistration.wrap, user.u2f_devices)
+	except:
+		devices = []
+		
+	challenge = user.u2f_challenge
+	c, t = verify_authenticate(devices, challenge, data)
+	return json.dumps({
+			'touch': t,
+			'counter': c
+		})
+	
 
 # INSTALLING
 @app.route("/install")

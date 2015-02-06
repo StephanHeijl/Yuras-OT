@@ -175,7 +175,7 @@ $(function () {
 		var st = $("body").scrollTop();
 		tmpCurrentPage = -1;
 		$(".document").each(function () {
-			var distance = st - $(this).offset().top + $(".navbar").height();
+			var distance = st - $(this).offset().top + parseInt($(".annotation-wrapper").css("top"));
 			if (distance > 0) {
 				tmpCurrentPage++;
 			}
@@ -270,7 +270,8 @@ $(function () {
 	function zoomInAnnotation(annotation, delay) {
 		setTimeout(function(){
 			annotation.css({"transform":"scale(1)"})
-		}, delay);
+			$(".marked[data-linked-to="+annotation.data("linked-to")+"]").css({"transform":"scale(1)"})
+		}, delay);		
 	}
 	
 	function addAnnotation(start,length,text,annotationContents,page) {
@@ -295,7 +296,6 @@ $(function () {
 		annotation.appendTo( $(".annotation-page").eq(page) )
 		annotation.css({"transform":"scale(0)"})
 		zoomInAnnotation(annotation, $(".annotation").length*10)
-		
 		
 		annotation.data("annotation-id", "undefined-"+$(".annotation").length)
 		annotation.data("location", start+","+length)
@@ -460,7 +460,8 @@ $(function () {
 	// Handle document analysis
 	$("#analyze-document").click(function(e) {
 		e.preventDefault()
-		console.log("Analyzing...")
+		
+		$(this).unbind("click").parent().addClass("disabled") // Disable button after it has been clicked.
 		
 		// Add overlay
 		overlay = $("<div>")
@@ -504,7 +505,7 @@ $(function () {
 						console.log("Adding annotation for word "+word+" to page "+page)
 						addAnnotation( start, word.length, word, contents, page)
 						$(this).html(
-							$(this).html().replace(regex, "<span class='marked' data-linked-to='"+$(".annotation").length+"'>"+word+"</span>")
+							$(this).html().replace(regex, "<span class='marked' data-linked-to='"+$(".annotation").length+"' style='transform: scale(0)'>"+word+"</span>")
 						)
 						return true
 					} else {
