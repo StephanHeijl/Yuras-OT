@@ -626,8 +626,8 @@ def documentsUpload():
 		
 		# Category detection
 		if document.category == "detect":
-			classifier = pickle.load( open(os.path.join( Config().WebAppDirectory, "../..", "Classifier.cpic"), "rb") )
-			vectorizer = pickle.load( open(os.path.join( Config().WebAppDirectory, "../..", "Vectorizer.cpic"), "rb") )
+			classifier = pickle.load( open(os.path.join( Config().WebAppDirectory, "..","..", "Classifier.cpic"), "rb") )
+			vectorizer = pickle.load( open(os.path.join( Config().WebAppDirectory, "..","..", "Vectorizer.cpic"), "rb") )
 			stopwords = []
 			with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
 				stopwords = swf.read().split("\n")

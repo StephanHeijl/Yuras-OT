@@ -157,5 +157,5 @@ if __name__ == "__main__":
 	
 	lm.analyzeJSON(args.get("in", None))
 	lm.fullTraining()
-	#lm.xfoldMachine(20, classifier=clf)
+	#lm.xfoldMachine(10, classifier=clf)
 	

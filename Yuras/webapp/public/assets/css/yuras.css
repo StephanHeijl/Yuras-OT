@@ -1,6 +1,6 @@
 body {
 	background: #eee;
-	font-family: Oxygen;
+	font-family: Open Sans;
 	font-size: 13pt;
 	text-rendering: optimizeLegibility;
 	-webkit-font-kerning: normal;
@@ -10,6 +10,15 @@ header {
 	text-align: center;
 	margin: 100px 0;
 }
+
+.navbar-logo {
+	margin-top: -6px;
+	transition: opacity 0.3s;
+}
+.navbar-logo:hover {
+	opacity: 0.5;
+}
+
 h1 {
 	letter-spacing: -1px;
 }
