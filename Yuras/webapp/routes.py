@@ -285,10 +285,17 @@ def documentSave(id):
 			a.linked_to = int(annotation["linked-to"])
 
 			a.save()
-
+	
+	stopwords = []
+	with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
+		stopwords = swf.read().split("\n")
+		
 	# Counting words
 	words = re.findall("[a-z]{2,}", contents_md.lower()) + re.findall("[a-z]{2,}", title.lower())
 	wordCount = collections.defaultdict(int)
+	
+	words = [ word for word in words if word not in stopwords ] # Remove all stopwords
+	
 	for word in words:
 		wordCount[word] += 1
 
@@ -364,13 +371,24 @@ def documentDownload(id, filetype):
 		return abort(405)
 
 def loopTermFrequencies( termFrequencies, tfidf, documentCount, wordCountsByKey ):
-	# This function is paralellezied due to the large amount of words and long CPU times.
+	# This function is paralellized due to the large amount of words and long CPU times.
 	for word, (count, tf) in termFrequencies:
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		idf = math.log(documentCount / (1+wordCountsByKey.get(key,0)))
 		tfidf[word] = (idf*tf, key)
 
-
+@app.route("/documents/<id>/related")
+#@login.login_required
+def documentRelated(id):
+	try:
+		document = Document().matchObjects({"_id": id}, fields={"_id":True, "content":True, "wordcount":True})[0]
+	except Exception as e:
+		print e
+		return abort(404)
+	
+	print document
+	return json.dumps(document.wordcount)
+		
 @app.route("/documents/<id>/tfidf")
 @login.login_required
 def documentTFIDF(id):
@@ -488,7 +506,11 @@ def addJurisprudenceDocuments():
 
 	def generateJurisprudenceDocuments():
 		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
-
+		
+		stopwords = []
+		with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
+			stopwords = swf.read().split("\n")
+		
 		categorized = {}
 		wiki = jurisprudence["Yuras"]["wiki"]
 		flatWiki = flatten(wiki)
@@ -515,6 +537,8 @@ def addJurisprudenceDocuments():
 
 				# Counting words
 				words = re.findall("[a-z]{2,}", document.lower()) + re.findall("[a-z]{2,}", title.lower())
+				words = [word for word in words if word not in stopwords]
+				
 				wordCount = collections.defaultdict(int)
 				for word in words:
 					wordCount[word] += 1
@@ -562,7 +586,7 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 		skip=skip
 	)
 
-	#results.sort(key=lambda r:r.wordcount.get(keys[0],0))
+	results.sort(key=lambda r:r.wordcount.get(keys[0],0))
 	return results
 
 @app.route("/documents/search")
@@ -635,17 +659,19 @@ def documentsUpload():
 			with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
 				stopwords = swf.read().split("\n")
 			
-			plainContents = Pandoc().convert("markdown_github","plain",document.contents)
+			plainContents = Pandoc().convert("markdown_github","plain",document.contents).lower()
 			for stopword in stopwords:
 				plainContents = plainContents.replace(stopword, "")
+				
 			matrix = vectorizer.transform([plainContents])
 			print matrix
 			print "Classifying"
 			document.category = classifier.predict( matrix )[0]
 		
 		# Counting words
-		words = re.findall("[a-z]{2,}", content.lower()) + re.findall("[a-z]{2,}", document.title.lower())
+		words = re.findall("[a-z]{2,}", plainContents.lower()) + re.findall("[a-z]{2,}", document.title.lower())
 		wordCount = collections.defaultdict(int)
+		
 		for word in words:
 			wordCount[word] += 1
 

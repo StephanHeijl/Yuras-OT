@@ -89,8 +89,8 @@ class Server(threading.Thread):
 				self.PORT +=1
 		
 	def run(self):
-		self.startLocal()
-		#self.startCompressed()
+		#self.startLocal()
+		self.startCompressed()
 	
 if __name__ == "__main__":
 	Server().run()

@@ -8,10 +8,10 @@ $(function () {
 				challenge: "YXJlIHlvdSBib3JlZD8gOy0p",
 				appId: "http://example.org",
 				sessionId: "26"
-    }
-], [], function (data) {
-			console.log(data);
-		});
+    		}], [], function (data) {
+				console.log(data);	
+			}
+		);
 
 
 		$.getJSON("/users/" + id + "/u2f/enroll", function (data) {
