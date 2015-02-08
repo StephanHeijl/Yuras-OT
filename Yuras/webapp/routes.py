@@ -149,7 +149,7 @@ def index():
 	news = ["First mockup released"]
 	return render_template("homepage/index.html", name="Dashboard", users=users, documents=documents, news=news, active="dashboard")
 
-@app.route("/assets/<assettype>/<filename>")
+@app.route("/assets/<assettype>/<path:filename>")
 def assets(assettype, filename):
 	openModes = {
 		"img": "rb",
@@ -163,9 +163,9 @@ def assets(assettype, filename):
 		"png" : "image/png",
 		"jpg" : "image/jpeg"
 	}
-
+	
 	path = os.path.join(assetsFolder,assettype,filename)
-
+	print path
 	try:
 		with open(path, openModes[assettype]) as asset:
 			assetContents = asset.read()
