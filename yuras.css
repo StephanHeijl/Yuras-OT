@@ -1,6 +1,6 @@
 body {
 	background: #eee;
-	font-family: Oxygen;
+	font-family: Open Sans;
 	font-size: 13pt;
 	text-rendering: optimizeLegibility;
 	-webkit-font-kerning: normal;
@@ -13,6 +13,33 @@ header {
 h1 {
 	letter-spacing: -1px;
 }
+
+.jumbotron {
+	overflow: hidden;
+	position: relative;
+	padding: 5vh 1vh;
+	background: url(./assets/img/PenAndPaper.png) top center;
+	background-size: cover;
+	height: 100vh;
+	top: -50px;
+}
+.jumbo-text {
+	z-index: 10;
+	position:relative;
+	color: black;
+}
+
+@media screen and (max-width:800px) {
+	.jumbo-text h2 {
+		color: white;
+	}
+}
+
+.yuras-logo {
+	height: 50%;
+	padding-top: 5%;
+}
+
 .row {
 	margin-top: 50px;
 }
@@ -62,6 +89,14 @@ p {
 .navbar-nav>li>a {
 	color: #337ab7 !important;
 }
+.navbar-logo {
+	margin-top: -6px;
+	transition: opacity 0.3s;
+}
+.navbar-logo:hover {
+	opacity: 0.5;
+}
+
 .price-table h3 {
 	text-align: center;
 }
