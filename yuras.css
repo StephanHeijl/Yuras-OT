@@ -6,6 +6,7 @@ body {
 	-webkit-font-kerning: normal;
 	-moz-font-kerning: normal;
 }
+
 header {
 	text-align: center;
 	margin: 100px 0;
@@ -21,13 +22,15 @@ h1 {
 	padding: 15vh 1vh;
 	background: url(./assets/img/PenAndPaper.png) top center;
 	background-size: cover;
+	background-attachment: fixed;
 	height: 100vh;
 	top: -100px;
 }
 
 .jumbo-arrow {
-	left:0;
-	position: absolute;;
+	left: 0;
+	position: absolute;
+	;
 	color: white;
 	bottom: 2vh;
 	font-size: 20pt;
@@ -41,9 +44,9 @@ h1 {
 
 .jumbo-text {
 	z-index: 10;
-	position:relative;
+	position: relative;
 	color: white;
-	text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .yuras-logo {
@@ -51,14 +54,14 @@ h1 {
 	padding-top: 5vh;
 }
 
-@media screen and (max-height:640px) {	
+@media screen and (max-height: 640px) {
 	.yuras-logo {
 		height: 30vh;
 		padding-top: 5vh;
 	}
 }
 
-@media screen and (max-height:599px) {	
+@media screen and (max-height: 599px) {
 	.yuras-logo {
 		height: 25vh;
 		padding-top: 0vh;
@@ -68,7 +71,7 @@ h1 {
 	}
 }
 
-@media screen and (max-height:480px) {	
+@media screen and (max-height: 480px) {
 	.yuras-logo {
 		display: none;
 	}
@@ -79,26 +82,30 @@ h1 {
 	color: white;
 	background-color: #1abc9c;
 	display: inline;
-	text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 	box-shadow: rgba(0, 0, 0, 0.1) 2px 2px 3px;
 }
 
 p {
 	text-align: justify;
 }
+
 .quote {
 	font-family: Georgia;
 	font-style: italic;
 	font-size: 16pt;
 }
+
 .quote:before {
 	content: "\201c";
 	font-style: normal;
 }
+
 .quote:after {
 	content: "\201d";
 	font-style: normal;
 }
+
 .quote-author {
 	text-align: right;
 	display: block;
@@ -106,19 +113,24 @@ p {
 	margin-top: 1em;
 	opacity: 0.6;
 }
+
 .quote-author:before {
 	content: "~ ";
 }
+
 .navbar-nav>.active>a {
 	color: #1abc9c !important;
 }
+
 .navbar-nav>li>a {
 	color: #337ab7 !important;
 }
+
 .navbar-logo {
 	margin-top: -6px;
 	transition: opacity 0.3s;
 }
+
 .navbar-logo:hover {
 	opacity: 0.5;
 }
@@ -126,13 +138,16 @@ p {
 .price-table h3 {
 	text-align: center;
 }
+
 td.price {
 	text-align: center;
 	font-size: 200%;
 }
+
 td.price small {
 	font-size: 33%;
 }
+
 .btn-yuras {
 	border-color: #1abc9c;
 	color: #1abc9c;
@@ -148,7 +163,7 @@ td.price small {
 	text-align: center;
 }
 
-@media screen and (max-width:810px) {	
+@media screen and (max-width: 810px) {
 	.user-story-introduction * {
 		font-size: 14pt;
 		line-height: 1.3em;
@@ -159,11 +174,39 @@ td.price small {
 	margin-top: 50px;
 }
 
-.feature-comparison {
+.overview-comparison {
 	text-align: justify;
 }
 
-.feature-comparison .glyphicon {
+.section-details {
+	text-align: justify;
+}
+
+.price-sticker {
+	background: white;
+	border-radius: 100%;
+	width: 256px;
+	height: 256px;
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+	margin: 2em auto;
+}
+
+.price-container {
+	position: relative;
+	top: 48%;
+	transform: translateY(-50%);
+}
+
+.price-sticker .large-price {
+	font-size: 44pt;
+	font-family: Georgia, Serif;
+}
+
+.price-sticker .small-note {
+	font-size:75%;
+}
+
+.overview-comparison .glyphicon {
 	font-size: 48px;
 	line-height: 64px;
 	display: block;
@@ -174,85 +217,84 @@ td.price small {
 	height: 128px;
 	padding: 32px;
 	border-radius: 100%;
-	box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 }
-
 /* Animations */
 
 .pulse-down-animation {
-  animation: animationFrames linear 2s;
-  animation-iteration-count: infinite;
-  transform-origin: 50% 50%;
-  -webkit-animation: animationFrames linear 2s;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-transform-origin: 50% 50%;
-  -moz-animation: animationFrames linear 2s;
-  -moz-animation-iteration-count: infinite;
-  -moz-transform-origin: 50% 50%;
-  -o-animation: animationFrames linear 2s;
-  -o-animation-iteration-count: infinite;
-  -o-transform-origin: 50% 50%;
-  -ms-animation: animationFrames linear 2s;
-  -ms-animation-iteration-count: infinite;
-  -ms-transform-origin: 50% 50%;
+	animation: animationFrames linear 2s;
+	animation-iteration-count: infinite;
+	transform-origin: 50% 50%;
+	-webkit-animation: animationFrames linear 2s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-transform-origin: 50% 50%;
+	-moz-animation: animationFrames linear 2s;
+	-moz-animation-iteration-count: infinite;
+	-moz-transform-origin: 50% 50%;
+	-o-animation: animationFrames linear 2s;
+	-o-animation-iteration-count: infinite;
+	-o-transform-origin: 50% 50%;
+	-ms-animation: animationFrames linear 2s;
+	-ms-animation-iteration-count: infinite;
+	-ms-transform-origin: 50% 50%;
 }
 
-@keyframes animationFrames{
-  0% {
-    transform:  translate(0px,-5px)  ;
-  }
-  50% {
-    transform:  translate(0px,5px)  ;
-  }
-  100% {
-    transform:  translate(0px,-5px)  ;
-  }
+@keyframes animationFrames {
+	0% {
+		transform: translate(0px, -5px);
+	}
+	50% {
+		transform: translate(0px, 5px);
+	}
+	100% {
+		transform: translate(0px, -5px);
+	}
 }
 
-@-moz-keyframes animationFrames{
-  0% {
-    -moz-transform:  translate(0px,-5px)  ;
-  }
-  50% {
-    -moz-transform:  translate(0px,5px)  ;
-  }
-  100% {
-    -moz-transform:  translate(0px,-5px)  ;
-  }
+@-moz-keyframes animationFrames {
+	0% {
+		-moz-transform: translate(0px, -5px);
+	}
+	50% {
+		-moz-transform: translate(0px, 5px);
+	}
+	100% {
+		-moz-transform: translate(0px, -5px);
+	}
 }
 
 @-webkit-keyframes animationFrames {
-  0% {
-    -webkit-transform:  translate(0px,-5px)  ;
-  }
-  50% {
-    -webkit-transform:  translate(0px,5px)  ;
-  }
-  100% {
-    -webkit-transform:  translate(0px,-5px)  ;
-  }
+	0% {
+		-webkit-transform: translate(0px, -5px);
+	}
+	50% {
+		-webkit-transform: translate(0px, 5px);
+	}
+	100% {
+		-webkit-transform: translate(0px, -5px);
+	}
 }
 
 @-o-keyframes animationFrames {
-  0% {
-    -o-transform:  translate(0px,-5px)  ;
-  }
-  50% {
-    -o-transform:  translate(0px,5px)  ;
-  }
-  100% {
-    -o-transform:  translate(0px,-5px)  ;
-  }
+	0% {
+		-o-transform: translate(0px, -5px);
+	}
+	50% {
+		-o-transform: translate(0px, 5px);
+	}
+	100% {
+		-o-transform: translate(0px, -5px);
+	}
 }
 
 @-ms-keyframes animationFrames {
-  0% {
-    -ms-transform:  translate(0px,-5px)  ;
-  }
-  50% {
-    -ms-transform:  translate(0px,5px)  ;
-  }
-  100% {
-    -ms-transform:  translate(0px,-5px)  ;
-  }
+	0% {
+		-ms-transform: translate(0px, -5px);
+	}
+	50% {
+		-ms-transform: translate(0px, 5px);
+	}
+	100% {
+		-ms-transform: translate(0px, -5px);
+	}
 }
