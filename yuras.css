@@ -10,6 +10,7 @@ header {
 	text-align: center;
 	margin: 100px 0;
 }
+
 h1 {
 	letter-spacing: -1px;
 }
@@ -17,46 +18,71 @@ h1 {
 .jumbotron {
 	overflow: hidden;
 	position: relative;
-	padding: 5vh 1vh;
+	padding: 15vh 1vh;
 	background: url(./assets/img/PenAndPaper.png) top center;
 	background-size: cover;
 	height: 100vh;
-	top: -50px;
+	top: -100px;
 }
+
+.jumbo-arrow {
+	left:0;
+	position: absolute;;
+	color: white;
+	bottom: 2vh;
+	font-size: 20pt;
+	width: 100%;
+	font-family: 'Glyphicons Halflings';
+}
+
+.jumbo-arrow:before {
+	content: "\e114";
+}
+
 .jumbo-text {
 	z-index: 10;
 	position:relative;
-	color: black;
-}
-
-@media screen and (max-width:800px) {
-	.jumbo-text h2 {
-		color: white;
-	}
+	color: white;
+	text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 .yuras-logo {
-	height: 50%;
-	padding-top: 5%;
+	height: 40vh;
+	padding-top: 5vh;
 }
 
-.row {
-	margin-top: 50px;
+@media screen and (max-height:640px) {	
+	.yuras-logo {
+		height: 30vh;
+		padding-top: 5vh;
+	}
 }
-.usp-callout {
-	text-align: center;
-	margin: 50px 0 10px;
-	background: #222;
-	color: #eee;
-	box-shadow: inset black 0 0 50px;
+
+@media screen and (max-height:599px) {	
+	.yuras-logo {
+		height: 25vh;
+		padding-top: 0vh;
+	}
+	.jumbo-text {
+		padding-top: 20px;
+	}
 }
+
+@media screen and (max-height:480px) {	
+	.yuras-logo {
+		display: none;
+	}
+}
+
 .marked {
 	padding: 2px 5px;
 	color: white;
 	background-color: #1abc9c;
 	display: inline;
+	text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 	box-shadow: rgba(0, 0, 0, 0.1) 2px 2px 3px;
 }
+
 p {
 	text-align: justify;
 }
@@ -115,4 +141,118 @@ td.price small {
 	text-align: center;
 	width: 100%;
 	font-size: 14pt;
+}
+
+.user-story-introduction {
+	margin-top: -100px;
+	text-align: center;
+}
+
+@media screen and (max-width:810px) {	
+	.user-story-introduction * {
+		font-size: 14pt;
+		line-height: 1.3em;
+	}
+}
+
+.row {
+	margin-top: 50px;
+}
+
+.feature-comparison {
+	text-align: justify;
+}
+
+.feature-comparison .glyphicon {
+	font-size: 48px;
+	line-height: 64px;
+	display: block;
+	width: 128px;
+	text-align: center;
+	margin: 0 auto;
+	background: white;
+	height: 128px;
+	padding: 32px;
+	border-radius: 100%;
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+}
+
+/* Animations */
+
+.pulse-down-animation {
+  animation: animationFrames linear 2s;
+  animation-iteration-count: infinite;
+  transform-origin: 50% 50%;
+  -webkit-animation: animationFrames linear 2s;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-transform-origin: 50% 50%;
+  -moz-animation: animationFrames linear 2s;
+  -moz-animation-iteration-count: infinite;
+  -moz-transform-origin: 50% 50%;
+  -o-animation: animationFrames linear 2s;
+  -o-animation-iteration-count: infinite;
+  -o-transform-origin: 50% 50%;
+  -ms-animation: animationFrames linear 2s;
+  -ms-animation-iteration-count: infinite;
+  -ms-transform-origin: 50% 50%;
+}
+
+@keyframes animationFrames{
+  0% {
+    transform:  translate(0px,-5px)  ;
+  }
+  50% {
+    transform:  translate(0px,5px)  ;
+  }
+  100% {
+    transform:  translate(0px,-5px)  ;
+  }
+}
+
+@-moz-keyframes animationFrames{
+  0% {
+    -moz-transform:  translate(0px,-5px)  ;
+  }
+  50% {
+    -moz-transform:  translate(0px,5px)  ;
+  }
+  100% {
+    -moz-transform:  translate(0px,-5px)  ;
+  }
+}
+
+@-webkit-keyframes animationFrames {
+  0% {
+    -webkit-transform:  translate(0px,-5px)  ;
+  }
+  50% {
+    -webkit-transform:  translate(0px,5px)  ;
+  }
+  100% {
+    -webkit-transform:  translate(0px,-5px)  ;
+  }
+}
+
+@-o-keyframes animationFrames {
+  0% {
+    -o-transform:  translate(0px,-5px)  ;
+  }
+  50% {
+    -o-transform:  translate(0px,5px)  ;
+  }
+  100% {
+    -o-transform:  translate(0px,-5px)  ;
+  }
+}
+
+@-ms-keyframes animationFrames {
+  0% {
+    -ms-transform:  translate(0px,-5px)  ;
+  }
+  50% {
+    -ms-transform:  translate(0px,5px)  ;
+  }
+  100% {
+    -ms-transform:  translate(0px,-5px)  ;
+  }
 }
