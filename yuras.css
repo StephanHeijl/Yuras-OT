@@ -5,6 +5,8 @@ body {
 	text-rendering: optimizeLegibility;
 	-webkit-font-kerning: normal;
 	-moz-font-kerning: normal;
+	text-align: justify;
+	line-height: 1.5em;
 }
 
 header {
@@ -193,8 +195,9 @@ td.price small {
 
 .price-container {
 	position: relative;
-	top: 48%;
+	top: 50%;
 	transform: translateY(-50%);
+	line-height: 2em;
 }
 
 .price-sticker .large-price {
@@ -218,6 +221,11 @@ td.price small {
 	padding: 32px;
 	border-radius: 100%;
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.feature-screenshot {
+	width: 100%;
+	margin-bottom: 1em;
 }
 /* Animations */
 
