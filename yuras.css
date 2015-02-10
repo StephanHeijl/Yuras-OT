@@ -27,6 +27,7 @@ h1 {
 	background-attachment: fixed;
 	height: 100vh;
 	top: -100px;
+	transform: translateZ(0);
 }
 
 .jumbo-arrow {
