@@ -11,9 +11,9 @@ from bson.objectid import ObjectId
 import datetime, base64
 
 # Crypto imports
-from Crypto.Cipher import PKCS1_OAEP, AES
+from Crypto.Cipher import _AES
+from Crypto.Cipher import AES
 from Crypto import Random
-from Crypto.Random import random
 
 class Storage(Singleton):
 	""" The storage module provides a layer of abstraction over PyMongo. 
@@ -63,6 +63,8 @@ class Storage(Singleton):
 				self.iv = Random.new().read(AES.block_size)
 				Config().iv = base64.b64encode( self.iv )
 				Config().save()
+				
+			self.cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
 		
 	def reconnect(self):
 		""" Executes the initialization function again. This will reconnect the instance to the server. """
@@ -155,7 +157,6 @@ class Storage(Singleton):
 		blockSize = AES.block_size
 		fullString = fullString.strip(paddingChar)
 		stringTypeSplit = fullString.split(paddingChar)
-		
 		objString = base64.b64decode(paddingChar.join(stringTypeSplit[:-1]))
 		objType = stringTypeSplit[-1].split("'")[1]
 				
@@ -241,6 +242,9 @@ class Storage(Singleton):
 		
 		return encryptedDocument
 	
+	def __resetCipher(self):
+		self.cipher._cipher = _AES.new( Config().encryptionKey, AES.MODE_CBC, self.iv )
+	
 	def __decryptDocument(self, document):
 		""" Decrypts a dictionary/document for before retrieval.
 		
@@ -249,16 +253,17 @@ class Storage(Singleton):
 		"""
 		
 		if isinstance(document, list):
-			decryptedDocument = []
-			
+			decryptedDocument = []			
 			for value in document:
 				if isinstance(value, list) or isinstance(value, dict):
 					decryptedDocument[key] = self.__decryptDocument(value)
 					continue
 				
-				value = base64.b64decode(value)			
-				cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
-
+				value = base64.b64decode(value)
+				
+				cipher = self.cipher
+				self.__resetCipher()
+				
 				decryptedValue = cipher.decrypt( value )
 				try:
 					unpaddedValue = self.__unpadString(decryptedValue)
@@ -269,7 +274,6 @@ class Storage(Singleton):
 			
 		elif isinstance(document, dict):
 			decryptedDocument = {}
-
 			for key, value in document.items():
 				if key == "_id": # Do not decrypt _id field.
 					decryptedDocument["_id"] = value
@@ -280,8 +284,10 @@ class Storage(Singleton):
 					continue
 
 				value = base64.b64decode(value)			
-				cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
-
+				
+				cipher = self.cipher
+				self.__resetCipher()
+				
 				decryptedValue = cipher.decrypt( value )
 				unpaddedValue = self.__unpadString(decryptedValue)
 

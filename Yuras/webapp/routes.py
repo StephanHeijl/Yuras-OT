@@ -1,7 +1,7 @@
 from __future__ import division
 
 import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math, pprint, random
-import multiprocessing
+import multiprocessing, traceback, sys
 
 import cPickle as pickle
 from functools import wraps
@@ -56,7 +56,7 @@ def do_login():
 		try:
 			user = User().getObjectsByKey("username", unicode(request.form.get("username")).lower(),limit=1)[0]
 		except Exception as e:
-			print e
+			traceback.print_exc(file=sys.stdout)
 			user = None
 			print "User not found"
 			time.sleep(1 + random.random()) # Wait for some time to make sure we don't reveal that the username is not known
@@ -386,11 +386,16 @@ def documentRelated(id):
 		print e
 		return abort(404)
 	
-	print document
+	
+	allDocuments = Document().matchObjects(
+		{"category":document.category},
+		fields={"wordcount":True}
+	)
+	
 	return json.dumps(document.wordcount)
 		
 @app.route("/documents/<id>/tfidf")
-@login.login_required
+#@login.login_required
 def documentTFIDF(id):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
@@ -449,41 +454,38 @@ def documentTFIDF(id):
 
 	pool = []
 	for core in range(cores):
-		print core, int(chunkSize*core),int(chunkSize*(core+1))
 		p = multiprocessing.Process(target=loopTermFrequencies, args=(termFrequencies.items()[int(chunkSize*core):int(chunkSize*(core+1))], tfidf, documentCount, managerWordCountsByKey))
 		p.start()
-		print "Starting", p
 		pool.append( p )
 
 	for p in pool:
-		print "Joining", p
 		p.join()
 
 	print time.time()-startTime
 
 	results = {}
+	
+	sortedItems = sorted( tfidf.items(), key=lambda x: x[1][0], reverse=True )
 
-	for word,(score,key) in tfidf.items():
-		if score >= 0.01:
-			related = Document().matchObjects(
-				{"$and": [
-						{"wordcount."+key : { "$exists": True }},
-						{"_id": {"$ne": ObjectId(id)}} # A conversion to ObjectId is needed for Mongo/Toku
-					]},
-				fields = {"title":True, "_id":True,"wordcount."+key:True},
-				sort = "wordcount."+key,
-				reverse=True
+	for word,(score,key) in sortedItems[:10]:
+		related = Document().matchObjects(
+			{"$and": [
+					{"wordcount."+key : { "$exists": True }},
+					{"_id": {"$ne": ObjectId(id)}} # A conversion to ObjectId is needed for Mongo/Toku
+				]},
+			fields = {"title":True, "_id":True,"wordcount."+key:True},
+			sort = "wordcount."+key,
+			reverse=True
+		)
+		relatedResults = []
+		for r in related[:3]:
+			relatedResults.append(
+				{
+					"title":r.title,
+					"_id":str(r._id)
+				}
 			)
-			relatedResults = []
-			for r in related[:3]:
-				relatedResults.append(
-					{
-						"title":r.title,
-						"_id":str(r._id)
-					}
-				)
-
-			results[word] = relatedResults
+		results[word] = relatedResults
 
 	print time.time()-startTime
 

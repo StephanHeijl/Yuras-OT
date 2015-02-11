@@ -73,7 +73,7 @@ $(function () {
 		}
 		url = basePath + "table/" + amount + "/" + (page + difference) + "?" + getParameters
 		console.log(url)
-		$("table tbody").load(url)
+		$("fake-table tbody").load(url)
 		setPageInfo(page + difference, amount);
 		$(".prev-page").attr("disabled", page + difference <= 0)
 	}
