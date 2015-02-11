@@ -17,7 +17,7 @@
 						{% for document in documents %} 
 						<tr>
 							<td><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a></td>
-							<td>{{ document._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+							<td width="125">{{ document._created.strftime("%d-%m-%Y") }}</td>
 						</tr>					
 						{% endfor %}
 					</tbody>

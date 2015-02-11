@@ -70,7 +70,7 @@
 						</td>
 						<td>{{ document.author }}</td>
 						<td>{{ document.secure }}</td>
-						<td>{{ document._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+						<td>{{ document._created.strftime("%d-%m-%Y") }}</td>
 						<td>
 							<a href="/documents/{{ document._id }}/delete" class="delete-document" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
 							<a href="/documents/{{ document._id }}/download/docx" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-download-alt"></span></a>

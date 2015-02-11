@@ -561,14 +561,21 @@ def addJurisprudenceDocuments():
 	return Response(generateJurisprudenceDocuments(), mimetype='text/plain')
 
 def do_documentSearch(keywords, category=None, skip=0, limit=10):
+	stopwords = []
+	with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
+		stopwords = swf.read().split("\n")
+		
 	wordCountList = []
 	keys = []
+	fields = {"title":True, "author":True, "_created":True}
 	for word in keywords:
-		if len(word) == 0:
+		if len(word) == 0 or word in stopwords:
 			continue
+					
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		keys.append(key)
 		wordCountList.append( {"wordcount."+key : { "$exists": True }} )
+		fields["wordcount."+key] = True
 
 	if len(wordCountList) > 0:
 		matchArray = {"$or":wordCountList}
@@ -581,15 +588,17 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 	else:
 		if category is not None:
 			matchArray = {"category":category}
-
-	results = Document().matchObjects(
-		matchArray,
-		limit=limit,
-		skip=skip
-	)
-
-	#results.sort(key=lambda r:r.wordcount.get(keys[0],0))
-	return results
+	 
+	try:
+		results = Document().matchObjects(
+			matchArray,
+			fields=fields
+		)
+	except:
+		return []
+	
+	results.sort(key=lambda r:tuple([r.wordcount.get(k,0) for k in keys]),reverse=True)
+	return results[skip*limit:(skip+1)*limit]
 
 @app.route("/documents/search")
 @login.login_required

@@ -72,8 +72,28 @@ $(function () {
 			basePath += "/"
 		}
 		url = basePath + "table/" + amount + "/" + (page + difference) + "?" + getParameters
-		console.log(url)
-		$("fake-table tbody").load(url)
+		
+		// Add overlay and loader
+		overlay = $("<div>")
+		overlay.addClass("document-overlay");
+		overlay.css({"display":"none","background":"transparent"})
+		loader = $("<div>").addClass("document-loader")
+		loader.appendTo(overlay)
+		overlay.appendTo( $("body") )
+		
+		loader.css({"transform":"scale(0)"})
+		overlay.fadeIn(300, function() {
+			loader.css({"transform":"scale(1)"})
+		})
+		
+		$("table tbody").load(url, function() {
+			// Reset overlay
+			loader.css({"transform":"scale(0)"})
+			
+			setTimeout(function() {
+				overlay.remove();
+			},500)
+		})
 		setPageInfo(page + difference, amount);
 		$(".prev-page").attr("disabled", page + difference <= 0)
 	}
@@ -88,7 +108,9 @@ $(function () {
 
 	// Set to the proper page if there are prev/next buttons
 	if ($(".next-page, .prev-page").length >= 2) {
-		changePage(0);
+		if(getPageInfo()[0]>9) {
+			changePage(0);	
+		}
 	}
 
 	// Handle category selection

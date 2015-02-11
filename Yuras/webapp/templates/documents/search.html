@@ -11,7 +11,7 @@
 					<input type="text" class="form-control" placeholder="Search documents" name="keywords" value="{{ keywords }}">
 					<span class="input-group-btn">
 						<!-- Category picker -->
-						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false">
+						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false" type=button>
 							<span class="category-dropdown-text">{{ category if category != "" else "Any category"}}</span>  <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
@@ -57,7 +57,7 @@
 						<td><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a>
 						</td>
 						<td>{{ document.author }}</td>
-						<td>{{ document._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+						<td>{{ document._created.strftime("%d-%m-%Y") }}</td>
 						<td>
 							<a href="/documents/{{ document._id }}/delete" class="delete-document" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
 							<a href="/documents/{{ document._id }}/download/docx" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-download-alt"></span></a>
