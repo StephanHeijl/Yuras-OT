@@ -8,7 +8,7 @@ from Yuras.common.Config import Config
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-import datetime, base64
+import datetime, base64, importlib
 
 # Crypto imports
 from Crypto.Cipher import _AES
@@ -64,6 +64,8 @@ class Storage(Singleton):
 				Config().iv = base64.b64encode( self.iv )
 				Config().save()
 				
+				
+			self.paddingChar = "{"	
 			self.cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
 		
 	def reconnect(self):
@@ -140,12 +142,11 @@ class Storage(Singleton):
 		except:
 			objString = base64.b64encode( obj.encode('utf-8') )
 		
-		paddingChar = "{"
 		blockSize = AES.block_size
 		
-		fullString = objString + paddingChar + str(objType)
+		fullString = objString + self.paddingChar + str(objType)
 		
-		return fullString + (blockSize - len(fullString) % blockSize) * paddingChar
+		return fullString + (blockSize - len(fullString) % blockSize) * self.paddingChar
 	
 	def __unpadString(self, fullString):
 		""" Undoes the padding and type concatenation from `Storage.__padObject`.
@@ -153,12 +154,14 @@ class Storage(Singleton):
 :param fullString: The padded string.
 :returns: The unpadded object in its original form, if possible.		
 		"""		
-		paddingChar = "{"
-		blockSize = AES.block_size
+		
+		split = str.split
+		paddingChar = self.paddingChar
+		
 		fullString = fullString.strip(paddingChar)
-		stringTypeSplit = fullString.split(paddingChar)
-		objString = base64.b64decode(paddingChar.join(stringTypeSplit[:-1]))
-		objType = stringTypeSplit[-1].split("'")[1]
+		stringTypeSplit = split(fullString,paddingChar)
+		objString = base64.b64decode(self.paddingChar.join(stringTypeSplit[:-1]))
+		objType = split(stringTypeSplit[-1],"'")[1]
 				
 		obj = self.__convert(objString,objType)
 		
@@ -172,18 +175,17 @@ class Storage(Singleton):
 :param type_: The value derived from `type()` without the xml-like markup and quotes.
 :returns: A properly cast object.
 		"""
-		import importlib
 		
 		if type_ == "NoneType":
 			return None
-		if type_ == "bool":
+		elif type_ == "bool":
 			return type_ == "True"
-		if type_ == "datetime.datetime":
+		elif type_ == "datetime.datetime":
 			try:
 				return datetime.datetime.strptime(value,'%Y-%m-%d %H:%M:%S.%f')
 			except:
 				return datetime.datetime(*[ int(i) for i in value[:-1].split("(")[1].split(", ")])
-		if type_ == "str":
+		elif type_ == "str":
 			return value.decode('utf-8')
 				
 		try:
@@ -243,7 +245,10 @@ class Storage(Singleton):
 		return encryptedDocument
 	
 	def __resetCipher(self):
-		self.cipher._cipher = _AES.new( Config().encryptionKey, AES.MODE_CBC, self.iv )
+		""" This resets the cipher to a new AES instance, foregoing all the PyCrypto rituals and Python instantion overhead."""
+		c = self.cipher
+		c._cipher = _AES.new( Config().encryptionKey, AES.MODE_CBC, self.iv )
+		return c
 	
 	def __decryptDocument(self, document):
 		""" Decrypts a dictionary/document for before retrieval.
@@ -252,6 +257,8 @@ class Storage(Singleton):
 :returns: The MongoDB document with decrypted values.		
 		"""
 		
+		b64d = base64.b64decode
+		
 		if isinstance(document, list):
 			decryptedDocument = []			
 			for value in document:
@@ -259,11 +266,9 @@ class Storage(Singleton):
 					decryptedDocument[key] = self.__decryptDocument(value)
 					continue
 				
-				value = base64.b64decode(value)
+				value = b64d(value)
 				
-				cipher = self.cipher
-				self.__resetCipher()
-				
+				cipher = self.__resetCipher()				
 				decryptedValue = cipher.decrypt( value )
 				try:
 					unpaddedValue = self.__unpadString(decryptedValue)
@@ -283,11 +288,9 @@ class Storage(Singleton):
 					decryptedDocument[key] = self.__decryptDocument(value)
 					continue
 
-				value = base64.b64decode(value)			
+				value = b64d(value)			
 				
-				cipher = self.cipher
-				self.__resetCipher()
-				
+				cipher = self.__resetCipher()				
 				decryptedValue = cipher.decrypt( value )
 				unpaddedValue = self.__unpadString(decryptedValue)
 
