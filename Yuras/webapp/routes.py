@@ -466,8 +466,10 @@ def documentTFIDF(id):
 	results = {}
 	
 	sortedItems = sorted( tfidf.items(), key=lambda x: x[1][0], reverse=True )
-
+	
+	mostrelevant = []
 	for word,(score,key) in sortedItems[:10]:
+		mostrelevant.append(key)
 		related = Document().matchObjects(
 			{"$and": [
 					{"wordcount."+key : { "$exists": True }},
@@ -487,7 +489,11 @@ def documentTFIDF(id):
 			)
 		results[word] = relatedResults
 
+	
 	print time.time()-startTime
+
+	document.mostrelevant = mostrelevant;
+	document.save()
 
 	return json.dumps(results)
 
@@ -567,7 +573,7 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 		
 	wordCountList = []
 	keys = []
-	fields = {"title":True, "author":True}
+	fields = {"title":True, "author":True, "contents":True}
 	for word in keywords:
 		if word in stopwords:
 			continue
@@ -597,7 +603,7 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 	except:
 		return []
 	
-	results.sort(key=lambda r:tuple([r.wordcount.get(k,0) for k in keys]),reverse=True)
+	results.sort(key=lambda r:tuple([len(r.wordcount)] + [r.wordcount.get(k,0) for k in keys]),reverse=True)
 	return results[skip*limit:(skip+1)*limit]
 
 @app.route("/documents/search")
