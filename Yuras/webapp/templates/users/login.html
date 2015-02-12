@@ -1,18 +1,27 @@
 {% extends "layout/minimal.html" %} {% block index %}
-<div class="container">
+<div class="container-fluid">
 
 	<div class="row">
-		<div class="col-lg-5" style="float:none; margin: 0 auto;">
-			{% if error %}
-				<div class="alert alert-danger">
-					{{error}}
-				</div>				
-			{% else %}
-				<br/>
-			{% endif %}
-			
+		<div class="col-lg-4 col-sm-8 col-xs-12" style="float:none; margin: 0 auto;">
 			<div class="panel panel-default">
 				<div class="panel-body">
+					<img src="/assets/img/logo-32.png" style="margin: 0 auto; display:block;" alt="Small Yuras logo">
+				</div>
+			</div>
+
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					Authenticate
+				</div>
+
+				<div class="panel-body">
+
+					{% if error %}
+					<div class="alert alert-danger">
+						{{error}}
+					</div>
+					{% endif %}
+
 					<form action="" method="post">
 						<div class="form-group">
 							<label for="username">Username</label>
@@ -22,12 +31,14 @@
 							<label for="password">Password</label>
 							<input type="password" name="password" class="form-control" id="password" placeholder="Password">
 						</div>
-						<input type="hidden" value="{{ csrf_token() }}" name="_csrf_token"/>
+						<input type="hidden" value="{{ csrf_token() }}" name="_csrf_token" />
 						<button type="submit" class="btn col-sm-12 btn-yuras">Log in</button>
-						<br/>
-						<br/>
-						<a href="/help" type="submit" class="btn col-sm-12 btn-default">I don't have an account</a>
+
 					</form>
+				</div>
+
+				<div class="panel-footer">
+					<small><a href="/help" >I don't have an account</a></small>
 				</div>
 			</div>
 
