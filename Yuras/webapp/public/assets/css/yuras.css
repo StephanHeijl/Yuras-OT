@@ -116,7 +116,6 @@ td.price small {
 	transition-timing-function: linear;
 }
 
-
 /* Fix bootstrap dropdowns to be scrollable */
 .dropdown-menu {
     height: auto;
