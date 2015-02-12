@@ -145,7 +145,7 @@ def index():
 	documents = Document().matchObjects(
 		{},
 		limit=10,
-		fields={"title":True, "created":True, "author":True, "secure":True})
+		fields={"title":True, "author":True, "secure":True})
 	news = ["First mockup released"]
 	return render_template("homepage/index.html", name="Dashboard", users=users, documents=documents, news=news, active="dashboard")
 
@@ -567,9 +567,9 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 		
 	wordCountList = []
 	keys = []
-	fields = {"title":True, "author":True, "_created":True}
+	fields = {"title":True, "author":True}
 	for word in keywords:
-		if len(word) == 0 or word in stopwords:
+		if word in stopwords:
 			continue
 					
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
@@ -577,7 +577,7 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 		wordCountList.append( {"wordcount."+key : { "$exists": True }} )
 		fields["wordcount."+key] = True
 
-	if len(wordCountList) > 0:
+	if wordCountList:
 		matchArray = {"$or":wordCountList}
 
 		if category is not None:
@@ -617,7 +617,7 @@ def documentSearch():
 						   active="documents")
 
 @app.route("/documents/search/table/<amount>/<page>")
-@login.login_required
+#@login.login_required
 def documentSearchTable(amount, page):
 	keywords = request.args.get("keywords", "").split(" ")
 	category = request.args.get("category", None)

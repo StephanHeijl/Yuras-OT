@@ -48,8 +48,10 @@ class Storage(Singleton):
 		host = dbAddressComponents[0]
 		port = 27017 # The default MongoDB port.
 		
-		if len(dbAddressComponents) > 1:
+		try:
 			port = int(dbAddressComponents[1])
+		except:
+			pass
 		
 		self.__client = MongoClient(host, port)
 		self.__currentCollection = None
