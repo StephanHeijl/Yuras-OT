@@ -239,83 +239,20 @@ def documentViewer(id):
 
 @app.route("/documents/<id>/save",methods=["POST"])
 @login.login_required
-def documentSave(id):
+def documentSave(id):	
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
 		document = None
 
-	if request.method != "POST":
-		return abort(405)
-
-	contents_escaped = urllib2.unquote( request.form.get("contents","").encode('utf-8') )
-	contents_md = unicode(Pandoc().convert("html","markdown_github",contents_escaped))
-	title = urllib2.unquote( request.form.get("title","").encode('utf-8') )
-
-	document.contents = contents_md.encode('utf-8')
-	document.title = title
-	category = urllib2.unquote( request.form.get("category","").encode('utf-8') )
-	if len(Category().getObjectsByKey("name", category)) == 0:
-		c = Category()
-		c.name = category
-		c.save()
-
-	document.category = category
-	document.save()
-
-	annotations = urllib2.unquote( request.form.get("annotations","").encode('utf-8') )
-
-	if annotations is not "":
-		annotations = json.loads(annotations)
-
-		pprint.pprint(annotations)
-
-		for anno_id, annotation in annotations.items():
-			try:
-				a = Annotation().getObjectsByKey("_id", anno_id)[0]
-			except:
-				a = Annotation()
-
-			a.contents = annotation["text"].encode('utf-8')
-			a.location = [int(i) for i in annotation["location"].split(",")]
-			a.document = id
-			a.page = int(annotation.get("page",0))
-			a.document_title = document.title
-			a.selected_text = annotation["selected_text"].encode('utf-8')
-			a.linked_to = int(annotation["linked-to"])
-
-			a.save()
+	title = request.form.get("title","").encode('utf-8')
+	contents = request.form.get("contents","").encode('utf-8')
+	category = request.form.get("category","").encode('utf-8')
+	annotations = request.form.get("annotations","").encode('utf-8')
+	if document.save(title,contents,category,annotations):
+		return json.dumps( {"success":"true","new_csrf":generate_csrf_token() } );
 	
-	stopwords = []
-	with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
-		stopwords = swf.read().split("\n")
-		
-	# Counting words
-	words = re.findall("[a-z]{2,}", contents_md.lower()) + re.findall("[a-z]{2,}", title.lower())
-	wordCount = collections.defaultdict(int)
-	
-	words = [ word for word in words if word not in stopwords ] # Remove all stopwords
-	
-	for word in words:
-		wordCount[word] += 1
-
-	hashedWordCount = collections.defaultdict(int)
-	for word, count in wordCount.items():
-		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
-		hashedWordCount[key] = count
-
-	print wordCount
-
-	document.wordcount = dict(hashedWordCount)
-	document.save()
-
-	if contents_escaped is not "":
-		return json.dumps( {
-				"success":"true",
-				"new_csrf":generate_csrf_token()
-			} );
-
-	return abort(403)
+	return abort(500)
 
 @app.route("/documents/<id>/delete",methods=["POST"])
 @login.login_required
@@ -324,9 +261,6 @@ def documentDelete(id):
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
 		return abort(404)
-
-	if request.method != "POST":
-		return abort(405)
 
 	document.remove()
 
@@ -338,50 +272,20 @@ def documentDelete(id):
 	return abort(403)
 
 @app.route("/documents/<id>/download/<filetype>")
-#@login.login_required
+@login.login_required
 def documentDownload(id, filetype):
 	try:
 		document = Document().getObjectsByKey("_id", id)[0]
 	except:
 		return abort(404)
 
-	filetypes = {
-		"docx":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-		"pdf":"application/pdf",
-		"txt":"text/plain",
-	}
-
-	pandoc_filetypes = {
-		"docx":"docx",
-		"pdf":"latex --latex-engine=pdflatex",
-		"txt":"plain"
-	}
-
-	if filetype in filetypes:
-		print document.contents
-		print document.contents.count("  ")
-		responseContents = Pandoc().convert("markdown_github", pandoc_filetypes[filetype], document.contents, filetype=filetype)
-		response = Response(responseContents, mimetype=filetypes[filetype])
-
-		filename = document.title + "." + filetype
-
-		response.headers['Content-Disposition'] = "attachment; filename=%s" % filename
-		return response
-	else:
-		return abort(405)
-
-def loopTermFrequencies( termFrequencies, tfidf, documentCount, wordCountsByKey ):
-	# This function is paralellized due to the large amount of words and long CPU times.
-	for word, (count, tf) in termFrequencies:
-		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
-		idf = math.log(documentCount / (1+wordCountsByKey.get(key,0)))
-		tfidf[word] = (idf*tf, key)
+	return document.download(filetype)
 
 @app.route("/documents/<id>/related")
 #@login.login_required
 def documentRelated(id):
 	try:
-		document = Document().matchObjects({"_id": id}, fields={"_id":True, "content":True, "wordcount":True})[0]
+		document = Document().matchObjects({"_id": id}, fields={"_id":True, "contents":True, "wordcount":True})[0]
 	except Exception as e:
 		print e
 		return abort(404)
@@ -395,176 +299,34 @@ def documentRelated(id):
 	return json.dumps(document.wordcount)
 		
 @app.route("/documents/<id>/tfidf")
-#@login.login_required
+@login.login_required
 def documentTFIDF(id):
 	try:
-		document = Document().getObjectsByKey("_id", id)[0]
+		document = Document().matchObjects({"_id": id}, fields={"_id":True,"title":True, "category":True, "contents":True, "wordcount":True})[0]
 	except Exception as e:
 		print e
 		return abort(404)
 
-	startTime = time.time()
-
-	# initialize manager for multiprocessing
-	manager = multiprocessing.Manager()
-
-	# Cound words in this document
-	words = re.findall("[a-z]{2,}", document.contents.lower()) + re.findall("[a-z]{2,}", document.title.lower())
-	wordCount = collections.defaultdict(int)
-	for word in words:
-		wordCount[word] += 1
-
-	print time.time()-startTime
-
-	termFrequencies = {}
-	for word in words:
-		termFrequencies[word] = (wordCount[word], wordCount[word]/len(words))
-
-	print time.time()-startTime
-
-	allDocuments = Document().matchObjects(
-		{"category":document.category},
-		fields={"wordcount":True}
-	)
-
-	print time.time()-startTime
-
-	documentCount = len(allDocuments)
-
-	print time.time()-startTime
-
-	allWordCounts = []
-	for d in allDocuments:
-		allWordCounts += d.wordcount.keys()
-
-	print time.time()-startTime
-
-	wordCountsByKey = defaultdict(int)
-	for k in allWordCounts:
-		wordCountsByKey[k] += 1
-
-	print time.time()-startTime
-
-	tfidf = manager.dict()
-	managerWordCountsByKey = manager.dict(wordCountsByKey)
-
-	cores = multiprocessing.cpu_count()
-	#cores = 1
-	chunkSize = len(termFrequencies)/cores
-
-	pool = []
-	for core in range(cores):
-		p = multiprocessing.Process(target=loopTermFrequencies, args=(termFrequencies.items()[int(chunkSize*core):int(chunkSize*(core+1))], tfidf, documentCount, managerWordCountsByKey))
-		p.start()
-		pool.append( p )
-
-	for p in pool:
-		p.join()
-
-	print time.time()-startTime
-
-	results = {}
-	
-	sortedItems = sorted( tfidf.items(), key=lambda x: x[1][0], reverse=True )
-	
-	mostrelevant = []
-	for word,(score,key) in sortedItems[:10]:
-		mostrelevant.append(key)
-		related = Document().matchObjects(
-			{"$and": [
-					{"wordcount."+key : { "$exists": True }},
-					{"_id": {"$ne": ObjectId(id)}} # A conversion to ObjectId is needed for Mongo/Toku
-				]},
-			fields = {"title":True, "_id":True,"wordcount."+key:True},
-			sort = "wordcount."+key,
-			reverse=True
-		)
-		relatedResults = []
-		for r in related[:3]:
-			relatedResults.append(
-				{
-					"title":r.title,
-					"_id":str(r._id)
-				}
-			)
-		results[word] = relatedResults
-
-	
-	print time.time()-startTime
-
-	document.mostrelevant = mostrelevant;
-	document.save()
-
-	return json.dumps(results)
-
-
-def flatten(d, parent_key='', sep='_'):
-	items = []
-	for k, v in d.items():
-		new_key = parent_key + sep + k if parent_key else k
-		if isinstance(v, collections.MutableMapping):
-			items.extend(flatten(v, new_key, sep=sep).items())
-		else:
-			items.append((new_key, v))
-	return dict(items)
+	print document.category
+	return document.tfidf()
 
 @app.route("/documents/add-jurisprudence")
-@login.login_required
+#@login.login_required
 def addJurisprudenceDocuments():
-
-	def generateJurisprudenceDocuments():
-		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
-		
-		stopwords = []
-		with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
-			stopwords = swf.read().split("\n")
-		
-		categorized = {}
-		wiki = jurisprudence["Yuras"]["wiki"]
-		flatWiki = flatten(wiki)
-		dCounter = 1
-		dTotal = len(flatWiki)
-		for key, document in flatWiki.items():
-			title = key.split("_")[-1].strip(".html").split("/")[-1].replace("-"," ")
-			title = title[0].upper() + title[1:]
-			key = key.split("_")[0]
-
-			if key not in categorized:
-				categorized[key] = []
-				if len(Category().getObjectsByKey("name", key)) == 0:
-					c = Category()
-					c.name = key
-					c.save()
-
-			if len(Document().getObjectsByKey("title", title)) == 0:
-				d = Document()
-				d.title = title
-				d.category = key
-				d.contents = Pandoc().convert("html","markdown_github", document)
-				d.author = "Yuras"
-
-				# Counting words
-				words = re.findall("[a-z]{2,}", document.lower()) + re.findall("[a-z]{2,}", title.lower())
-				words = [word for word in words if word not in stopwords]
-				
-				wordCount = collections.defaultdict(int)
-				for word in words:
-					wordCount[word] += 1
-
-				hashedWordCount = collections.defaultdict(int)
-				for word, count in wordCount.items():
-					k = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
-					hashedWordCount[k] = count
-
-				d.wordcount = dict(hashedWordCount)
-				d.save()
-
-			categorized[key].append(document)
-			print title, "saved", dCounter, "/", dTotal
-			dCounter += 1
-			yield title + "\n"
-
-	return Response(generateJurisprudenceDocuments(), mimetype='text/plain')
+	Document.generateJurisprudenceDocuments()
+	
+	print "Performing total TFIDF run."
+	allDocuments = Document().matchObjects(
+		{},
+		fields={"_id":True,"title":True, "category":True, "contents":True, "wordcount":True}
+	)
+	
+	for d in allDocuments:
+		print "TFIDF for", d.title,
+		d.tfidf()
+		print len(d.tags),"results"
+	
+	return json.dumps({"success":"true"})
 
 def do_documentSearch(keywords, category=None, skip=0, limit=10):
 	stopwords = []
@@ -685,20 +447,7 @@ def documentsUpload():
 			print "Classifying"
 			document.category = classifier.predict( matrix )[0]
 		
-		# Counting words
-		words = re.findall("[a-z]{2,}", plainContents.lower()) + re.findall("[a-z]{2,}", document.title.lower())
-		wordCount = collections.defaultdict(int)
-		
-		for word in words:
-			wordCount[word] += 1
-
-		hashedWordCount = collections.defaultdict(int)
-		for word, count in wordCount.items():
-			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
-			hashedWordCount[key] = count
-
-		document.wordcount = dict(hashedWordCount)
-		
+		document.wordCount()		
 		document.save()
 		print "Document saved", document._id
 
