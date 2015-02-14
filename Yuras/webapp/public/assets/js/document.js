@@ -473,22 +473,43 @@ $(function () {
 
 		if (documentIcon.length == 1) {
 			$.getJSON(window.location.href.replace("#", "") + "/related", function (data) {
+				modalBody.find(".related-loader").remove()
+
 				$.each(data, function (d, doc) {
 					icon = documentIcon.clone()
-					icon.find(".case-document-title").text(doc[1])
+					icon.find(".case-document-title").text(doc[1]).attr("href", "/documents/" + doc[0])
+					icon.attr("data-score", doc[2])
 					$(".modal-body .row").last().append(icon)
-
 					if ($(".modal-body .row").last().children().length == 3) {
 						$(".modal-body .container-fluid").append("<div class='row'></div>")
 					}
-					icon.attr("href", "/documents/" + doc[0])
 					icon.fadeIn()
 					console.log(icon)
 				})
+
+				$(".related-document-rating").heatcolor(
+					function () {
+						$(this).width($(this).parent().data("score")*24)
+						return $(this).parent().data("score");
+					}, {
+						lightness: 0,
+						colorStyle: 'greentored',
+						maxval: 1,
+						minval: 0,
+					});
 			});
 		}
 
 
+	});
+	
+	// Handle adding related document to case 
+	
+	$("body").on("click", ".related-document-add", function(e) {		
+		console.log("Hey")
+		
+		$(this).css({"background":"#337ab7", "color":"white"});
+		$(this).find(".glyphicon").attr("class", "glyphicon glyphicon-ok")
 	});
 
 	// Handle document analysis

@@ -187,9 +187,21 @@ class Document(StoredObject):
 		if len(self.tags) == 0 or not isinstance(self.tags, dict):
 			self.tfidf()
 			
-		return json.dumps( self.getRelatedDocumentsByTags(self.tags) )
-			
-	def getRelatedDocumentsByTags(self, tags):
+		return json.dumps( self.getRelatedDocumentsByIndividualTags(self.tags) )
+	
+	@staticmethod
+	def getSimilarityScore( score ):
+		""" Returns the score as a Tanh product.
+		
+		Reference: http://www.wolframalpha.com/input/?i=plot+tanh%28x*4%29+from+0+to+1
+		
+		:param score: A number between 0 and 1.
+		:rtype: Float, the Tanh product of the given score, from 0-1
+		"""
+		
+		return math.tanh(score)
+	
+	def getRelatedDocumentsByIndividualTags(self, tags):
 		results = {}
 		print tags
 		for key,word in tags.items():
@@ -213,7 +225,36 @@ class Document(StoredObject):
 			results[word] = relatedResults
 		
 		return results
+			
+	def getRelatedDocumentsByTags(self):
+		matchTags = []
+		tags = self.tags.keys()
+		for tag in tags:
+			matchTags.append({"tags."+tag: {"$exists":True}})
+
+		match = {"$or": matchTags, "_id": {"$ne": self._id}}
+
+		allDocuments = Document().matchObjects(
+			match,
+			fields={"title":True, "_id":True,"tags":True}
+		)
+		tagsSet = set(tags)
+
+		for d in allDocuments:
+			d.tagsIntersect = list(tagsSet.intersection(set(d.tags.keys())))
+
+		if len(allDocuments) == 0:
+			return "{}"
+
+		allDocuments.sort(key=lambda d: len(d.tagsIntersect), reverse=True)
+		maxIntersectLength = len(allDocuments[0].tagsIntersect)*0.5
 		
+		return json.dumps([(str(d._id), 
+							d.title, 
+							Document.getSimilarityScore(
+								float(len(d.tagsIntersect)) / float(len(allDocuments[0].tagsIntersect))
+							)) for d in allDocuments if len(d.tagsIntersect)>maxIntersectLength])
+				
 	def tfidf(self, allDocuments=None, multiprocessLTF=True):
 		manager = multiprocessing.Manager()
 		words,wordcount = self.plainWordCount()

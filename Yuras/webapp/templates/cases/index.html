@@ -1,0 +1,39 @@
+{% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }}
+<div class="container">
+
+	<div class="row">
+
+		<div class="col-lg-12">
+			<h2>Documents</h2>
+			<a class="btn btn-default" href="/cases/new"><span class="glyphicon glyphicon-folder-open"></span> New case </a>
+		</div>
+
+		<div class="col-lg-12">
+
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th> Title </th>
+						<th> Created </th>
+						<th> Actions </th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for case in cases %}
+					<tr>
+						<td>{{ case.title }}</td>
+						<td>{{ case._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+						<td>
+							<a href="/cases/{{ case._id }}/delete" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+
+		</div>
+
+	</div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }}
+<div class="container">
+
+	<div class="row">
+
+		<div class="col-lg-12">
+			<h2>{{ case.title }}</h2>
+		</div>
+
+		<div class="col-lg-12">
+			{% for document in case.documents %}
+			<div class="case-document col-md-2">
+				<div class="glyphicon glyphicon-file"></div>
+				<span class="case-document-title">{{ document.title }}</span>
+			</div>
+			{% endfor %}
+
+		</div>
+
+	</div>
+
+</div>
+{% endblock %}

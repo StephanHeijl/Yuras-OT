@@ -60,6 +60,13 @@
 			<li>
 				<a href="#" id="get-related" data-csrf={{ csrf_token() }} data-toggle="modal" data-target="#relatedModal"><span class="glyphicon glyphicon-search"></span> Get related documents</a>
 			</li>
+			
+		</ul>
+		
+		<ul class="nav navbar-nav pull-right">			
+			<li>
+				<a href="/documents" id="back"><span class="glyphicon glyphicon-remove"></span> Exit</a>
+			</li>
 		</ul>
 	</div>
 	<!-- /.navbar-collapse -->
@@ -128,12 +135,18 @@
 				</div>
 				<div class="modal-body">
 					<div class="container-fluid">
-						<a href="" class="case-document col-md-4" style="display:none;">
+						<div class="case-document col-md-4" style="display:none;">
+							<div class="related-document-rating"></div>
+							<div class="related-document-add">
+								<div class="glyphicon glyphicon-plus"></div>
+							</div>
+							
 							<div class="glyphicon glyphicon-file"></div>
-							<span class="case-document-title">This is a longer document title</span>
-						</a>
+							<a href="" class="case-document-title">This is a longer document title</a>
+						</div>
+						<img class="related-loader" src="/assets/img/loader.gif">>
 						<div class="row">
-
+							
 						</div>
 					</div>
 				</div>

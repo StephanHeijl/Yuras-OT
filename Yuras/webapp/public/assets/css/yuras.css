@@ -131,6 +131,17 @@ td.price small {
 	text-align: left;
 }
 
+@media screen and (max-width:992px) {
+	.modal-body .row {
+		width:100%;
+	}
+}
+
+.related-loader {
+	display: block;
+	margin: 0 auto;	
+}
+
 .case-document { 
 	color: #333;
 	text-align: center; 
@@ -138,18 +149,30 @@ td.price small {
 	border-radius: 5%;
 	cursor:pointer;
 	float: none;
-    display: table-cell;
+    display: inline-block;
     vertical-align: top;
 	font-size: 11pt;
+}
+
+@media screen and (max-width:992px) {
+	.case-document {
+		display:block;
+	}
+}
+
+.case-document:hover {
+	text-decoration: none;
 }
 
 .case-document:hover {
 	background: #eee;
 }
 
-.case-document .glyphicon {
+.case-document .glyphicon-file {
 	width:100%;
 	font-size: 36pt;
+	z-index: 10;
+	position:relative;
 }
 
 /* Fix bootstrap dropdowns to be scrollable */

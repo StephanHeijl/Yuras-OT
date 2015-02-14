@@ -295,30 +295,7 @@ def documentRelated(id):
 		print e
 		return abort(404)
 	
-	matchTags = []
-	tags = document.tags.keys()
-	for tag in tags:
-		matchTags.append({"tags."+tag: {"$exists":True}})
-		
-	match = {"$or": matchTags, "_id": {"$ne": document._id}}
-	
-	allDocuments = Document().matchObjects(
-		match,
-		fields={"title":True, "_id":True,"tags":True}
-	)
-	
-	tagsSet = set(tags)
-	
-	for d in allDocuments:
-		d.tagsIntersect = list(tagsSet.intersection(set(d.tags.keys())))
-	
-	if len(allDocuments) == 0:
-		return "{}"
-	
-	allDocuments.sort(key=lambda d: len(d.tagsIntersect), reverse=True)
-	maxIntersectLength = len(allDocuments[0].tagsIntersect)*0.5
-	
-	return json.dumps([(str(d._id), d.title, len(d.tagsIntersect)) for d in allDocuments if len(d.tagsIntersect)>maxIntersectLength])
+	return document.getRelatedDocumentsByTags()
 		
 @app.route("/documents/<id>/tfidf")
 @login.login_required
