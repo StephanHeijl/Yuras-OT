@@ -116,6 +116,42 @@ td.price small {
 	transition-timing-function: linear;
 }
 
+.modal-content {
+	max-height: 90vh;
+	overflow: auto;
+}
+
+.modal-title {
+	color: #333;
+}
+
+.modal-body .row {
+	margin-top:0px;
+	display: table;
+	text-align: left;
+}
+
+.case-document { 
+	color: #333;
+	text-align: center; 
+	padding: 10px;
+	border-radius: 5%;
+	cursor:pointer;
+	float: none;
+    display: table-cell;
+    vertical-align: top;
+	font-size: 11pt;
+}
+
+.case-document:hover {
+	background: #eee;
+}
+
+.case-document .glyphicon {
+	width:100%;
+	font-size: 36pt;
+}
+
 /* Fix bootstrap dropdowns to be scrollable */
 .dropdown-menu {
     height: auto;

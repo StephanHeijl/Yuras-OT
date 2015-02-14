@@ -14,6 +14,8 @@
 	<!-- Collect the nav links, forms, and other content for toggling -->
 	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 		<ul class="nav navbar-nav">
+
+			<!--
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">File <span class="caret"></span></a>
 				<ul class="dropdown-menu" role="menu">
@@ -31,6 +33,13 @@
 					</li>
 				</ul>
 			</li>
+			-->
+
+			<!--
+			<li>
+				<a href="#" id="back"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+			</li>
+			-->
 
 			<li class="dropdown">
 				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Download as... <span class="caret"></span></a>
@@ -43,9 +52,13 @@
 					</li>
 				</ul>
 			</li>
-			
+
 			<li>
 				<a href="#" id="analyze-document" data-csrf={{ csrf_token() }}><span class="glyphicon glyphicon-eye-open"></span> Analyze document</a>
+			</li>
+
+			<li>
+				<a href="#" id="get-related" data-csrf={{ csrf_token() }} data-toggle="modal" data-target="#relatedModal"><span class="glyphicon glyphicon-search"></span> Get related documents</a>
 			</li>
 		</ul>
 	</div>
@@ -103,4 +116,33 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- Modal -->
+	<div class="modal fade" id="relatedModal" tabindex="-1" role="dialog" aria-labelledby="relatedModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+					</button>
+					<span class="modal-title" id="relatedModalLabel">Related documents</span>
+				</div>
+				<div class="modal-body">
+					<div class="container-fluid">
+						<a href="" class="case-document col-md-4" style="display:none;">
+							<div class="glyphicon glyphicon-file"></div>
+							<span class="case-document-title">This is a longer document title</span>
+						</a>
+						<div class="row">
+
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-primary">Add all to case</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	{% endblock %}

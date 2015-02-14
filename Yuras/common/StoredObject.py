@@ -127,7 +127,7 @@ class StoredObject():
 		
 		storage.getDatabase(database)
 		storage.getCollection(collection)
-		#print match, limit, skip, fields
+
 		documents = storage.getDocuments(match, limit, skip, fields)
 		
 		if sort is not None:

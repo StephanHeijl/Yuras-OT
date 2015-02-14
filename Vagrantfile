@@ -15,8 +15,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     inline: "cd /vagrant; sudo bash ./YurasSetup.sh"
   
   config.vm.provider "virtualbox" do |v|
-    v.memory = 2048
-    v.cpus = 2
+    v.memory = 4096
+    v.cpus = 4
   end
   config.vm.network "forwarded_port", guest: 5000, host: 7000
   config.vm.network "forwarded_port", guest: 5001, host: 7001

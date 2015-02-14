@@ -20,6 +20,7 @@ from Yuras.webapp.models.Document import Document
 from Yuras.webapp.models.Annotation import Annotation
 from Yuras.webapp.models.User import User
 from Yuras.webapp.models.Category import Category
+from Yuras.webapp.models.Case import Case
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
@@ -231,6 +232,7 @@ def documentViewer(id):
 		return abort(404)
 
 	annotations = Annotation().getObjectsByKey("document", id)
+	
 	categories = Category().matchObjects({})
 	annotations.sort(key=lambda a: a.location[0])
 	document.contents = Pandoc().convert("markdown_github", "html", document.contents)
@@ -249,6 +251,9 @@ def documentSave(id):
 	contents = request.form.get("contents","").encode('utf-8')
 	category = request.form.get("category","").encode('utf-8')
 	annotations = request.form.get("annotations","").encode('utf-8')
+	
+	document.author = login.current_user.username
+	
 	if document.save(title,contents,category,annotations):
 		return json.dumps( {"success":"true","new_csrf":generate_csrf_token() } );
 	
@@ -282,39 +287,60 @@ def documentDownload(id, filetype):
 	return document.download(filetype)
 
 @app.route("/documents/<id>/related")
-#@login.login_required
+@login.login_required
 def documentRelated(id):
 	try:
-		document = Document().matchObjects({"_id": id}, fields={"_id":True, "contents":True, "wordcount":True})[0]
+		document = Document().matchObjects({"_id": id}, fields={"_id":True, "contents":True, "tags":True})[0]
 	except Exception as e:
 		print e
 		return abort(404)
 	
+	matchTags = []
+	tags = document.tags.keys()
+	for tag in tags:
+		matchTags.append({"tags."+tag: {"$exists":True}})
+		
+	match = {"$or": matchTags, "_id": {"$ne": document._id}}
 	
 	allDocuments = Document().matchObjects(
-		{"category":document.category},
-		fields={"wordcount":True}
+		match,
+		fields={"title":True, "_id":True,"tags":True}
 	)
 	
-	return json.dumps(document.wordcount)
+	tagsSet = set(tags)
+	
+	for d in allDocuments:
+		d.tagsIntersect = list(tagsSet.intersection(set(d.tags.keys())))
+	
+	if len(allDocuments) == 0:
+		return "{}"
+	
+	allDocuments.sort(key=lambda d: len(d.tagsIntersect), reverse=True)
+	maxIntersectLength = len(allDocuments[0].tagsIntersect)*0.5
+	
+	return json.dumps([(str(d._id), d.title, len(d.tagsIntersect)) for d in allDocuments if len(d.tagsIntersect)>maxIntersectLength])
 		
 @app.route("/documents/<id>/tfidf")
 @login.login_required
 def documentTFIDF(id):
 	try:
-		document = Document().matchObjects({"_id": id}, fields={"_id":True,"title":True, "category":True, "contents":True, "wordcount":True})[0]
+		document = Document().matchObjects({"_id": id}, fields={"_id":True,"title":True, "category":True, "contents":True, "tags":True, "wordcount":True})[0]
 	except Exception as e:
-		print e
+		traceback.print_exc(file=sys.stdout)
 		return abort(404)
 
-	print document.category
-	return document.tfidf()
+	return document.documentAnalysis()
 
 @app.route("/documents/add-jurisprudence")
-#@login.login_required
+@login.login_required
 def addJurisprudenceDocuments():
 	Document.generateJurisprudenceDocuments()
 	
+	return json.dumps({"success":"true"})
+
+@app.route("/documents/full-tfidf")
+@login.login_required
+def fullTFIDFRun():	
 	print "Performing total TFIDF run."
 	allDocuments = Document().matchObjects(
 		{},
@@ -323,7 +349,7 @@ def addJurisprudenceDocuments():
 	
 	for d in allDocuments:
 		print "TFIDF for", d.title,
-		d.tfidf()
+		d.tfidf(allDocuments=allDocuments)
 		print len(d.tags),"results"
 	
 	return json.dumps({"success":"true"})
@@ -367,6 +393,12 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 	
 	results.sort(key=lambda r:tuple([len(r.wordcount)] + [r.wordcount.get(k,0) for k in keys]),reverse=True)
 	return results[skip*limit:(skip+1)*limit]
+
+@app.route("/documents/qsearch")
+#@login.login_required
+def documentQuickSearch():
+	keywords = request.args.get("keywords", "").split(" ")
+	return Document().quickSearch(keywords)
 
 @app.route("/documents/search")
 @login.login_required
@@ -458,7 +490,34 @@ def documentsUpload():
 	
 	return returnUploadError(error,categories)
 	
+# CASES #
+@app.route("/cases/")
+@login.login_required
+def caseIndex():
+	cases = Case().matchObjects(
+		{},
+		limit=25
+	)
 
+	return render_template("cases/index.html", name="Cases overview", cases=cases, active="cases")
+
+@app.route("/cases/new")
+@login.login_required
+def caseCreate():
+	case = Case()
+	case.save()
+	_id = case._id;
+	return redirect("/cases/%s/edit" % _id)
+
+@app.route("/cases/<id>/edit")
+@login.login_required
+def caseEdit(id):
+	try:
+		case = Case().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	return render_template("cases/edit.html", name="Edit case", case=case, active="cases")
 
 # ANNOTATIONS #
 

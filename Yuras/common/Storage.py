@@ -265,7 +265,7 @@ class Storage(Singleton):
 			decryptedDocument = []			
 			for value in document:
 				if isinstance(value, list) or isinstance(value, dict):
-					decryptedDocument[key] = self.__decryptDocument(value)
+					decryptedDocument.append( self.__decryptDocument(value) )
 					continue
 				
 				value = b64d(value)
@@ -382,7 +382,7 @@ class Storage(Singleton):
 			
 		if self.__encryptDocuments:
 			match = self.__encryptDocument(match)
-			
+						
 		if fields == {}:
 			documents = self.__currentCollection.find(match, skip=skip)
 		else:

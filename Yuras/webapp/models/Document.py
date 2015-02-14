@@ -18,11 +18,10 @@ class Document(StoredObject):
 		self.createdDate = None
 		self.modifiedDate = None
 		self.contents = ""
-		self.tags = []
+		self.tags = {}
 		self.annotations = []
 		self.category = None
 		self.wordcount = {}
-		self.__stopwords = None
 		
 		self.accessible = True
 		
@@ -34,11 +33,11 @@ class Document(StoredObject):
 		# Does not return wordcount by default
 		return super(Document, self).matchObjects(match,limit,skip,fields,sort,reverse)
 	
-	def getStopwords(self):
-		if self.__stopwords is None:
-			with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
-				self.__stopwords = swf.read().split("\n")
-		return self.__stopwords
+	@staticmethod
+	def getStopwords():
+		with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
+			stopwords = swf.read().split("\n")
+		return stopwords
 	
 	def plainWordCount(self, filterStopwords=True):
 		plainContents = Pandoc().convert("markdown_github", "plain", self.contents.lower())
@@ -47,7 +46,7 @@ class Document(StoredObject):
 		wordCount = collections.defaultdict(int)
 		
 		if filterStopwords:
-			stopwords = self.getStopwords()
+			stopwords = Document.getStopwords()
 			words = [ word for word in words if word not in stopwords ] # Remove all stopwords		
 		
 		for word in words:
@@ -55,25 +54,50 @@ class Document(StoredObject):
 		
 		return words, wordCount
 	
-	def hashedWordCount(self, words, plainWordCount):
+	def hashedWordCount(self, plainWordCount, results):
 		b64enc = base64.b64encode
 		hashedWordCount = collections.defaultdict(int)
-		for word, count in plainWordCount.items():
-			key = b64enc(scrypt.hash(str(word), str(Config().database), N=1<<9))
+		salt = str(Config().database)
+		for word, count in plainWordCount:
+			key = b64enc(scrypt.hash(str(word), salt, N=1<<9))
 			hashedWordCount[key] = count
-		
-		return dict(hashedWordCount)
+		results += dict(hashedWordCount).items()
 	
 	def countWords(self, store=True):
 		words, plainWordCount = self.plainWordCount()
-		hashedWordcount = self.hashedWordCount(words,plainWordCount)		
-		if store:
-			self.wordcount = hashedWordcount
 		
-		return hashedWordcount
+		manager = multiprocessing.Manager()
+		results = manager.list()
+
+		cores = multiprocessing.cpu_count()
+		chunkSize = len(plainWordCount)/cores
+
+		pool = []
+		for core in range(cores):
+			p = multiprocessing.Process(
+				target=self.hashedWordCount,
+				args = (
+					plainWordCount.items()[int(chunkSize*core):int(chunkSize*(core+1))],
+					results
+				)
+			)
+			p.start()
+			pool.append( p )
+
+		for p in pool:
+			p.join()
+		
+		hashedWordCount = dict(results)
+		
+		if store:
+			self.wordcount = hashedWordCount
+		
+		return hashedWordCount
 	
 	def __storeAnnotations(self, annotations):
+		print annotations
 		annotations = json.loads(annotations)
+		print annotations
 		for anno_id, annotation in annotations.items():
 			try:
 				a = Annotation().getObjectsByKey("_id", anno_id)[0]
@@ -82,12 +106,12 @@ class Document(StoredObject):
 
 			a.contents = annotation["text"].encode('utf-8')
 			a.location = [int(i) for i in annotation["location"].split(",")]
-			a.document = id
+			a.document = unicode(self._id)
 			a.page = int(annotation.get("page",0))
-			a.document_title = self.title
+			a.document_title = str(self.title)
 			a.selected_text = annotation["selected_text"].encode('utf-8')
 			a.linked_to = int(annotation["linked-to"])
-
+						
 			a.save()
 		
 	def save(self, title, contents, category, annotations):
@@ -111,11 +135,21 @@ class Document(StoredObject):
 		
 		# Set annotations
 		annotations = urllib2.unquote( annotations )
-		if annotations is not "":
-			self.__storeAnnotations(annotations)
+		self.__storeAnnotations(annotations)
 
 		super(Document, self).save()
 		return True
+	
+	def quickSearch(self, words):
+		matchedObjects = {}
+		
+		for word in words:
+			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+			matchedObjects["tags."+key] = { "$exists": True }
+		
+		results = self.matchObjects(matchedObjects, fields={"_id":True,"title":True})
+		
+		return json.dumps(dict([(str(document._id), document.title) for document in results ]))
 	
 	def download(self, filetype):
 		filetypes = {
@@ -140,17 +174,6 @@ class Document(StoredObject):
 			return response
 		else:
 			return abort(405)
-		
-	@staticmethod
-	def __flatten(d, parent_key='', sep='_'):
-		items = []
-		for k, v in d.items():
-			new_key = parent_key + sep + k if parent_key else k
-			if isinstance(v, collections.MutableMapping):
-				items.extend(Document.__flatten(v, new_key, sep=sep).items())
-			else:
-				items.append((new_key, v))
-		return dict(items)
 	
 	def __loopTermFrequencies(self, termFrequencies, tfidf, documentCount, wordCountsByKey ):
 		# This function is paralellized due to the large amount of words and long CPU times.
@@ -158,64 +181,18 @@ class Document(StoredObject):
 			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 			idf = math.log(float(documentCount) / (1+wordCountsByKey.get(key,0)))			
 			tfidf[word] = (idf*tf, key)
+		print "ltf done"
 		
-	def tfidf(self):
-		manager = multiprocessing.Manager()
-		words,wordcount = self.plainWordCount()
-		
-		wordslen = len(words)
-		termFrequencies = {}
-		for word in words:
-			termFrequencies[word] = (wordcount[word], float(wordcount[word])/wordslen)
-
-		allDocuments = self.matchObjects(
-			{"category":self.category},
-			fields={"wordcount":True}
-		)
-		
-		documentCount = len(allDocuments)
-
-		allWordCounts = []
-		for d in allDocuments:
-			allWordCounts += d.wordcount.keys()
-
-		wordCountsByKey = collections.defaultdict(int)
-		for k in allWordCounts:
-			wordCountsByKey[k] += 1
-
-		tfidf = manager.dict()
-		managerWordCountsByKey = manager.dict(wordCountsByKey)
-
-		cores = multiprocessing.cpu_count()
-		chunkSize = len(termFrequencies)/cores
-
-		pool = []
-		for core in range(cores):
-			p = multiprocessing.Process(
-				target=self.__loopTermFrequencies,
-				args = (
-					termFrequencies.items()[int(chunkSize*core):int(chunkSize*(core+1))],
-					tfidf,
-					documentCount,
-					managerWordCountsByKey
-				)
-			)
-			p.start()
-			pool.append( p )
-
-		for p in pool:
-			p.join()
-
+	def documentAnalysis(self):
+		if len(self.tags) == 0 or not isinstance(self.tags, dict):
+			self.tfidf()
+			
+		return json.dumps( self.getRelatedDocumentsByTags(self.tags) )
+			
+	def getRelatedDocumentsByTags(self, tags):
 		results = {}
-		
-		sortedItems = sorted( tfidf.items(), key=lambda x: x[1][0], reverse=True )
-		
-		percentile = 0.05
-		maxitems = int((len(sortedItems)*percentile)+1)
-		
-		tags = []
-		for word,(score,key) in sortedItems[:maxitems]:
-			tags.append(key)
+		print tags
+		for key,word in tags.items():
 			related = Document().matchObjects(
 				{"$and": [
 						{"wordcount."+key : { "$exists": True }},
@@ -234,19 +211,89 @@ class Document(StoredObject):
 					}
 				)
 			results[word] = relatedResults
+		
+		return results
+		
+	def tfidf(self, allDocuments=None, multiprocessLTF=True):
+		manager = multiprocessing.Manager()
+		words,wordcount = self.plainWordCount()
+		
+		wordslen = len(words)
+		termFrequencies = {}
+		for word in words:
+			termFrequencies[word] = (wordcount[word], float(wordcount[word])/wordslen)
+			
+		if allDocuments is None:
+			allDocuments = self.matchObjects(
+				{"category":self.category},
+				fields={"wordcount":True}
+			)
+		
+		documentCount = len(allDocuments)
 
-		self.tags = tags;
+		allWordCounts = []
+		for d in allDocuments:
+			allWordCounts += d.wordcount.keys()
+
+		wordCountsByKey = collections.defaultdict(int)
+		for k in allWordCounts:
+			wordCountsByKey[k] += 1
+
+		tfidf = manager.dict()
+		managerWordCountsByKey = manager.dict(wordCountsByKey)
+		
+		if multiprocessLTF:
+			cores = multiprocessing.cpu_count()
+			chunkSize = len(termFrequencies)/cores
+			pool = []
+			for core in range(cores):
+				p = multiprocessing.Process(
+					target=self.__loopTermFrequencies,
+					args = (
+						termFrequencies.items()[int(chunkSize*core):int(chunkSize*(core+1))],
+						tfidf,
+						documentCount,
+						managerWordCountsByKey
+					)
+				)
+				p.start()
+				pool.append( p )
+
+			for p in pool:
+				print "Joining", p
+				p.join()
+		else:
+			self.__loopTermFrequencies(termFrequencies.items(), tfidf, documentCount, managerWordCountsByKey)
+
+		results = {}
+		
+		sortedItems = sorted( tfidf.items(), key=lambda x: x[1][0], reverse=True )
+		percentile = 0.05
+		maxitems = int((len(sortedItems)*percentile)+1)
+		
+		tags = {}
+		for item in sortedItems[:maxitems]:
+			tags[item[1][1]] = item[0]
+			
+		self.tags = tags
 		super(Document, self).save()
-
-		return json.dumps(results)
+	
+	@staticmethod
+	def __flatten(d, parent_key='', sep='_'):
+		items = []
+		for k, v in d.items():
+			new_key = parent_key + sep + k if parent_key else k
+			if isinstance(v, collections.MutableMapping):
+				items.extend(Document.__flatten(v, new_key, sep=sep).items())
+			else:
+				items.append((new_key, v))
+		return dict(items)
 	
 	@staticmethod
 	def generateJurisprudenceDocuments():
 		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
 		
-		stopwords = []
-		with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
-			stopwords = swf.read().split("\n")
+		stopwords = Document.getStopwords()
 		
 		categorized = {}
 		wiki = jurisprudence["Yuras"]["wiki"]
