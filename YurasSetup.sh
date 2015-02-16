@@ -10,9 +10,14 @@ sudo cabal install pandoc
 # add pandoc dir to path
 export PATH=$PATH:~/.cabal/bin
 
+# Add TokuMX directories
 sudo mkdir /data
 sudo mkdir /data/db
 sudo chown -R vagrant /data 
-mongod > /dev/null &
+
+# Start TokuMX database
+sudo service tokumx start
+sleep 5
+mongo localhost:27017 --eval "database='Yuras1'" setupDatabase.js
 
 find -name "requirements.txt" | xargs -i sudo pip install -r {}

@@ -6,6 +6,10 @@ body {
 	margin: 0;
 	padding: 0;
 }
+
+a { 
+	outline: 0 !important;
+}
 /* General purpose */
 
 .pull-right {
@@ -70,6 +74,10 @@ body {
 }
 
 /* Document styling */
+
+#csrf-token {
+	display:none;
+}
 
 /* This element is the size of a standard A4 paper. */
 

@@ -232,12 +232,13 @@ def documentViewer(id):
 		return abort(404)
 
 	annotations = Annotation().getObjectsByKey("document", id)
+	cases = Case().matchObjects({})
 	
 	categories = Category().matchObjects({})
 	annotations.sort(key=lambda a: a.location[0])
 	document.contents = Pandoc().convert("markdown_github", "html", document.contents)
 
-	return render_template("documents/viewer.html", name="Document", document=document, annotations=annotations, categories=categories)
+	return render_template("documents/viewer.html", name="Document", document=document, cases=cases, annotations=annotations, categories=categories)
 
 @app.route("/documents/<id>/save",methods=["POST"])
 @login.login_required
@@ -495,6 +496,49 @@ def caseEdit(id):
 		return abort(404)
 	
 	return render_template("cases/edit.html", name="Edit case", case=case, active="cases")
+
+@app.route("/cases/<id>/delete",methods=["POST"])
+@login.login_required
+def caseDelete(id):
+	try:
+		case = Case().getObjectsByKey("_id", id)[0]
+	except:
+		return abort(404)
+
+	if request.method != "POST":
+		return abort(405)
+
+	case.remove()
+
+	return json.dumps( {
+			"success":"true",
+			"new_csrf":generate_csrf_token()
+		} );
+
+	return abort(403)
+
+@app.route("/cases/<id>/add",methods=["POST"])
+@login.login_required
+def caseAddDocument(id):
+	try:
+		case = Case().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	return json.dumps( { "success":case.insertDocument( request.form.get("document_id", None ) ),
+					   	 "new_csrf":generate_csrf_token() } )
+
+@app.route("/cases/<id>/remove",methods=["POST"])
+@login.login_required
+def caseRemoveDocument(id):
+	try:
+		case = Case().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	return json.dumps( { "success":case.removeDocument( request.form.get("document_id", None ) ),
+					   	 "new_csrf":generate_csrf_token() } )
+
 
 # ANNOTATIONS #
 

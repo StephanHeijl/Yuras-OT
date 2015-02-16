@@ -189,18 +189,6 @@ class Document(StoredObject):
 			
 		return json.dumps( self.getRelatedDocumentsByIndividualTags(self.tags) )
 	
-	@staticmethod
-	def getSimilarityScore( score ):
-		""" Returns the score as a Tanh product.
-		
-		Reference: http://www.wolframalpha.com/input/?i=plot+tanh%28x*4%29+from+0+to+1
-		
-		:param score: A number between 0 and 1.
-		:rtype: Float, the Tanh product of the given score, from 0-1
-		"""
-		
-		return math.tanh(score)
-	
 	def getRelatedDocumentsByIndividualTags(self, tags):
 		results = {}
 		print tags
@@ -251,9 +239,8 @@ class Document(StoredObject):
 		
 		return json.dumps([(str(d._id), 
 							d.title, 
-							Document.getSimilarityScore(
-								float(len(d.tagsIntersect)) / float(len(allDocuments[0].tagsIntersect))
-							)) for d in allDocuments if len(d.tagsIntersect)>maxIntersectLength])
+							float(len(d.tagsIntersect)) / float(len(allDocuments[0].tagsIntersect))
+							) for d in allDocuments if len(d.tagsIntersect)>maxIntersectLength])
 				
 	def tfidf(self, allDocuments=None, multiprocessLTF=True):
 		manager = multiprocessing.Manager()
@@ -301,7 +288,6 @@ class Document(StoredObject):
 				pool.append( p )
 
 			for p in pool:
-				print "Joining", p
 				p.join()
 		else:
 			self.__loopTermFrequencies(termFrequencies.items(), tfidf, documentCount, managerWordCountsByKey)

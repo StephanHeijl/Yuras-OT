@@ -11,7 +11,7 @@
 			{% for document in case.documents %}
 			<div class="case-document col-md-2">
 				<div class="glyphicon glyphicon-file"></div>
-				<span class="case-document-title">{{ document.title }}</span>
+				<span class="case-document-title"><a href="/documents/{{ document.id }}" class="document-link">{{ document.title }}</a></span>
 			</div>
 			{% endfor %}
 

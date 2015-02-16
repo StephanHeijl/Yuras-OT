@@ -14,6 +14,7 @@
 	<!-- Collect the nav links, forms, and other content for toggling -->
 	<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 		<ul class="nav navbar-nav">
+			<div id="csrf-token" data-csrf={{ csrf_token() }}></div>
 
 			<!--
 			<li class="dropdown">
@@ -60,12 +61,12 @@
 			<li>
 				<a href="#" id="get-related" data-csrf={{ csrf_token() }} data-toggle="modal" data-target="#relatedModal"><span class="glyphicon glyphicon-search"></span> Get related documents</a>
 			</li>
-			
+
 		</ul>
-		
-		<ul class="nav navbar-nav pull-right">			
+
+		<ul class="nav navbar-nav pull-right">
 			<li>
-				<a href="/documents" id="back"><span class="glyphicon glyphicon-remove"></span> Exit</a>
+				<a href="/documents" id="back"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
 			</li>
 		</ul>
 	</div>
@@ -132,6 +133,19 @@
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
 					</button>
 					<span class="modal-title" id="relatedModalLabel">Related documents</span>
+					<div class="dropdown pull-right" style="margin-right: 20px; margin-top: -5px;">
+						<div class="case-dropdown btn btn-default dropdown-toggle" data-toggle="dropdown" data-value="">
+							<span id="chosen-case" data-case-id="{{ cases[-1]._id }}">{{ cases[-1].title }}</span>
+							<span class="caret"></span>
+						</div>
+						<ul class="dropdown-menu" role="menu">
+							{% for case in cases %}
+							<li role="presentation">
+								<a role="menuitem" tabindex="-1" href="#" class="case-menu-option" data-case-id="{{case._id}}">{{case.title}}</a>
+							</li>
+							{% endfor %}
+						</ul>
+					</div>
 				</div>
 				<div class="modal-body">
 					<div class="container-fluid">
@@ -140,19 +154,19 @@
 							<div class="related-document-add">
 								<div class="glyphicon glyphicon-plus"></div>
 							</div>
-							
+
 							<div class="glyphicon glyphicon-file"></div>
 							<a href="" class="case-document-title">This is a longer document title</a>
 						</div>
 						<img class="related-loader" src="/assets/img/loader.gif">>
 						<div class="row">
-							
+
 						</div>
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary">Add all to case</button>
+					<button type="button" class="btn btn-default">Select all</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal">Close and add selected</button>
 				</div>
 			</div>
 		</div>

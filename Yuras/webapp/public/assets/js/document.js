@@ -218,7 +218,7 @@ $(function () {
 	});
 
 	function saveDocument() {
-		csrfToken = encodeURIComponent($("#save-document").data("csrf"))
+		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
 		html = ""
 		$(".document-body").each(function () {
 			html += $(this).html()
@@ -251,7 +251,7 @@ $(function () {
 			"_csrf_token": csrfToken
 		}, function (response) {
 			response = JSON.parse(response);
-			$("#save-document").data("csrf", response.new_csrf);
+			$("#csrf-token").data("csrf", response.new_csrf);
 			$("#document-title").removeClass("not-saved");
 		})
 	}
@@ -478,7 +478,8 @@ $(function () {
 				$.each(data, function (d, doc) {
 					icon = documentIcon.clone()
 					icon.find(".case-document-title").text(doc[1]).attr("href", "/documents/" + doc[0])
-					icon.attr("data-score", doc[2])
+					icon.data("score", doc[2])
+					icon.attr("data-id", doc[0])
 					$(".modal-body .row").last().append(icon)
 					if ($(".modal-body .row").last().children().length == 3) {
 						$(".modal-body .container-fluid").append("<div class='row'></div>")
@@ -489,27 +490,51 @@ $(function () {
 
 				$(".related-document-rating").heatcolor(
 					function () {
-						$(this).width($(this).parent().data("score")*24)
+						$(this).width(12 + (($(this).parent().data("score") - 0.5) * 48))
 						return $(this).parent().data("score");
 					}, {
 						lightness: 0,
 						colorStyle: 'greentored',
 						maxval: 1,
-						minval: 0,
+						minval: 0.5,
 					});
 			});
 		}
 
 
 	});
+
+	// Handle adding related document to case 	
+	$("body").on("click", ".related-document-add", function (e) {
+		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
+		$(this).css({
+			"background": "#337ab7",
+			"color": "white",
+			"border-color": "white"
+		});
+		$(this).find(".glyphicon").attr("class", "glyphicon glyphicon-ok");
+
+		$.ajax({
+			type: "POST",
+			url: "/cases/"+$("#chosen-case").data("case-id")+"/add", 
+			data :{
+				"document_id": $(this).parents(".case-document").data("id"),
+				"_csrf_token": csrfToken
+			},
+			success: function (response) {
+				console.log(response)
+				$("#csrf-token").data("csrf", response.new_csrf);
+			},
+			dataType: "json"
+		});
+
+	});
 	
-	// Handle adding related document to case 
+	// Handle picking a case
 	
-	$("body").on("click", ".related-document-add", function(e) {		
-		console.log("Hey")
-		
-		$(this).css({"background":"#337ab7", "color":"white"});
-		$(this).find(".glyphicon").attr("class", "glyphicon glyphicon-ok")
+	$(".case-menu-option").click( function(e) {
+		console.log($(this).data("case-id"))
+		$("#chosen-case").text($(this).text()).data("case-id", $(this).data("case-id"))
 	});
 
 	// Handle document analysis
