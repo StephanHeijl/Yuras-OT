@@ -61,6 +61,10 @@
 			<li>
 				<a href="#" id="get-related" data-csrf={{ csrf_token() }} data-toggle="modal" data-target="#relatedModal"><span class="glyphicon glyphicon-search"></span> Get related documents</a>
 			</li>
+			
+			<li lass="related-document-add">
+				<a href="#"><div class="glyphicon glyphicon-plus"></div> Add to latest case</a>
+			</li>
 
 		</ul>
 
@@ -132,11 +136,10 @@
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
 					</button>
-					<span class="modal-title" id="relatedModalLabel">Related documents</span>
-					{% if cases|length > 0 %}
+					<span class="modal-title" id="relatedModalLabel">Related documents</span> {% if cases|length > 0 %}
 					<div class="dropdown pull-right" style="margin-right: 20px; margin-top: -5px;">
 						<div class="case-dropdown btn btn-default dropdown-toggle" data-toggle="dropdown" data-value="">
-								<span id="chosen-case" data-case-id="{{ cases[-1]._id }}">{{ cases[-1].title }}</span>
+							<span id="chosen-case" data-case-id="{{ cases[-1]._id }}">{{ cases[-1].title }}</span>
 							<span class="caret"></span>
 						</div>
 						<ul class="dropdown-menu" role="menu">

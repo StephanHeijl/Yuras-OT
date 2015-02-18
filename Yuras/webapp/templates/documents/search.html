@@ -12,7 +12,7 @@
 					<span class="input-group-btn">
 						<!-- Category picker -->
 						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false" type=button>
-							<span class="category-dropdown-text">{{ category if category != "" else "Any category"}}</span>  <span class="caret"></span>
+							<span class="category-dropdown-text">{{ category if category != "" else "Any category"}}</span> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
 						<li>
@@ -53,7 +53,11 @@
 				<tbody>
 					{% for document in documents %}
 					<tr>
-						<td><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a>
+						<td>
+							<a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a>
+							<div class="document-summary">
+								{% for mc in document.markedContents %} ...{{mc|safe}}... {%endfor%}
+							</div>
 						</td>
 						<td>{{ document.author }}</td>
 						<td>
@@ -64,7 +68,7 @@
 					{% endfor %}
 				</tbody>
 			</table>
-			
+
 			<a class="btn btn-default prev-page" disabled=disabled><span class="glyphicon glyphicon-arrow-left"></span> Previous page </a>
 			<a class="btn btn-default pull-right next-page"> Next page <span class="glyphicon glyphicon-arrow-right"></span></a>
 		</div>

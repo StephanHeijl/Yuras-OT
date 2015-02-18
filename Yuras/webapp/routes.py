@@ -91,7 +91,11 @@ def csrf_protect(*args, **kwargs):
 
 def generate_csrf_token():
 	if '_csrf_token' not in session:
-		session['_csrf_token'] = base64.b64encode(Random.new().read(32))
+		try:
+			session['_csrf_token'] = base64.b64encode(Random.new().read(32))
+		except AssertionError:
+			Random.atfork()
+			session['_csrf_token'] = base64.b64encode(Random.new().read(32))
 	return session['_csrf_token']
 
 app.jinja_env.globals['csrf_token'] = generate_csrf_token
@@ -333,9 +337,7 @@ def fullTFIDFRun():
 	return json.dumps({"success":"true"})
 
 def do_documentSearch(keywords, category=None, skip=0, limit=10):
-	stopwords = []
-	with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
-		stopwords = swf.read().split("\n")
+	stopwords = Document.getStopwords()
 		
 	wordCountList = []
 	keys = []
@@ -343,6 +345,8 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 	for word in keywords:
 		if word in stopwords:
 			continue
+			
+		word = word.lower()
 					
 		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 		keys.append(key)
@@ -369,11 +373,26 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 	except:
 		return []
 	
+	for result in results:
+		result.markedContents = []
+		for word in keywords:
+			if word in stopwords:
+				continue
+				
+			surroundLength = 20
+			try:
+				wordIndex = result.contents.lower().index(word)
+			except:
+				continue
+			start = wordIndex - surroundLength
+			end = wordIndex + len(word) + surroundLength
+			result.markedContents.append( result.contents[start:end].replace(word, "<span class='marked'>"+word+"</span>") )
+	
 	results.sort(key=lambda r:tuple([len(r.wordcount)] + [r.wordcount.get(k,0) for k in keys]),reverse=True)
 	return results[skip*limit:(skip+1)*limit]
 
 @app.route("/documents/qsearch")
-#@login.login_required
+@login.login_required
 def documentQuickSearch():
 	keywords = request.args.get("keywords", "").split(" ")
 	return Document().quickSearch(keywords)
@@ -395,7 +414,7 @@ def documentSearch():
 						   active="documents")
 
 @app.route("/documents/search/table/<amount>/<page>")
-#@login.login_required
+@login.login_required
 def documentSearchTable(amount, page):
 	keywords = request.args.get("keywords", "").split(" ")
 	category = request.args.get("category", None)
@@ -495,7 +514,14 @@ def caseEdit(id):
 	except Exception as e:
 		return abort(404)
 	
-	return render_template("cases/edit.html", name="Edit case", case=case, active="cases")
+	match = {"_id": {"$in":[ ObjectId(d["id"]) for d in case.documents] }}
+	documents = Document().matchObjects( match )
+	tags = defaultdict(int)
+	for d in documents:
+		for tag in d.tags.values():
+			tags[tag]+=1
+		
+	return render_template("cases/edit.html", name="Edit case", case=case, tags=dict(tags), active="cases")
 
 @app.route("/cases/<id>/delete",methods=["POST"])
 @login.login_required

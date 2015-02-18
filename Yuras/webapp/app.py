@@ -60,7 +60,8 @@ class Server(threading.Thread):
 			# Try adding 1 to the port every time we can't listen on the preferred port.
 			try:
 				http_server = HTTPServer(WSGIContainer(app))
-				http_server.listen(self.PORT)
+				http_server.bind(self.PORT)
+				http_server.start(0)
 				IOLoop.instance().start()
 				serverStarted = True
 			except Exception as e:
@@ -81,7 +82,8 @@ class Server(threading.Thread):
 			try:
 				print ("Starting on port %s..." % self.PORT)
 				http_server = HTTPServer(WSGIContainer(app))
-				http_server.listen(self.PORT)
+				http_server.bind(self.PORT)
+				http_server.start(0)
 				IOLoop.instance().start()
 				serverStarted = True
 			except Exception as e:

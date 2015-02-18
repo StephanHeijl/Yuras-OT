@@ -7,14 +7,25 @@
 			<h2>{{ case.title }}</h2>
 		</div>
 
-		<div class="col-lg-12">
-			{% for document in case.documents %}
-			<div class="case-document col-md-2">
-				<div class="glyphicon glyphicon-file"></div>
-				<span class="case-document-title"><a href="/documents/{{ document.id }}" class="document-link">{{ document.title }}</a></span>
+		<div class="col-lg-9">
+			<div class="container-fluid">
+				<div class="row">
+					{% for document in case.documents %}
+					<div class="case-document col-md-2">
+						<div class="glyphicon glyphicon-file"></div>
+						<span class="case-document-title"><a href="/documents/{{ document.id }}" class="document-link">{{ document.title }}</a></span>
+					</div>
+					{% endfor %}
+				</div>
 			</div>
-			{% endfor %}
 
+		</div>
+		<div class="col-lg-3" style="text-align:center; line-height: 1.7em;">
+			{% for tag in tags|dictsort(false, 'value')|reverse %} 
+				{% if tag[1] > 1 %}
+					<span class="label {% if tag[1]|int>=case.documents|length %}label-success{% else %}label-default{%endif%}" data-occurs="{{tag[1]}}" title="This tag appeared {{tag[1]}} times.">{{tag[0]}}</span> 
+				{%endif%} 
+			{% endfor %}
 		</div>
 
 	</div>

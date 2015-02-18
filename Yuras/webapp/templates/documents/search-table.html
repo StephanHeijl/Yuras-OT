@@ -1,6 +1,12 @@
 {% for document in documents %}
 <tr>
-	<td><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a>
+	<td>
+		<a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a>
+		<div class="document-summary">
+			{% for mc in document.markedContents %}
+			...{{mc|safe}}...
+			{%endfor%}
+		</div>
 	</td>
 	<td>{{ document.author }}</td>
 	<td>

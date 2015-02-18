@@ -160,6 +160,10 @@ td.price small {
 	}
 }
 
+.document-summary {
+	font-size: 75%;
+}
+
 .case-document:hover {
 	text-decoration: none;
 }
