@@ -8,6 +8,12 @@
 
 		<div class="col-lg-12">
 			<h2>Profile page for {{ user.firstname }} </h2>	
+			
+			{% if passwordError %}
+			<div class="alert alert-danger">
+				{{ passwordError }}
+			</div>
+			{% endif %}
 		</div>
 
 		<div class="col-lg-12">
@@ -42,7 +48,7 @@
 				<div class="form-group">
 					<label for="password" class="col-sm-2 control-label">Change password</label>
 					<div class="col-sm-10">
-						<input type="text" class="form-control" id="new-password" placeholder="Old password" name="old-password" value="">
+						<input type="text" class="form-control" id="old-password" placeholder="Old password" name="old-password" value="">
 					</div>
 				</div>
 				

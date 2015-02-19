@@ -486,7 +486,7 @@ def documentsUpload():
 	return returnUploadError(error,categories)
 	
 def returnUploadReferenceError(error):
-	return render_template("users/profile.html", active="profile", name="Profile", referenceError=error)
+	return render_template("users/profile.html", active="profile", name="Profile", passwordError=None, referenceError=error)
 	
 @app.route("/documents/upload-reference", methods=["POST"])
 @login.login_required
@@ -676,8 +676,18 @@ def userEdit(id):
 @app.route("/users/profile")
 @login.login_required
 def userProfile():
+	error = request.args.get("error",None)
+	passwordError = None
+	passwordErrors = {
+		"password-toocommon": "The password you tried to use was is too common.",
+		"password-incorrect": "The old password you provided was incorrect",
+		"password-nomatch": "The new passwords you sent don't match up."
+	}
+	if error is not None:
+		passwordError = passwordErrors.get(error,None)
+	
 	documents = Document().getObjectsByKey("author", login.current_user.username, limit=10)
-	return render_template("users/profile.html", name="Your profile page", user=login.current_user, documents=documents, active="profile")
+	return render_template("users/profile.html", name="Your profile page", user=login.current_user, documents=documents, passwordError=passwordError, active="profile")
 
 @app.route("/users/<id>")
 @login.login_required
@@ -704,9 +714,21 @@ def userSave(id):
 
 	data = dict(request.form)
 
-	rawPassword = urllib2.unquote( data.get("password", [""])[0].decode("utf-8") )
-	if len(rawPassword) > 0:
-		user.setPassword(rawPassword)
+	oldPassword = urllib2.unquote( data.get("old-password", [""])[0].decode("utf-8") )
+	newPassword = urllib2.unquote( data.get("new-password", [""])[0].decode("utf-8") )
+	newPasswordAgain = urllib2.unquote( data.get("new-password-again", [""])[0].decode("utf-8") )
+	
+	if not user.checkPassword(oldPassword):
+		return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-incorrect")
+	
+	if newPassword != newPasswordAgain:
+		return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-nomatch")
+	
+	if newPassword in User.getMostCommonPasswords():
+		return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-toocommon")
+	
+	if len(newPassword) > 0:
+		user.setPassword(newPassword)
 
 	user.username = data["username"][0]
 	user.firstname = data["firstname"][0]
@@ -714,7 +736,7 @@ def userSave(id):
 	user.email = data["email"][0]
 	user.save()
 
-	return redirect(request.args.get("back", "/users/%s/edit" % id))
+	return redirect(request.args.get("back", "/users/%s/edit" % id)+"?success=true")
 
 @app.route("/users/<id>/delete",methods=["POST"])
 @login.login_required

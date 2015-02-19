@@ -1,5 +1,5 @@
 from Yuras.common.StoredObject import StoredObject
-import bcrypt, scrypt, base64, time
+import bcrypt, scrypt, base64, time, os
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES
@@ -19,6 +19,12 @@ class User(StoredObject):
 		self.documents = []
 		
 		super(User, self).__init__(collection = "users")
+		
+	@staticmethod
+	def getMostCommonPasswords(n=10000):
+		with open(os.path.join( Config().WebAppDirectory, "../..", "common-passwords.txt"), "r") as cpw:
+			passwords = cpw.read().split("\n")
+		return passwords[:n]
 	
 	def matchObjects(self, match, limit=None, skip=0, fields={"referenceDocument":0}, sort=None,reverse=False):
 		# Does not return reference template by default
