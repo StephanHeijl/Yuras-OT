@@ -175,6 +175,37 @@ $(function () {
 			},
 			dataType: "json"
 		});
-
+	});
+	
+	// Handle changing a case title
+	function changeCaseTitle(title) {
+		$(".display-title .case-title").text(title)
+		$(".case-title-editor").attr("placeholder",title)
+		
+		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
+		$.ajax({
+			type: "POST",
+			url: "/cases/"+$("#chosen-case").data("case-id")+"/set-title", 
+			data :{
+				"document_title": title,
+				"_csrf_token": csrfToken
+			},
+			success: function (response) {
+				$("#csrf-token").data("csrf", response.new_csrf);
+			},
+			dataType: "json"
+		});
+	}
+	
+	// Handle case title transfering
+	$("#edit-case-title").click(function(e) {
+		e.preventDefault()
+		$(this).parents(".display-title").hide()
+		$(".edit-title").show()
+		$(".case-title-editor").bind("blur submit", function() {
+			changeCaseTitle($(this).val())
+			$(".edit-title").hide()
+			$(".display-title").show()
+		})		
 	});
 });

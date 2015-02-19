@@ -6,8 +6,17 @@
 	<div class="row">
 
 		<div class="col-lg-12">
-			<h2>{{ case.title }}</h2>
-			<div class="alert alert-warning add-related-document-warning" style="display:none;"> Please reload the page to see the newly added documents. </div>
+			<div class="display-title">
+				<h2>
+					<span class="case-title">{{ case.title }}</span>
+					<small><a href="#" title="Edit case title" id="edit-case-title"><div class="glyphicon glyphicon-pencil"></div></a></small></h2>
+				<div class="alert alert-warning add-related-document-warning" style="display:none;"> Please reload the page to see the newly added documents. </div>
+			</div>
+			<div class="edit-title" style="display:none;">
+				<br/>
+				<input type="text" class="form-control input-lg case-title-editor" placeholder="Case title" value="{{ case.title }}"/>
+			</div>
+			
 		</div>
 		
 		<div class="col-lg-9">
@@ -31,7 +40,7 @@
 				</div>
 
 				<div class="glyphicon glyphicon-file"></div>
-				<a href="" class="case-document-title">{{ document[1] }}</a>
+				<a href="/documents/{{ document[0] }}" class="case-document-title">{{ document[1] }}</a>
 			</div>
 			{% endfor %}
 

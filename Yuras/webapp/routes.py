@@ -547,10 +547,7 @@ def caseEdit(id):
 			if len(tag) > 3:
 				tags[tag]+=1
 		
-	if len(case.documents) < 5:
-		suggested = case.getFullCaseRecommendations()
-	else:
-		suggested = []
+	suggested = case.getFullCaseRecommendations()
 	return render_template("cases/edit.html", name="Edit case", case=case, suggested=suggested, tags=dict(tags), active="cases")
 
 @app.route("/cases/<id>/delete",methods=["POST"])
@@ -594,6 +591,21 @@ def caseRemoveDocument(id):
 		return abort(404)
 	
 	return json.dumps( { "success":case.removeDocument( request.form.get("document_id", None ) ),
+					   	 "new_csrf":generate_csrf_token() } )
+
+@app.route("/cases/<id>/set-title",methods=["POST"])
+@login.login_required
+def caseSetTitle(id):
+	try:
+		case = Case().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		return abort(404)
+	
+	title = request.form.get("document_title", None )
+	case.title = title
+	case.save()
+	
+	return json.dumps( { "success":True,
 					   	 "new_csrf":generate_csrf_token() } )
 
 

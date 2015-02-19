@@ -3,6 +3,8 @@ from Yuras.webapp.models.Document import Document
 
 from bson.objectid import ObjectId
 
+import collections
+
 class Case(StoredObject):
 	def __init__(self):	
 		self.title = "Case"
@@ -62,8 +64,14 @@ class Case(StoredObject):
 			tags = []
 			for d in documents:
 				tags+=d.tags.keys()
-			tags = list(set(tags))
 			
+		tagcount = collections.defaultdict(int)
+		for tag in tags:
+			tagcount[tag]+=1
+		
+		if len(documents)>1:
+			# Remove tags that occur in less than half of the documents
+			tags = [k for k,v in dict(tagcount).items() if v >= len(documents)/4 ]
+		
 		related = Document().getRelatedDocumentsByTags(tags=tags,asJSON=False,exclude=[ObjectId(d["id"]) for d in self.documents])
-		print related, type(related)
 		return related
