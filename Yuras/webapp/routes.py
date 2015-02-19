@@ -289,7 +289,7 @@ def documentDownload(id, filetype):
 	except:
 		return abort(404)
 
-	return document.download(filetype)
+	return document.download(filetype, login.current_user)
 
 @app.route("/documents/<id>/related")
 @login.login_required
@@ -463,9 +463,7 @@ def documentsUpload():
 		if document.category == "detect":
 			classifier = pickle.load( open(os.path.join( Config().WebAppDirectory, "..","..", "Classifier.cpic"), "rb") )
 			vectorizer = pickle.load( open(os.path.join( Config().WebAppDirectory, "..","..", "Vectorizer.cpic"), "rb") )
-			stopwords = []
-			with open(os.path.join( Config().WebAppDirectory, "../..", "stopwords.txt"), "r") as swf:
-				stopwords = swf.read().split("\n")
+			stopwords = Document.getStopwords()
 			
 			plainContents = Pandoc().convert("markdown_github","plain",document.contents).lower()
 			for stopword in stopwords:
@@ -476,7 +474,7 @@ def documentsUpload():
 			print "Classifying"
 			document.category = classifier.predict( matrix )[0]
 		
-		document.wordCount()		
+		document.wordCount()
 		document.save()
 		print "Document saved", document._id
 
@@ -486,6 +484,34 @@ def documentsUpload():
 			return returnUploadError(error,categories)
 	
 	return returnUploadError(error,categories)
+	
+def returnUploadReferenceError(error):
+	return render_template("users/profile.html", active="profile", name="Profile", referenceError=error)
+	
+@app.route("/documents/upload-reference", methods=["POST"])
+@login.login_required
+def documentsReferenceUpload():
+	filetypes = {
+		"docx":"docx"
+	}
+	
+	error = None
+	f = request.files["reference"]
+	data = dict(request.form)
+	filename = f.filename
+	extension = filename.split(".")[-1]
+	if extension not in filetypes.keys():
+		error = "Not an allowed format."
+		return returnUploadReferenceError(error)
+	
+	user = login.current_user	
+	user.referenceDocument = f.stream.read()
+	user.save()
+
+	if error is None:
+		return redirect("/users/profile")
+	else:
+		return returnUploadReferenceError(error)
 	
 # CASES #
 @app.route("/cases/")

@@ -7,9 +7,7 @@ class Pandoc():
 		self.baseCommand = "~/.cabal/bin/pandoc {text} -f {from} -t {to}"
 		self.fileOutputCommand = "~/.cabal/bin/pandoc {text} -f {from} -t {to} -o {outputpath}"
 		
-		
-		
-	def convert(self, from_, to_, text, filetype=None):
+	def convert(self, from_, to_, text, filetype=None, reference=None):
 		""" Converts a string from one format to another, returns the result.
 		
 :param from_: The initial format.
@@ -25,6 +23,14 @@ class Pandoc():
 			tmp.write( text.encode('utf-8') )
 			
 		tmp.close()
+		
+		if reference is not None:
+			tmpref = tempfile.NamedTemporaryFile(delete=False, suffix=".docx")
+			tmpref.write(reference)
+			tmpref.close()
+			
+			self.baseCommand += " --reference-docx="+tmpref.name
+			self.fileOutputCommand += " --reference-docx="+tmpref.name
 		
 		formatDict = {"from":from_, "to":to_, "text":tmp.name}
 		if filetype is None:

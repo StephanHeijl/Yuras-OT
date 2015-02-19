@@ -188,7 +188,10 @@ class Storage(Singleton):
 			except:
 				return datetime.datetime(*[ int(i) for i in value[:-1].split("(")[1].split(", ")])
 		elif type_ == "str":
-			return value.decode('utf-8')
+			try:
+				return value.decode('utf-8')
+			except UnicodeDecodeError:
+				return value
 				
 		try:
 			# Check if it's a builtin type

@@ -151,7 +151,7 @@ class Document(StoredObject):
 		
 		return json.dumps(dict([(str(document._id), document.title) for document in results ]))
 	
-	def download(self, filetype):
+	def download(self, filetype, user=None):
 		filetypes = {
 			"docx":"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 			"pdf":"application/pdf",
@@ -163,9 +163,14 @@ class Document(StoredObject):
 			"pdf":"latex --latex-engine=pdflatex",
 			"txt":"plain"
 		}
+		
+		reference = None
+		
+		if user is not None:
+			reference = user.getReferenceDocument()		
 
 		if filetype in filetypes:
-			responseContents = Pandoc().convert("markdown_github", pandoc_filetypes[filetype], self.contents, filetype=filetype)
+			responseContents = Pandoc().convert("markdown_github", pandoc_filetypes[filetype], self.contents, filetype=filetype, reference=reference)
 			response = Response(responseContents, mimetype=filetypes[filetype])
 
 			filename = self.title + "." + filetype

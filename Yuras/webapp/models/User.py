@@ -20,6 +20,16 @@ class User(StoredObject):
 		
 		super(User, self).__init__(collection = "users")
 	
+	def matchObjects(self, match, limit=None, skip=0, fields={"referenceDocument":0}, sort=None,reverse=False):
+		# Does not return reference template by default
+		return super(User, self).matchObjects(match,limit,skip,fields,sort,reverse)
+	
+	def getReferenceDocument(self):
+		try:
+			return self.matchObjects({"_id":self._id}, limit=1, fields={"referenceDocument":1})[0].referenceDocument
+		except:
+			return None
+	
 	def setPassword(self, password):
 		hashedPassword = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt(Config().bcryptDifficulty))
 		

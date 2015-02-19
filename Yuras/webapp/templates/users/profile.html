@@ -10,7 +10,7 @@
 			<h2>Profile page for {{ user.firstname }} </h2>	
 		</div>
 
-		<div class="col-lg-8">
+		<div class="col-lg-12">
 			<form class="form-horizontal" action="/users/{{ user._id }}/save?back=/users/profile" method="post" role="form" data-toggle="validator">
 				<div class="form-group">
 					<label for="firstname" class="col-sm-2 control-label">First name</label>
@@ -74,10 +74,31 @@
 		</div>
 
 
-		<div class="col-lg-4">
+		<div class="col-lg-12">
+			<h3>Two-factor authentication</h3>
+			<p>You can use a secondary authentication device, like your mobile phone or a dongle to improve security. </p>
 			<button class="btn btn-default btn-lg" id="enrollU2F" data-user-id="{{ user._id }}"> Click here to enroll your U2F device. </button>
+			<br/><br/>
+			<button class="btn btn-default btn-lg" id="enrollMobile" data-user-id="{{ user._id }}"> Click here to enroll mobile phone. </button>
 		</div>
 		
+		
+		<div class="col-lg-12">
+			<h3>Document template</h3>
+			<p> Upload a Microsoft Word document that will be used as the layout for the documents you download. </p>
+			{% if user.referenceDocument %}
+			<div class="alert alert-warning">
+				By uploading a new reference you will be replacing your current template.
+			</div>
+				
+			{% endif %}
+			<form action="/documents/upload-reference" method="post" enctype="multipart/form-data">
+				<input type="file" name="reference">
+				<!-- CSRF token -->
+				<input type="hidden" class="hidden" name="_csrf_token" value={{ csrf_token() }} /> <br/>
+				<button type="submit" class="btn btn-lg btn-success">Upload template</button>
+			</form>
+		</div>
 		
 		<div class="col-lg-12">
 			<h2> Documents by {{ user.firstname }}</h2>
