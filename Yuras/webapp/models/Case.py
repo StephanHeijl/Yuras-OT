@@ -1,6 +1,8 @@
 from Yuras.common.StoredObject import StoredObject
 from Yuras.webapp.models.Document import Document
 
+from bson.objectid import ObjectId
+
 class Case(StoredObject):
 	def __init__(self):	
 		self.title = "Case"
@@ -39,8 +41,29 @@ class Case(StoredObject):
 			return False
 		
 		try:
-			self.documents.remove(_id)
+			for document in self.documents[:]:
+				if document["id"] == _id:
+					self.documents.remove(document)
 			self.save()
 			return True
-		except:
+		except Exception as e:
+			print self.documents
+			print e
 			return False
+
+	def getDocuments(self):
+		match = {"_id": {"$in":[ ObjectId(d["id"]) for d in self.documents] }}
+		documents = Document().matchObjects( match )
+		return documents
+		
+	def getFullCaseRecommendations(self,tags = None):
+		if tags is None:
+			documents = self.getDocuments()
+			tags = []
+			for d in documents:
+				tags+=d.tags.keys()
+			tags = list(set(tags))
+			
+		related = Document().getRelatedDocumentsByTags(tags=tags,asJSON=False,exclude=[ObjectId(d["id"]) for d in self.documents])
+		print related, type(related)
+		return related

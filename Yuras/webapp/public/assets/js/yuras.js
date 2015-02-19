@@ -118,4 +118,63 @@ $(function () {
 		$('.category-dropdown-text').text($(this).text());
 		$('.category-input').val($(this).data('value'));
 	});
+	
+	// Handle heatcolor of related rating when they are present on load
+	$(".related-document-rating").heatcolor(
+		function () {
+			$(this).width(12 + (($(this).parent().data("score") - 0.5) * 48))
+			return $(this).parent().data("score");
+		}, {
+			lightness: 0,
+			colorStyle: 'greentored',
+			maxval: 1,
+			minval: 0.5,
+		});
+	
+	// Handle adding related document to case 	
+	$("body").on("click", ".related-document-add", function (e) {
+		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
+		$(this).css({
+			"background": "#337ab7",
+			"color": "white",
+			"border-color": "white"
+		});
+		$(this).find(".glyphicon").attr("class", "glyphicon glyphicon-ok");
+
+		$.ajax({
+			type: "POST",
+			url: "/cases/"+$("#chosen-case").data("case-id")+"/add", 
+			data :{
+				"document_id": $(this).parents(".case-document").data("id"),
+				"_csrf_token": csrfToken
+			},
+			success: function (response) {
+				console.log(response)
+				$("#csrf-token").data("csrf", response.new_csrf);
+				$(".add-related-document-warning").fadeIn()
+			},
+			dataType: "json"
+		});
+	});
+	
+	// Handle removing related document to case 	
+	$("body").on("click", ".related-document-remove", function (e) {
+		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
+		caseDocument = $(this).parents(".case-document")
+		$.ajax({
+			type: "POST",
+			url: "/cases/"+$("#chosen-case").data("case-id")+"/remove", 
+			data :{
+				"document_id": caseDocument.data("id"),
+				"_csrf_token": csrfToken
+			},
+			success: function (response) {
+				console.log(response)
+				$("#csrf-token").data("csrf", response.new_csrf);
+				caseDocument.fadeOut( 500, caseDocument.remove )
+			},
+			dataType: "json"
+		});
+
+	});
 });

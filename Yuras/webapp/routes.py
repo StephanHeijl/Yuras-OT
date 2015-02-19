@@ -540,14 +540,18 @@ def caseEdit(id):
 	except Exception as e:
 		return abort(404)
 	
-	match = {"_id": {"$in":[ ObjectId(d["id"]) for d in case.documents] }}
-	documents = Document().matchObjects( match )
+	documents = case.getDocuments()
 	tags = defaultdict(int)
 	for d in documents:
 		for tag in d.tags.values():
-			tags[tag]+=1
+			if len(tag) > 3:
+				tags[tag]+=1
 		
-	return render_template("cases/edit.html", name="Edit case", case=case, tags=dict(tags), active="cases")
+	if len(case.documents) < 5:
+		suggested = case.getFullCaseRecommendations()
+	else:
+		suggested = []
+	return render_template("cases/edit.html", name="Edit case", case=case, suggested=suggested, tags=dict(tags), active="cases")
 
 @app.route("/cases/<id>/delete",methods=["POST"])
 @login.login_required
@@ -579,6 +583,7 @@ def caseAddDocument(id):
 	
 	return json.dumps( { "success":case.insertDocument( request.form.get("document_id", None ) ),
 					   	 "new_csrf":generate_csrf_token() } )
+
 
 @app.route("/cases/<id>/remove",methods=["POST"])
 @login.login_required

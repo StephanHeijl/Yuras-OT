@@ -219,13 +219,24 @@ class Document(StoredObject):
 		
 		return results
 			
-	def getRelatedDocumentsByTags(self):
+	def getRelatedDocumentsByTags(self, tags=None, asJSON=True, exclude=None):
 		matchTags = []
-		tags = self.tags.keys()
+		if tags is None:
+			tags = self.tags.keys()
+			
+		if len(tags) == 0:
+			return "[]" if asJSON else []
+		
 		for tag in tags:
 			matchTags.append({"tags."+tag: {"$exists":True}})
-
-		match = {"$or": matchTags, "_id": {"$ne": self._id}}
+		
+		if exclude is None:
+			try:
+				match = {"$or": matchTags, "_id": {"$ne": self._id}}
+			except AttributeError:
+				match = {"$or": matchTags}
+		else:
+			match = {"$or": matchTags, "_id": {"$nin": exclude}}
 
 		allDocuments = Document().matchObjects(
 			match,
@@ -237,15 +248,24 @@ class Document(StoredObject):
 			d.tagsIntersect = list(tagsSet.intersection(set(d.tags.keys())))
 
 		if len(allDocuments) == 0:
-			return "{}"
+			return "[]" if asJSON else []
+				
 
 		allDocuments.sort(key=lambda d: len(d.tagsIntersect), reverse=True)
 		maxIntersectLength = len(allDocuments[0].tagsIntersect)*0.5
 		
-		return json.dumps([(str(d._id), 
-							d.title, 
-							float(len(d.tagsIntersect)) / float(len(allDocuments[0].tagsIntersect))
-							) for d in allDocuments if len(d.tagsIntersect)>maxIntersectLength])
+		results = [(
+					str(d._id), 
+					d.title, 
+					float(len(d.tagsIntersect)) / float(len(allDocuments[0].tagsIntersect))
+					) 
+				   for d in allDocuments if len(d.tagsIntersect)>maxIntersectLength
+				  ]
+		
+		if asJSON:
+			return json.dumps(results)
+		else:
+			return results
 				
 	def tfidf(self, allDocuments=None, multiprocessLTF=True):
 		manager = multiprocessing.Manager()

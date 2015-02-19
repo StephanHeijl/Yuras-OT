@@ -503,35 +503,8 @@ $(function () {
 
 
 	});
-
-	// Handle adding related document to case 	
-	$("body").on("click", ".related-document-add", function (e) {
-		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
-		$(this).css({
-			"background": "#337ab7",
-			"color": "white",
-			"border-color": "white"
-		});
-		$(this).find(".glyphicon").attr("class", "glyphicon glyphicon-ok");
-
-		$.ajax({
-			type: "POST",
-			url: "/cases/"+$("#chosen-case").data("case-id")+"/add", 
-			data :{
-				"document_id": $(this).parents(".case-document").data("id"),
-				"_csrf_token": csrfToken
-			},
-			success: function (response) {
-				console.log(response)
-				$("#csrf-token").data("csrf", response.new_csrf);
-			},
-			dataType: "json"
-		});
-
-	});
 	
 	// Handle picking a case
-	
 	$(".case-menu-option").click( function(e) {
 		console.log($(this).data("case-id"))
 		$("#chosen-case").text($(this).text()).data("case-id", $(this).data("case-id"))
