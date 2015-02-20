@@ -62,6 +62,28 @@ class Document(StoredObject):
 			key = b64enc(scrypt.hash(str(word), salt, N=1<<9))
 			hashedWordCount[key] = count
 		results += dict(hashedWordCount).items()
+		
+	def getArticlesFromContent(self):
+		
+		"""
+			Regex explained:
+			
+				((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )? 						# Xde lid van... (Optional)
+				[aA]rtikel(en)? \d+\w?(:\d+)? 															# Article number and suffix
+				((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)? 	# Xde lid van or lid X van (Optional)
+				([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?													# Abbreviation suffix (Optional)
+				[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?				# Article book or source (Optional)
+		
+		"""
+		
+		articleRegexString = "((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )?[Aa]rtikel(en)? \d+\w?(:\d+)?((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)?([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?"
+		articleRegex = re.compile(articleRegexString)
+		
+		results = set()
+		
+		for result in articleRegex.finditer(self.contents):
+			results.add(result.group(0).strip(",. "))
+		return list(results)
 	
 	def countWords(self, store=True):
 		words, plainWordCount = self.plainWordCount()

@@ -313,6 +313,17 @@ def documentTFIDF(id):
 
 	return document.documentAnalysis()
 
+@app.route("/documents/<id>/articles")
+@login.login_required
+def documentArticles(id):
+	try:
+		document = Document().matchObjects({"_id": id}, fields={"_id":True,"contents":True})[0]
+	except Exception as e:
+		traceback.print_exc(file=sys.stdout)
+		return abort(404)
+
+	return json.dumps( document.getArticlesFromContent() )
+
 @app.route("/documents/add-jurisprudence")
 @login.login_required
 def addJurisprudenceDocuments():
@@ -681,13 +692,20 @@ def userProfile():
 	passwordErrors = {
 		"password-toocommon": "The password you tried to use was is too common.",
 		"password-incorrect": "The old password you provided was incorrect",
-		"password-nomatch": "The new passwords you sent don't match up."
+		"password-nomatch": "The new passwords you sent don't match up.",
+		"password-tooshort": "The password you're trying too use is too short."
 	}
 	if error is not None:
 		passwordError = passwordErrors.get(error,None)
 	
 	documents = Document().getObjectsByKey("author", login.current_user.username, limit=10)
-	return render_template("users/profile.html", name="Your profile page", user=login.current_user, documents=documents, passwordError=passwordError, active="profile")
+	return render_template("users/profile.html",
+						   name="Your profile page",
+						   user=login.current_user,
+						   documents=documents,
+						   passwordError=passwordError,
+						   success=request.args.get("success",None),
+						   active="profile")
 
 @app.route("/users/<id>")
 @login.login_required
@@ -718,16 +736,19 @@ def userSave(id):
 	newPassword = urllib2.unquote( data.get("new-password", [""])[0].decode("utf-8") )
 	newPasswordAgain = urllib2.unquote( data.get("new-password-again", [""])[0].decode("utf-8") )
 	
-	if not user.checkPassword(oldPassword):
-		return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-incorrect")
-	
-	if newPassword != newPasswordAgain:
-		return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-nomatch")
-	
-	if newPassword in User.getMostCommonPasswords():
-		return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-toocommon")
-	
 	if len(newPassword) > 0:
+		if not user.checkPassword(oldPassword):
+			return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-incorrect")
+
+		if newPassword != newPasswordAgain:
+			return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-nomatch")
+
+		if len(newPassword) < 8:
+			return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-tooshort")
+
+		if newPassword in User.getMostCommonPasswords():
+			return redirect(request.args.get("back", "/users/%s/edit" % id)+"?error=password-toocommon")
+
 		user.setPassword(newPassword)
 
 	user.username = data["username"][0]

@@ -9,6 +9,12 @@
 		<div class="col-lg-12">
 			<h2>Profile page for {{ user.firstname }} </h2>	
 			
+			{% if success %}
+			<div class="alert alert-success">
+				Profile save was successful.
+			</div>
+			{% endif %}
+			
 			{% if passwordError %}
 			<div class="alert alert-danger">
 				{{ passwordError }}
