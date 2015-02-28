@@ -39,21 +39,6 @@ class Document(StoredObject):
 			stopwords = swf.read().split("\n")
 		return stopwords
 	
-	def plainWordCount(self, filterStopwords=True):
-		plainContents = Pandoc().convert("markdown_github", "plain", self.contents.lower())
-		plainWordRegex = re.compile("[a-z]{2,}")
-		words = plainWordRegex.findall(self.title.lower()) + plainWordRegex.findall(plainContents)
-		wordCount = collections.defaultdict(int)
-		
-		if filterStopwords:
-			stopwords = Document.getStopwords()
-			words = [ word for word in words if word not in stopwords ] # Remove all stopwords		
-		
-		for word in words:
-			wordCount[word] += 1
-		
-		return words, wordCount
-	
 	def hashedWordCount(self, plainWordCount, results):
 		b64enc = base64.b64encode
 		hashedWordCount = collections.defaultdict(int)
@@ -63,8 +48,7 @@ class Document(StoredObject):
 			hashedWordCount[key] = count
 		results += dict(hashedWordCount).items()
 		
-	def getArticlesFromContent(self):
-		
+	def getArticlesFromContent(self):		
 		"""
 			Regex explained:
 			
@@ -83,7 +67,30 @@ class Document(StoredObject):
 		
 		for result in articleRegex.finditer(self.contents):
 			results.add(result.group(0).strip(",. "))
-		return list(results)
+			
+		# We also filter out substrings
+		results = list(results)
+		filteredResults = [j for i, j in enumerate(results) if all(j not in k for k in results[i + 1:])]
+		
+		self.articles = filteredResults
+		super(Document, self).save()
+		
+		return filteredResults
+	
+	def plainWordCount(self, filterStopwords=True):
+		plainContents = Pandoc().convert("markdown_github", "plain", self.contents.lower())
+		plainWordRegex = re.compile("[a-z]{2,}")
+		words = plainWordRegex.findall(self.title.lower()) + plainWordRegex.findall(plainContents)
+		wordCount = collections.defaultdict(int)
+		
+		if filterStopwords:
+			stopwords = Document.getStopwords()
+			words = [ word for word in words if word not in stopwords ] # Remove all stopwords		
+		
+		for word in words:
+			wordCount[word] += 1
+		
+		return words, wordCount
 	
 	def countWords(self, store=True):
 		words, plainWordCount = self.plainWordCount()
@@ -208,7 +215,6 @@ class Document(StoredObject):
 			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
 			idf = math.log(float(documentCount) / (1+wordCountsByKey.get(key,0)))			
 			tfidf[word] = (idf*tf, key)
-		print "ltf done"
 		
 	def documentAnalysis(self):
 		if len(self.tags) == 0 or not isinstance(self.tags, dict):

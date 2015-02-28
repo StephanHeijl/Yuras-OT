@@ -317,7 +317,7 @@ def documentTFIDF(id):
 @login.login_required
 def documentArticles(id):
 	try:
-		document = Document().matchObjects({"_id": id}, fields={"_id":True,"contents":True})[0]
+		document = Document().matchObjects({"_id": id}, fields={"_id":True,"title":True, "category":True, "contents":True, "tags":True, "wordcount":True})[0]
 	except Exception as e:
 		traceback.print_exc(file=sys.stdout)
 		return abort(404)
@@ -331,13 +331,29 @@ def addJurisprudenceDocuments():
 	
 	return json.dumps({"success":"true"})
 
+@app.route("/documents/full-articles")
+@login.login_required
+def fullArticlesRun():	
+	print "Performing total articles run."
+	allDocuments = Document().matchObjects(
+		{},
+		fields={"_id":True,"title":True, "category":True, "contents":True, "tags":True, "wordcount":True}
+	)
+	
+	for d in allDocuments:
+		print "Articles for", d.title,
+		d.getArticlesFromContent()
+		print len(d.articles),"results"
+	
+	return json.dumps({"success":"true"})
+
 @app.route("/documents/full-tfidf")
 @login.login_required
 def fullTFIDFRun():	
 	print "Performing total TFIDF run."
 	allDocuments = Document().matchObjects(
 		{},
-		fields={"_id":True,"title":True, "category":True, "contents":True, "wordcount":True}
+		fields={"_id":True,"title":True, "category":True, "contents":True, "wordcount":True, "articles":True}
 	)
 	
 	for d in allDocuments:

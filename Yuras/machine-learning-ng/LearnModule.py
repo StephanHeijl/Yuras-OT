@@ -1,7 +1,6 @@
 import json, os, argparse, collections, re, math, pprint
 
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 from sklearn.linear_model import SGDClassifier
 from sklearn.svm import SVC
@@ -21,6 +20,20 @@ class LearnModule():
 		self.categorizedData = None
 		self.stopWords = []
 		self.tfidf = None
+		
+		"""
+			Regex explained:
+			
+				((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )? 						# Xde lid van... (Optional)
+				[aA]rtikel(en)? \d+\w?(:\d+)? 															# Article number and suffix
+				((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)? 	# Xde lid van or lid X van (Optional)
+				([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?													# Abbreviation suffix (Optional)
+				[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?				# Article book or source (Optional)
+		
+		"""
+		
+		articleRegexString = "((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )?[Aa]rtikel(en)? \d+\w?(:\d+)?((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)?([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?"
+		self.articleRegex = re.compile(articleRegexString)
 			
 	def parseArguments(self):
 		self.argparser.add_argument("--in", type=str, help="The directory to walk.", required=True)
@@ -37,9 +50,6 @@ class LearnModule():
 				if strippedKey not in categorizedData:
 					categorizedData[strippedKey] = []
 				
-				if len(self.stopWords) > 0:
-					for sw in self.stopWords:
-						value = value.replace(sw, "")
 				categorizedData[strippedKey].append(value)
 				
 		self.categorizedData = categorizedData
@@ -57,6 +67,24 @@ class LearnModule():
 	def getStopWords(self, path):
 		with open(path) as stopWords:
 			self.stopWords = stopWords.read().split("\n")
+			
+	def tokenizer(self, string):
+		tokens = re.split("[^\w]", string)
+		for sw in self.stopWords:
+			tokens = filter(lambda t: t!=sw, tokens)
+		
+		articles = self.getArticlesFromContent(string)
+		print articles
+		tokens += articles*50
+		return tokens
+	
+	def getArticlesFromContent(self, string):			
+		results = []
+		
+		for result in self.articleRegex.finditer(string):
+			results.append(result.group(0).strip(",. "))		
+		return results
+		
 	
 	def processDocuments(self, data):
 		allDocuments = []
@@ -74,7 +102,7 @@ class LearnModule():
 				allDocuments.append(document.lower())
 				
 		if self.tfidf is None:
-			tfidf = TfidfVectorizer()
+			tfidf = TfidfVectorizer(strip_accents='ascii', tokenizer=self.tokenizer)
 			self.tfidf = tfidf
 			return tfidf.fit_transform(allDocuments), categoryList
 		else:
@@ -156,6 +184,6 @@ if __name__ == "__main__":
 		lm.getStopWords(args.get("stopwords",""))
 	
 	lm.analyzeJSON(args.get("in", None))
-	lm.fullTraining()
-	#lm.xfoldMachine(10, classifier=clf)
+	#lm.fullTraining()
+	lm.xfoldMachine(10, classifier=None)
 	

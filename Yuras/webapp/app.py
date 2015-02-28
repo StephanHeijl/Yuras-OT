@@ -82,8 +82,8 @@ class Server(threading.Thread):
 			try:
 				print ("Starting on port %s..." % self.PORT)
 				http_server = HTTPServer(WSGIContainer(app))
-				http_server.bind(self.PORT)
-				http_server.start(0)
+				http_server.listen(self.PORT)
+				#http_server.start(0)
 				IOLoop.instance().start()
 				serverStarted = True
 			except Exception as e:
