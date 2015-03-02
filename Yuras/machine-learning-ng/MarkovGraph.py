@@ -1,118 +1,134 @@
 from graph_tool.all import *
-import pprint, random, re
+import pprint, random, re, time
 
 class MarkovGraph():
 	def __init__(self):
 		self.text = ""
 		self.tokens = []
+		with open("stopwords.txt") as stopwords:
+			self.stopwords = stopwords.read().split("\n")
 	
 	def getfile(self):
 		with open("wbvstrafrecht.txt") as f:
-			self.text = f.read()[:10000]
+			self.text = f.read()[:100000]
 			
 	def tokenize(self):
 		text = self.text.replace(".", " . ")
 		text = text.replace(",", " , ")
 		tokens = re.split("[^a-zA-Z\,\.]", text.lower())
-		self.tokens = [t for t in tokens if t!=""]
+		self.tokens = [t for t in tokens if t!="" and t not in self.stopwords]
 		print "Found",len(self.tokens),"tokens"
 		
-	def chain(self):
-		chain = {}
-		for t, token in enumerate(self.tokens):
-			if token not in chain:
-				chain[token] = {"total":0,"tokens":{}}
-			try:
-				nextt = self.tokens[t+1]
-			except:
-				continue
-			if nextt not in chain[token]["tokens"]:
-				chain[token]["tokens"][nextt] = 0
-			chain[token]["tokens"][nextt]+=1
-			chain[token]["total"]+=1
-					
-		nchain = {}
-		for token in chain:
-			nchain[token] = []
-			total = float(chain[token]["total"])
-			sortedNTokens = sorted(chain[token]["tokens"].items(), key=lambda t:t[1], reverse=True)
-			for t,v in sortedNTokens:
-				nchain[token].append((t,v/total))
-				
-		self.chain = nchain
 		
-	def creategraph(self):
+	def graphTokens(self, rootName="*"):
 		G = Graph()
-		weights = []
-		vertices = {}
+		root = G.add_vertex()
 		
 		wordprop = G.new_vertex_property('string')
-		weightprop = G.new_edge_property('double')
+		weightprop = G.new_edge_property('int')
+		
+		currentVertex = root
+		wordprop[root] = rootName
+		
+		for token in self.tokens:
+			if token in [",","."]:
+				currentVertex = root
+				continue
 			
-		for source,destinations in self.chain.items():
-			sourcelabel = "".join([l for l in source if ord(l) < 128])
-			if sourcelabel not in vertices:
-				vertices[sourcelabel] = G.add_vertex()
-				wordprop[vertices[sourcelabel]] = sourcelabel
+			foundVertex = False			
 			
-			for dest, score in destinations:
-				destlabel = "".join([l for l in dest if ord(l) < 128])
-				if destlabel not in vertices:
-					vertices[destlabel] = G.add_vertex()
-					wordprop[vertices[destlabel]] = destlabel
+			for e in currentVertex.out_edges():
+				if wordprop[e.target()] == token:
+					currentVertex = e.target()
+					weightprop[e] += 1
+					foundVertex = True
+					break
+			
+			if foundVertex:
+				continue
+			
+			v = G.add_vertex()
+			wordprop[v] = token
+			e = G.add_edge(currentVertex, v)
+			currentVertex = v
+			weightprop[e] = 1
+			
+		self.graph = G
+		self.wordprop = wordprop
+		self.weightprop = weightprop
+			
+	def visGraph(self):
+		G = self.graph
+		pos = radial_tree_layout(G, 0)
+		graph_draw(G, pos=pos, output="graph.png",output_size=(10000, 10000))
+		
+	def findWord(self, word):
+		wordprop = self.wordprop
+		weightprop = self.weightprop
+		G = self.graph
+		
+		results = []
+		
+		for i in range(len(self.tokens)):
+			try:
+				v = G.vertex(i)
+				wprop = wordprop[v]
+			except:
+				break
+				
+			if wprop == word:
+				results.append( {"v":v} )
+
+		return results
+		
+		
+	def constructSentence(self, word):
+		results = self.findWord(word)
+		root = self.graph.vertex(0)
+		sentence = []
+		
+		for result in results:
+			v = result["v"]
+			currentVertex = v
+
+			while currentVertex!=root:
+				sentence.append( self.wordprop[currentVertex])
+				for e in currentVertex.in_edges():
+					currentVertex = e.source()
 					
-				edge = G.add_edge(vertices[sourcelabel], vertices[destlabel])
-				weightprop[edge] = score
+			sentence.reverse()
+			
+			outedges = [e for e in currentVertex.out_edges()]
+			while len(outedges) > 0:
+				edges = [(e,self.weightprop[e]) for e in outedges]
+				edges.sort(key=lambda e: e[1], reverse=True)
+				currentVertex = edges[0][0].target()
+				print currentVertex
+				sentence.append(self.wordprop[currentVertex])
+				outedges = [e for e in currentVertex.out_edges()]
+					
+			print " ".join(sentence)
+			
+			print 
 				
 				
-				weights.append(score)		
-		
-		self.vertices = vertices
-		return G, wordprop, weightprop
-	
-	def traverseGraph(self, g, wordprop, weightprop):
-		target,destination = random.sample(self.vertices.values(),2)
-		currentVertex = target
-		maxSteps = 100
-		step = 0
-		chain = []
-		
-		while currentVertex != destination and step< maxSteps:
-			step+=1
-			edges = sorted( [(edge.target(), weightprop[edge]) for edge in currentVertex.out_edges() ], key=lambda e: e[1], reverse=True)
-			choices = []
-			for edge in edges:
-				for e in range(int(edge[1]*100)+1):
-					choices.append(edge)
-			currentVertex = random.choice(choices)[0]
-			chain.append( wordprop[currentVertex] )
-			
-		cap = True
-		description = ""
-		for word in chain:
-			word = " "+word
-			if cap:
-				word = word[0].upper() + word[1:]
-				cap = False
-			if word[1] in [".",","]:
-				word = word[1]	
-				if word == ".":
-					cap = True
-			description+= word
-			
-		print description
-		
-		
-	def drawGraph(self, G, wordprop, weightprop):		
-		pos = sfdp_layout(G, eweight=weightprop, C=5, verbose=True)
-		graph_draw(G, pos=pos, output="graph.pdf")
+				
 			
 if __name__ == "__main__":
 	mg = MarkovGraph()
 	mg.getfile()
 	mg.tokenize()
-	mg.chain()
-	graph, wordprop, weightprop = mg.creategraph()
-	mg.traverseGraph(graph, wordprop, weightprop)
+	
+	mg.graphTokens(rootName="*")
+	mg.constructSentence("wet")
+	
+	mg.visGraph()
+	
+	#mg.chain()
+	
+	
+	
+	#graph, wordprop, weightprop = mg.creategraph()
+	#mg.traverseGraph(graph, wordprop, weightprop)
 	#mg.drawGraph(graph, wordprop, weightprop)
 	

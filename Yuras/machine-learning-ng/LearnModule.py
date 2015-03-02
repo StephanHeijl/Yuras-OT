@@ -51,8 +51,35 @@ class LearnModule():
 					categorizedData[strippedKey] = []
 				
 				categorizedData[strippedKey].append(value)
-				
+		
 		self.categorizedData = categorizedData
+		
+	def JSONtoCSV(self, path):
+		data = json.load(open(path))
+		flattenedData = self.__flatten(data)
+		categorizedData = {}
+		
+		for key, value in flattenedData.items()[:1000]:
+			cat = key.split("_")[2]
+			if cat == "strafrecht":
+				cat+= "-" + key.split("_")[3]
+			categorizedData[key.split("_")[-1]] = (self.getArticlesFromContent(value), cat)
+					
+		articles = []
+		for ararr in categorizedData.values():
+			articles += ararr[0]
+		articles = list(set(articles))
+		
+		print ",".join(["\""+s+"\"" for s in articles+["category"]])
+		for t, (a, c) in categorizedData.items():
+			data = []
+			for ai in articles:
+				if ai in a:
+					data.append("\"y\"")
+				else:
+					data.append("\"n\"")
+			print ",".join(data + ["\""+c+"\""])
+		
 		
 	def __flatten(self,d, parent_key='', sep='_'):
 		items = []
@@ -78,12 +105,14 @@ class LearnModule():
 		tokens += articles*50
 		return tokens
 	
-	def getArticlesFromContent(self, string):			
+	def getArticlesFromContent(self, string):
 		results = []
 		
 		for result in self.articleRegex.finditer(string):
-			results.append(result.group(0).strip(",. "))		
-		return results
+			results.append(result.group(0).strip(",. "))
+			
+		filteredResults = [j for i, j in enumerate(results) if all(j not in k for k in results[i + 1:])]
+		return filteredResults
 		
 	
 	def processDocuments(self, data):
@@ -102,7 +131,8 @@ class LearnModule():
 				allDocuments.append(document.lower())
 				
 		if self.tfidf is None:
-			tfidf = TfidfVectorizer(strip_accents='ascii', tokenizer=self.tokenizer)
+			#tfidf = TfidfVectorizer(strip_accents='ascii', tokenizer=self.tokenizer)
+			tfidf = TfidfVectorizer(stop_words=self.stopWords,analyzer="char", norm=None, ngram_range=(1,2))
 			self.tfidf = tfidf
 			return tfidf.fit_transform(allDocuments), categoryList
 		else:
@@ -183,7 +213,8 @@ if __name__ == "__main__":
 	if "stopwords" in args:
 		lm.getStopWords(args.get("stopwords",""))
 	
-	lm.analyzeJSON(args.get("in", None))
+	lm.JSONtoCSV(args.get("in", None))
+	#lm.analyzeJSON(args.get("in", None))
 	#lm.fullTraining()
-	lm.xfoldMachine(10, classifier=None)
+	#lm.xfoldMachine(10, classifier=None)
 	
