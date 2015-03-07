@@ -1,4 +1,5 @@
 import requests, time, json
+from xml.dom.minidom import parse, parseString
 
 url = "http://uitspraken.rechtspraak.nl/api/zoek"
 payload = """{"PageIndex":%s,"PageSize":%s,"ShouldReturnHighlights":true,"ShouldCountFacets":true,"SortOrder":"Relevance","SearchTerms":[],"Contentsoorten":[{"NodeType":7,"Identifier":"uitspraak","level":1}],"Rechtsgebieden":[],"Instanties":[],"DatumPublicatie":[],"DatumUitspraak":[],"Advanced":{"PublicatieStatus":"AlleenGepubliceerd"},"CorrelationId":"704cf0dbc2f84f91a159151af2979c1a"}"""
@@ -17,11 +18,10 @@ headers = { "Host":" uitspraken.rechtspraak.nl",
 "Accept-Language":" nl-NL,nl;q=0.8,en-US;q=0.6,en;q=0.4",
 "Cookie":" WT_FPC=id=92.110.83.17-3079728544.30424086:lv=1425485400003:ss=1425484112277" }
 
-importioapi = "https://api.import.io/store/data/1e925fc7-26d7-4774-b5cb-66e4323c9580/_query?input/webpage/url={}&_user=25ce5931-7842-406c-8e24-5b3594f52ecc&_apikey=EFgA9V0bfcD4Eaj%2BOdFKaNzxAUk2spuzzLn%2BJwssq%2BQ6elaPDx3qsygYnd1swOl3bmsRmC9%2FGig%2B1A2QvpIE8w%3D%3D"
-documenturl = "http://uitspraken.rechtspraak.nl/inziendocument?id="
+documenturl = "http://data.rechtspraak.nl/uitspraken/content?id="
 
 uitspraken = 314216
-n = 1
+n = 1735
 step = 100
 
 starttime = time.time()
@@ -30,11 +30,18 @@ timen = 1
 print "ID\tpage\tstep\tresult"
 while n*step < uitspraken:
 	resultsOutput = open("rechtspraak.nl-page-%s.json" % n, "w")
-	
-	r = requests.post(url, payload % (n, step), headers=headers)
-	#print payload % (n, n*step)
+	results = []
 	resultsDict = {}
-	for r, result in enumerate(r.json()["Results"]):
+	while len(results) == 0:
+		r = requests.post(url, payload % (n, step), headers=headers)
+		print url
+		try:
+			results = r.json()["Results"]
+		except:
+			time.sleep(30)
+			
+		
+	for r, result in enumerate(results):
 		_id = result["TitelEmphasis"]
 		
 		totalelapsed = time.time() - starttime
@@ -53,16 +60,60 @@ while n*step < uitspraken:
 		timen+=1
 		resultsDict[_id] = result
 		
-		apiurl = importioapi.format(documenturl+_id)
+		apiurl = documenturl+_id
 		document = requests.get(apiurl)
+		
+		parsedDocument = {}
+		
+		xml = parseString(document.content)
 		try:
-			resultsDict[_id]["contents"] = document.json()
+			uitspraak = xml.getElementsByTagName("uitspraak")[0]
+		except:
+			continue
+
+		parsedDocument["uitspraak"] = []
+		for para in uitspraak.getElementsByTagName("para"):
+			try:
+				parsedDocument["uitspraak"].append(para.firstChild.nodeValue)
+			except:
+				pass
+			
+		parsedDocument["id"] = _id
+		
+		try:
+			parsedDocument["datum_uitspraak"] = xml.getElementsByTagName("dcterms:date")[0].firstChild.nodeValue
+		except:
+			pass		
+		try:
+			parsedDocument["datum_publicatie"] = xml.getElementsByTagName("dcterms:issued")[0].firstChild.nodeValue
+		except:
+			pass
+		try:
+			parsedDocument["zaaknummer"] = xml.getElementsByTagName("psi:zaaknummer")[0].firstChild.nodeValue
+		except:
+			pass
+		try:
+			parsedDocument["bijzondere_kenmerken"] = xml.getElementsByTagName("dcterms:subject")[0].firstChild.nodeValue
+		except:
+			pass
+		
+		try:
+			parsedDocument["inhoudsindicatie"] = xml.getElementsByTagName("inhoudsindicatie")[0].firstChild.firstChild.nodeValue
+		except:
+			pass
+		
+		
+		resultsDict[_id]["contents"] = {}
+		resultsDict[_id]["contents"]["results"] = parsedDocument
+		
+		
+		try:
+			pass
 		except:
 			print "Error on", _id
 			time.sleep(30)
 		
-		
+	
 	json.dump(resultsDict,resultsOutput)
 	resultsOutput.close()
 	n+=1
-	

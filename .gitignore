@@ -41,3 +41,4 @@ env/
 *.csv
 output*/
 *.pyc
+rechtspraak/*.json

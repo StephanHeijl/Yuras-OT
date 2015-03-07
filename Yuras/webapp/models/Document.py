@@ -48,19 +48,8 @@ class Document(StoredObject):
 			hashedWordCount[key] = count
 		results += dict(hashedWordCount).items()
 		
-	def getArticlesFromContent(self):		
-		"""
-			Regex explained:
-			
-				((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )? 						# Xde lid van... (Optional)
-				[aA]rtikel(en)? \d+\w?(:\d+)? 															# Article number and suffix
-				((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)? 	# Xde lid van or lid X van (Optional)
-				([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?													# Abbreviation suffix (Optional)
-				[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?				# Article book or source (Optional)
-		
-		"""
-		
-		articleRegexString = "((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )?[Aa]rtikel(en)? \d+\w?(:\d+)?((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)?([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?"
+	def getArticlesFromContent(self):
+		articleRegexString = "([Aa]rtikel(en)?|art\.) ((\d+|[IVX]+)([:\.]\d+)?([a-z]+)?( en |, ?)?)+ ?(([etdvzan][ewic][a-z]+?((d|st)e[^a-z]))?(lid|paragraaf|volzin)( \d+)?([, ])*)*((van|het|de|Wet|wet) )*( ?(([A-Z]([A-Z]{1,4}|[a-z]{1,2}))[^\w]) ?(\d{4})?|([\w\-]+ ?)+ ?(\d{4})?)"
 		articleRegex = re.compile(articleRegexString)
 		
 		results = set()

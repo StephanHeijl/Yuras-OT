@@ -319,7 +319,7 @@ class Storage(Singleton):
 		if self.__currentCollection == None:
 			raise ValueError, "There was no collection selected"
 			
-		if self.__encryptDocuments:
+		if self.__encryptDocuments and document.get("_encrypt",True):
 			encryptedDocument = self.__encryptDocument(document)
 			self.__currentCollection.insert( encryptedDocument )
 			document["_id"] = encryptedDocument["_id"]

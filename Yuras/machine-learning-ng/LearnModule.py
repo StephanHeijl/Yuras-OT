@@ -1,11 +1,7 @@
 import json, os, argparse, collections, re, math, pprint
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-
-from sklearn.linear_model import SGDClassifier
 from sklearn.svm import SVC
-from sklearn.naive_bayes import GaussianNB,MultinomialNB,BernoulliNB
-
 from sklearn import metrics
 
 import cPickle as pickle
@@ -24,15 +20,15 @@ class LearnModule():
 		"""
 			Regex explained:
 			
-				((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )? 						# Xde lid van... (Optional)
+				((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )? 						# Xde lid/paragraaf van... (Optional)
 				[aA]rtikel(en)? \d+\w?(:\d+)? 															# Article number and suffix
-				((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)? 	# Xde lid van or lid X van (Optional)
+				((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)? 	# Xde lid/paragraaf van or lid/paragraaf X van (Optional)
 				([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?													# Abbreviation suffix (Optional)
 				[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?				# Article book or source (Optional)
 		
 		"""
 		
-		articleRegexString = "((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid van )?[Aa]rtikel(en)? \d+\w?(:\d+)?((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}lid (\d+)?)?([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?"
+		articleRegexString = "(ECLI:[\w:]+|BNB \d+/\d+)|((eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) (lid|paragraaf) van )?[Aa]rtikel(en)? \d+\w?(:\d+)?((.{1,3}(eer|twee|derd|vier|vijf|zes|zeven|acht|negen)(de|ste) lid)|.{1,3}(lid|paragraaf) (\d+)?)?([^\.\n]{,10}(RV|BW|SV|Sr|PBW|EVRM))?[, ]?(( ?van ?)?( ?de ?)?( ?het ?)?([A-Z][A-Za-z\-]+ ?(([a-z\-]+)? )?)+)?"
 		self.articleRegex = re.compile(articleRegexString)
 			
 	def parseArguments(self):
@@ -114,7 +110,6 @@ class LearnModule():
 		filteredResults = [j for i, j in enumerate(results) if all(j not in k for k in results[i + 1:])]
 		return filteredResults
 		
-	
 	def processDocuments(self, data):
 		allDocuments = []
 		categoryList = []

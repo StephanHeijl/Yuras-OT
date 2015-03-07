@@ -12,7 +12,6 @@ class Config(Singleton):
 		if self.instantiated:
 			return 
 		currentDir = os.path.dirname(__file__)
-		print currentDir
 		
 		# guardStore.conf is the configuration file that is loaded for guardStore
 		if configurationPath == None:
@@ -30,7 +29,6 @@ class Config(Singleton):
 		self.configFileName = ""
 		""" This attribute stores the location where the configuration is to be saved. """
 		
-		print guardStoreConfPath
 		if os.path.exists(guardStoreConfPath):
 			self.setConfig(json.load( open(guardStoreConfPath, "r") ))
 			self.configFileName = guardStoreConfPath
