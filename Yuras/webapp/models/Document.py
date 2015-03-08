@@ -24,6 +24,10 @@ class Document(StoredObject):
 		self.wordcount = {}
 		
 		self.accessible = True
+		if getattr(self,"_encrypt",True):
+			self.scryptHashFactor = 9
+		else:
+			self.scryptHashFactor = 1
 		
 		self.secure = False
 		
@@ -44,7 +48,7 @@ class Document(StoredObject):
 		hashedWordCount = collections.defaultdict(int)
 		salt = str(Config().database)
 		for word, count in plainWordCount:
-			key = b64enc(scrypt.hash(str(word), salt, N=1<<9))
+			key = b64enc(scrypt.hash(str(word), salt, N=1<<self.scryptHashFactor))
 			hashedWordCount[key] = count
 		results += dict(hashedWordCount).items()
 		
@@ -87,7 +91,7 @@ class Document(StoredObject):
 		manager = multiprocessing.Manager()
 		results = manager.list()
 
-		cores = multiprocessing.cpu_count()
+		cores = multiprocessing.cpu_count() 
 		chunkSize = len(plainWordCount)/cores
 
 		pool = []
@@ -131,6 +135,9 @@ class Document(StoredObject):
 			a.linked_to = int(annotation["linked-to"])
 						
 			a.save()
+			
+	def vanillaSave(self):
+		return super(Document, self).save()
 		
 	def save(self, title, contents, category, annotations):
 		# Set contents
@@ -162,7 +169,7 @@ class Document(StoredObject):
 		matchedObjects = {}
 		
 		for word in words:
-			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<self.scryptHashFactor))
 			matchedObjects["tags."+key] = { "$exists": True }
 		
 		results = self.matchObjects(matchedObjects, fields={"_id":True,"title":True})
@@ -201,7 +208,7 @@ class Document(StoredObject):
 	def __loopTermFrequencies(self, termFrequencies, tfidf, documentCount, wordCountsByKey ):
 		# This function is paralellized due to the large amount of words and long CPU times.
 		for word, (count, tf) in termFrequencies:
-			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<self.scryptHashFactor))
 			idf = math.log(float(documentCount) / (1+wordCountsByKey.get(key,0)))			
 			tfidf[word] = (idf*tf, key)
 		
@@ -359,7 +366,9 @@ class Document(StoredObject):
 		return dict(items)
 	
 	@staticmethod
-	def generateJurisprudenceDocuments():
+	def generateJurisprudenceDocuments(documentClass=None):
+		if documentClass is None:
+			documentClass = Document
 		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
 		
 		stopwords = Document.getStopwords()
@@ -382,13 +391,13 @@ class Document(StoredObject):
 					c.save()
 
 			if len(Document().getObjectsByKey("title", title)) == 0:
-				d = Document()
+				d = documentClass()
 				d.title = title
 				d.category = key
 				d.contents = Pandoc().convert("html","markdown_github", document)
 				d.author = "Yuras"
 				d.countWords()
-				super(Document, d).save()
+				d.vanillaSave()
 
 			categorized[key].append(document)
 			print title, "saved", dCounter, "/", dTotal

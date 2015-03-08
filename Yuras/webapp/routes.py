@@ -16,7 +16,7 @@ from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
 from Yuras.common.Config import Config
 
-from Yuras.webapp.models.Document import Document
+from Yuras.webapp.models.PublicDocument import PublicDocument as Document
 from Yuras.webapp.models.Annotation import Annotation
 from Yuras.webapp.models.User import User
 from Yuras.webapp.models.Category import Category
@@ -327,7 +327,7 @@ def documentArticles(id):
 @app.route("/documents/add-jurisprudence")
 @login.login_required
 def addJurisprudenceDocuments():
-	Document.generateJurisprudenceDocuments()
+	Document.generateJurisprudenceDocuments( Document )
 	
 	return json.dumps({"success":"true"})
 
@@ -375,7 +375,7 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 			
 		word = word.lower()
 					
-		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<9))
+		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<Document().scryptHashFactor))
 		keys.append(key)
 		wordCountList.append( {"wordcount."+key : { "$exists": True }} )
 		fields["wordcount."+key] = True
@@ -395,7 +395,10 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 	try:
 		results = Document().matchObjects(
 			matchArray,
-			fields=fields
+			fields=fields,
+			skip=skip,
+			limit=limit,
+			sort=[("wordcount."+key, -1) for key in keys]
 		)
 	except:
 		return []
@@ -415,8 +418,9 @@ def do_documentSearch(keywords, category=None, skip=0, limit=10):
 			end = wordIndex + len(word) + surroundLength
 			result.markedContents.append( result.contents[start:end].replace(word, "<span class='marked'>"+word+"</span>") )
 	
-	results.sort(key=lambda r:tuple([len(r.wordcount)] + [r.wordcount.get(k,0) for k in keys]),reverse=True)
-	return results[skip*limit:(skip+1)*limit]
+	#results.sort(key=lambda r:tuple([len(r.wordcount)] + [r.wordcount.get(k,0) for k in keys]),reverse=True)
+	return results
+	#return results[skip*limit:(skip+1)*limit]
 
 @app.route("/documents/qsearch")
 @login.login_required
@@ -501,8 +505,8 @@ def documentsUpload():
 			print "Classifying"
 			document.category = classifier.predict( matrix )[0]
 		
-		document.wordCount()
-		document.save()
+		document.countWords()
+		document.vanillaSave()
 		print "Document saved", document._id
 
 		if error is None:

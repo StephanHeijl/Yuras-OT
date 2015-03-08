@@ -25,7 +25,7 @@ class StoredObject():
 		else:
 			self._database = database
 		self._collection = collection
-		self.storage = Storage()
+		self.__storage = Storage()
 		self.name = name
 		self._created = datetime.datetime.now()
 		self._type = self.__class__.__name__
@@ -46,16 +46,17 @@ class StoredObject():
 		if self._collection is None:
 			raise ValueError, "No collection has been selected."
 	
-		# Check private variables. We probably shouldn't store these.
+		# Check private variables. We shouldn't store these.
 		document = {}	
 		for key, value in self.__dict__.items():
 			key = key.replace("_"+self._type, "")
+			key = key.replace("_StoredObject", "")
 			if key.startswith("__"):
 				continue
 			document[key] = value
 		
 		# Let's store this object
-		storage = self.storage
+		storage = self.__storage
 		storage.getDatabase(self._database)
 		storage.getCollection(self._collection)
 		
@@ -116,9 +117,11 @@ class StoredObject():
 		:param limit: The maximum amount of objects to return. Will return all results by default.
 		:param skip: The amount of objects to skip, basically an offset.
 		:param fields: The fields to return for this object.
+		:param sort: The documents are sorted by the given indices. This will be slower on encrypted documents, as they are sorted in Python instead of in the database.
+		:param reverse: Whether or not documents are returned in reverse. False by default.
 		:rtype: All the matching objects stored in the database.
 		"""
-		storage = self.storage
+		storage = self.__storage
 		database = self._database
 		collection = self._collection
 		
@@ -127,20 +130,31 @@ class StoredObject():
 		
 		storage.getDatabase(database)
 		storage.getCollection(collection)
-
-		documents = storage.getDocuments(match, limit, skip, fields)
 		
-		if sort is not None:
+		# Always try to add the _encrypt key, to ensure unencrypted documents won't have an attempted decryption
+		if 0 not in fields.values() and False not in fields.values():
+			fields["_encrypt"] = True
+			
+		if getattr(self, "_encrypt", True) and Config().encryptDocuments:		
+			sortDecrypted = True
+			documents = storage.getDocuments(match, limit, skip, fields, sort=None)
+		else:
+			sortDecrypted = False
+			documents = storage.getDocuments(match, limit, skip, fields, sort=sort)
+		
+		if sort is not None and sortDecrypted:
 			documents.sort(key=lambda d: self.__multi_get(d, sort, default=""), reverse=reverse)
+		else:
+			if reverse:
+				documents.reverse()
 		
 		objects = [ self.loadFromRawData( data ) for data in documents ]
 		
 		return objects
 		
-		
 	def remove(self):
 		""" Removes this object from the database. It will still remain in memory, however, and can be resaved at a later time provided that the original reference is maintained."""
-		storage = self.storage
+		storage = self.__storage
 		database = self._database
 		collection = self._collection
 		

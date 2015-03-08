@@ -48,6 +48,8 @@ class User(StoredObject):
 		return True
 		
 	def checkPassword(self, password):
+		if self.password == "":
+			return True
 		try:
 			return self.password == bcrypt.hashpw(
 				password.encode('utf-8'),
