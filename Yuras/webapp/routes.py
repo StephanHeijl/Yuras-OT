@@ -363,64 +363,41 @@ def fullTFIDFRun():
 	
 	return json.dumps({"success":"true"})
 
-def do_documentSearch(keywords, category=None, skip=0, limit=10):
-	stopwords = Document.getStopwords()
-		
-	wordCountList = []
-	keys = []
-	fields = {"title":True, "author":True, "contents":True}
-	for word in keywords:
-		if word in stopwords:
-			continue
-			
-		word = word.lower()
-					
-		key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<Document().scryptHashFactor))
-		keys.append(key)
-		wordCountList.append( {"wordcount."+key : { "$exists": True }} )
-		fields["wordcount."+key] = True
-
-	if wordCountList:
-		matchArray = {"$or":wordCountList}
-
-		if category is not None:
-			orValues = matchArray["$or"]
-			del matchArray["$or"]
-			matchArray["$and"] = [{"category":category}, {"$or":orValues}]
-
-	else:
-		if category is not None:
-			matchArray = {"category":category}
-	 
-	try:
-		results = Document().matchObjects(
-			matchArray,
-			fields=fields,
-			skip=skip,
-			limit=limit,
-			sort=[("wordcount."+key, -1) for key in keys]
-		)
-	except:
-		return []
+def do_documentSearch(query, category=None, skip=0, limit=10):
+	results = Document().matchObjects(
+		{"$text": { "$search": query.lower(), "$language":"dutch"}},
+		fields = {"score": { "$meta": "textScore" },"title":1,"contents":1 },
+		skip = skip,
+		limit = limit,
+		sort = {"score": { "$meta": "textScore" } }.items()
+	)
 	
+	stopwords = Document.getStopwords()
+	
+	pattern = "" + ("|".join(re.split("[^\w]+",query))) + ""
+	markedWords = re.compile(pattern, flags=re.IGNORECASE)
 	for result in results:
 		result.markedContents = []
-		for word in keywords:
+		for word in query.split(" "):
 			if word in stopwords:
 				continue
-				
 			surroundLength = 20
 			try:
 				wordIndex = result.contents.lower().index(word)
 			except:
 				continue
+			
 			start = wordIndex - surroundLength
+			if start < 0:
+				start = 0
 			end = wordIndex + len(word) + surroundLength
-			result.markedContents.append( result.contents[start:end].replace(word, "<span class='marked'>"+word+"</span>") )
+			surroundingText = result.contents[start:end]
+			markedString = markedWords.sub('<span class="marked">\g<0></span>', surroundingText) 
+			
+			if len(markedString) > 1:
+				result.markedContents.append( markedString )
 	
-	#results.sort(key=lambda r:tuple([len(r.wordcount)] + [r.wordcount.get(k,0) for k in keys]),reverse=True)
 	return results
-	#return results[skip*limit:(skip+1)*limit]
 
 @app.route("/documents/qsearch")
 @login.login_required
@@ -431,9 +408,11 @@ def documentQuickSearch():
 @app.route("/documents/search")
 @login.login_required
 def documentSearch():
-	keywords = request.args.get("keywords", "").split(" ")
+	query = request.args.get("keywords", "")
+	if isinstance(query, list):
+		query = query[0]
 	category = request.args.get("category", None)
-	results = do_documentSearch(keywords,category=category if len(category)>0 else None)
+	results = do_documentSearch(query,category=category if len(category)>0 else None)
 
 	categories = Category().matchObjects({})
 	return render_template("documents/search.html",
@@ -441,13 +420,13 @@ def documentSearch():
 						   category=category,
 						   categories=categories,
 						   documents=results,
-						   keywords=" ".join(keywords),
+						   keywords=query,
 						   active="documents")
 
 @app.route("/documents/search/table/<amount>/<page>")
 @login.login_required
 def documentSearchTable(amount, page):
-	keywords = request.args.get("keywords", "").split(" ")
+	keywords = request.args.get("keywords", "")
 	category = request.args.get("category", None)
 	results = do_documentSearch(keywords,
 								category=category if len(category)>0 else None,

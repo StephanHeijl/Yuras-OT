@@ -13,5 +13,7 @@ db = conn.getDB(database);
 print("* Selected Client Database.");
 db.documents.ensureIndex( { "tags" : 1 } );
 print("* Ensured index on tags.");
+db.documents.createIndex( { contents: "text" } )
+print("* Ensured text index on contents.");
 
 print("\nAll done.\n");

@@ -342,7 +342,7 @@ class Storage(Singleton):
 		if self.__currentCollection == None:
 			raise ValueError, "There was no collection selected"
 			
-		if self.__encryptDocuments:
+		if self.__encryptDocuments and document.get("_encrypt",True):
 			document = self.__encryptDocument(document)
 						
 		self.__currentCollection.save( document )
@@ -362,7 +362,7 @@ class Storage(Singleton):
 		self.__currentCollection.remove(match)
 		return True
 		
-	def getDocuments(self, match, limit=None, skip=0, fields={}, sort=None):
+	def getDocuments(self, match, limit=None, skip=0, fields={}, sort=None, _encrypted=True):
 		""" Returns all documents that match the give query, up until `limit` is reached. By default, this will return every single result.
 		Refer to the [MongoDB documentation](http://docs.mongodb.org/manual/tutorial/query-documents) on this subject for more information on queries.
 		This method will also work if documents are encrypted.
@@ -383,8 +383,10 @@ class Storage(Singleton):
 		if "_id" in match and (isinstance(match["_id"], str) or isinstance(match["_id"], unicode)):
 			match["_id"] = ObjectId(match["_id"])			
 			
-		if self.__encryptDocuments:
+		if self.__encryptDocuments and _encrypted:
 			match = self.__encryptDocument(match)
+			
+		print match
 						
 		if fields == {}:
 			documents = self.__currentCollection.find(match, skip=skip)
@@ -398,7 +400,7 @@ class Storage(Singleton):
 			documents = documents.sort(sort)
 			print sort
 		
-		if self.__encryptDocuments:
+		if self.__encryptDocuments and _encrypted:
 			decrypted = []
 			for d in documents:
 				if d.get("_encrypt",True):
