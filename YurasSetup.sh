@@ -1,8 +1,8 @@
-# tokumx prerequisites
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 505A7412
-echo "deb [arch=amd64] http://s3.amazonaws.com/tokumx-debs $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/tokumx.list
+# MongoDB 3.0.0 prerequisites
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.0.list
 sudo apt-get update
-sudo apt-get install python python-dev python-pip python-nose haskell-platform texlive python-scipy python-numpy libssl-dev tokumx libffi-dev openssl swig libssl-dev -y
+sudo apt-get install python python-dev python-pip python-nose haskell-platform texlive python-scipy python-numpy libssl-dev mongodb-org libffi-dev openssl swig libssl-dev -y
 # install pandoc
 sudo cabal update
 sudo cabal install pandoc
@@ -16,7 +16,7 @@ sudo mkdir /data/db
 sudo chown -R vagrant /data 
 
 # Start TokuMX database
-sudo service tokumx start
+sudo service mongodb start
 sleep 5
 mongo localhost:27017 --eval "database='Yuras1'" setupDatabase.js
 
