@@ -3,4 +3,4 @@ python:
   - "2.6"
   - "2.7"
 # command to install dependencies
-install: "./YurasSetup.sh"
+install: "sudo bash ./YurasSetup.sh"
