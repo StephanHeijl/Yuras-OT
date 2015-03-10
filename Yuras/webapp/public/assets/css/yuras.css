@@ -311,8 +311,9 @@ td.price small {
 }
 
 .file-icon:hover .file-icon-marker {
-	height: 30px;
-	transition: height 0.3s;
+	height: 35px;
+	transition: all 0.3s;
+	opacity:0.5;
 }
 
 .file-icon-marker:nth-child(2) {
@@ -380,6 +381,7 @@ td.price small {
 	transition: all 0.3s;
 	right: -10px;
 	top: -10px;
+	opacity:0.1;
 }
 
 .file-icon:hover .file-icon-fold-cover {

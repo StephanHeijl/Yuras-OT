@@ -45,23 +45,23 @@
 			{% for document in documents %}
 			<div class="col-md-2 document-item">
 				<div class="file-icon">
-					{% if loop.index % 3 >= 0 %}
+					{% if loop.index % 5 >= 0 %}
 					<div class="file-icon-marker teal-marker"></div>
 					{% endif %}
-					{% if loop.index % 3 >= 1 %}
+					{% if loop.index % 5 >= 2 %}
 					<div class="file-icon-marker red-marker"></div>
 					{% endif %}
-					{% if loop.index % 3 >= 2 %}
+					{% if loop.index % 5 >= 4 %}
 					<div class="file-icon-marker blue-marker"></div>
 					{% endif %}
 					
 					<div class="file-icon-fold"></div>
 					<div class="file-icon-fold-cover"></div>
 					
-					{% if loop.index % 3 == 0 %}
+					{% if loop.index % 7 == 0  %}
 					<div class="file-icon-image gavel"></div>
 					{% endif %}
-					{% if loop.index % 3 == 2 %}
+					{% if loop.index % 7 == 2 %}
 					<div class="file-icon-image">
 						<div class="glyphicon glyphicon-star"></div>
 					</div>
