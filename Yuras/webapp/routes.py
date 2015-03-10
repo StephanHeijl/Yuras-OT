@@ -166,7 +166,8 @@ def assets(assettype, filename):
 		"css" : "text/css",
 		"js" : "text/javascript",
 		"png" : "image/png",
-		"jpg" : "image/jpeg"
+		"jpg" : "image/jpeg",
+		"svg": "image/svg+xml"
 	}
 	
 	path = os.path.join(assetsFolder,assettype,filename)
@@ -186,7 +187,7 @@ def assets(assettype, filename):
 def documentsIndex():
 	documents = Document().matchObjects(
 		{},
-		limit=10,
+		limit=18,
 		fields={"title":True, "_created":True, "author":True, "secure":True, "_id":True}
 		)
 

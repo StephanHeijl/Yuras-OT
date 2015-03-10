@@ -127,7 +127,7 @@ class RechtspraakParser():
 	def learnArticles(self, documents):
 		# This regex matches everything after the initial article number.
 		articleRegex = re.compile(r"([Aa]rtikel(en)?|art\.) ((\d+|[IVX]+)([:\.]\d+)?([a-z]+)?( en |, ?)?)+ ?(([etdvzan][ewic][a-z]+?((d|st)e[^a-z]))?(lid|paragraaf|volzin)( \d+)?([, ])*)*((van|het|de|Wet|wet) )*( ?(([A-Z]([A-Z]{1,4}|[a-z]{1,2}))[^\w]) ?(\d{4})?|([\w\-]+ ?)+ ?(\d{4})?)")	
-		articles = []
+		articles = {}
 		
 		for _id,document in documents.items():
 			contents = self.getDocumentContents(document)
@@ -136,22 +136,29 @@ class RechtspraakParser():
 				
 			for article in articleRegex.finditer( contents ):
 				normArticle = article.group(0).strip(",.() ").replace("art.", "artikel").replace("Artikel","artikel")
-				articles.append( normArticle )
+				articles[normArticle] = article
+				
+		strafrechtArticles = [ art for art in articles if "strafrecht" in art.lower()]
 		
-		counter = collections.Counter(articles)
-		print "Total", len(articles)
+		with open(Config().WebAppDirectory+"/../../wbvstrafrecht.txt") as f:
+			wbvstrafrecht = f.read().decode('ascii',errors="replace")
 		
-		for suffix in sorted(counter.items(), key=lambda a: a[1],reverse=True):
-			try:
-				print '"%s"' % (suffix[0])
-			except:
-				pass
-			if suffix[1] < 5:
-				break	
+		for art in strafrechtArticles:
+			numbers = list(set([ "".join(nr) for nr in re.findall("(\d+|[IVX]+)([:\.]\d+)?([a-z]+)?",art)]))
+			for number in numbers:
+				key = "**artikel "+number
+				
+				try:
+					#print key
+					index = wbvstrafrecht.lower().index(key)
+					print wbvstrafrecht[index:wbvstrafrecht.index("**A", index+20)]
+					print "-"*80
+				except:
+					pass
 				
 	
 if __name__ == "__main__":
 	RP = RechtspraakParser()
 	documents = RP.parseJson(RP.jsonFileName)
 	#RP.parseDocumentDict(dict(documents.items()[:10000]))
-	RP.learnArticles(dict(documents.items()))
+	RP.learnArticles(dict(documents.items()[:100]))

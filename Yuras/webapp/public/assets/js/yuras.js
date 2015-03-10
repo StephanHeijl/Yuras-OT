@@ -92,7 +92,7 @@ $(function () {
 			
 			setTimeout(function() {
 				overlay.remove();
-			},500)
+			})
 		})
 		setPageInfo(page + difference, amount);
 		$(".prev-page").attr("disabled", page + difference <= 0)
