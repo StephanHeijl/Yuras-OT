@@ -72,25 +72,34 @@ $(function () {
 			basePath += "/"
 		}
 		url = basePath + "table/" + amount + "/" + (page + difference) + "?" + getParameters
-		
+
 		// Add overlay and loader
 		overlay = $("<div>")
 		overlay.addClass("document-overlay");
-		overlay.css({"display":"none","background":"transparent"})
+		overlay.css({
+			"display": "none",
+			"background": "transparent"
+		})
 		loader = $("<div>").addClass("document-loader")
 		loader.appendTo(overlay)
-		overlay.appendTo( $("body") )
-		
-		loader.css({"transform":"scale(0)"})
-		overlay.fadeIn(300, function() {
-			loader.css({"transform":"scale(1)"})
+		overlay.appendTo($("body"))
+
+		loader.css({
+			"transform": "scale(0)"
 		})
-		
-		$("table tbody").load(url, function() {
+		overlay.fadeIn(300, function () {
+			loader.css({
+				"transform": "scale(1)"
+			})
+		})
+
+		$("table tbody").load(url, function () {
 			// Reset overlay
-			loader.css({"transform":"scale(0)"})
-			
-			setTimeout(function() {
+			loader.css({
+				"transform": "scale(0)"
+			})
+
+			setTimeout(function () {
 				overlay.remove();
 			})
 		})
@@ -108,29 +117,31 @@ $(function () {
 
 	// Set to the proper page if there are prev/next buttons
 	if ($(".next-page, .prev-page").length >= 2) {
-		if(getPageInfo()[0]>9) {
-			changePage(0);	
+		if (getPageInfo()[0] > 9) {
+			changePage(0);
 		}
 	}
 
 	// Handle category selection
-	$('.category-option').click(function() {
+	$('.category-option').click(function () {
 		$('.category-dropdown-text').text($(this).text());
 		$('.category-input').val($(this).data('value'));
 	});
-	
+
 	// Handle heatcolor of related rating when they are present on load
-	$(".related-document-rating").heatcolor(
-		function () {
-			$(this).width(12 + (($(this).parent().data("score") - 0.5) * 48))
-			return $(this).parent().data("score");
-		}, {
-			lightness: 0,
-			colorStyle: 'greentored',
-			maxval: 1,
-			minval: 0.5,
-		});
-	
+	if ($(".related-document-rating").length > 0) {
+		$(".related-document-rating").heatcolor(
+			function () {
+				$(this).width(12 + (($(this).parent().data("score") - 0.5) * 48))
+				return $(this).parent().data("score");
+			}, {
+				lightness: 0,
+				colorStyle: 'greentored',
+				maxval: 1,
+				minval: 0.5,
+			});
+	}
+
 	// Handle adding related document to case 	
 	$("body").on("click", ".related-document-add", function (e) {
 		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
@@ -143,8 +154,8 @@ $(function () {
 
 		$.ajax({
 			type: "POST",
-			url: "/cases/"+$("#chosen-case").data("case-id")+"/add", 
-			data :{
+			url: "/cases/" + $("#chosen-case").data("case-id") + "/add",
+			data: {
 				"document_id": $(this).parents(".case-document").data("id"),
 				"_csrf_token": csrfToken
 			},
@@ -156,37 +167,37 @@ $(function () {
 			dataType: "json"
 		});
 	});
-	
+
 	// Handle removing related document to case 	
 	$("body").on("click", ".related-document-remove", function (e) {
 		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
 		caseDocument = $(this).parents(".case-document")
 		$.ajax({
 			type: "POST",
-			url: "/cases/"+$("#chosen-case").data("case-id")+"/remove", 
-			data :{
+			url: "/cases/" + $("#chosen-case").data("case-id") + "/remove",
+			data: {
 				"document_id": caseDocument.data("id"),
 				"_csrf_token": csrfToken
 			},
 			success: function (response) {
 				console.log(response)
 				$("#csrf-token").data("csrf", response.new_csrf);
-				caseDocument.fadeOut( 500, caseDocument.remove )
+				caseDocument.fadeOut(500, caseDocument.remove)
 			},
 			dataType: "json"
 		});
 	});
-	
+
 	// Handle changing a case title
 	function changeCaseTitle(title) {
 		$(".display-title .case-title").text(title)
-		$(".case-title-editor").attr("placeholder",title)
-		
+		$(".case-title-editor").attr("placeholder", title)
+
 		csrfToken = encodeURIComponent($("#csrf-token").data("csrf"))
 		$.ajax({
 			type: "POST",
-			url: "/cases/"+$("#chosen-case").data("case-id")+"/set-title", 
-			data :{
+			url: "/cases/" + $("#chosen-case").data("case-id") + "/set-title",
+			data: {
 				"document_title": title,
 				"_csrf_token": csrfToken
 			},
@@ -196,16 +207,29 @@ $(function () {
 			dataType: "json"
 		});
 	}
-	
+
 	// Handle case title transfering
-	$("#edit-case-title").click(function(e) {
+	$("#edit-case-title").click(function (e) {
 		e.preventDefault()
 		$(this).parents(".display-title").hide()
 		$(".edit-title").show()
-		$(".case-title-editor").bind("blur submit", function() {
+		$(".case-title-editor").bind("blur submit", function () {
 			changeCaseTitle($(this).val())
 			$(".edit-title").hide()
 			$(".display-title").show()
-		})		
+		})
 	});
+
+	// Handle document clicking in the search and documents pages
+	$(".document-item").click(function () {
+		highlightContainer = $(this).parents(".container").next(".document-highlight-container")
+		$(".document-highlight-container").not(highlightContainer).removeClass("visible")
+		
+		highlightContainer.addClass("visible")
+		
+		pointer = highlightContainer.find(".document-highlight-pointer-container")
+		pointer.css({"left": $(this).offset().left + ($(this).width()/2) - 15 })
+		highlightContainer.find(".document-title").text( $(this).find(".document-title").text() )
+	});
+
 });

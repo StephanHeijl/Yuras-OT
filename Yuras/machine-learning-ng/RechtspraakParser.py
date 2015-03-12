@@ -156,9 +156,58 @@ class RechtspraakParser():
 				except:
 					pass
 				
+	def parseWetboek(self, filename):
+		f = open(filename)
+		
+		articles = [[]]
+		currentArticleIndex = 0
+		lastRealArticleIndex = -1
+		for line in f:
+			if line == "\n":
+				continue
+			if line.startswith("**"):
+				articles[-1].append(line.strip("* \n"))
+				currentArticleIndex = len(articles)-1
+			else:
+				if len(articles[currentArticleIndex]) == 0:
+					continue
+				if not isinstance(articles[currentArticleIndex][-1], list):
+					articles[currentArticleIndex].append([])	
+				articles[currentArticleIndex][-1].append(line.strip(" \n"))
+				
+				if len(articles[currentArticleIndex]) >= 3:
+					lastRealArticleIndex = currentArticleIndex
+				
+				if len(articles[-1]) > 0:
+					if len(articles[-1]) < 3 and lastRealArticleIndex >= 0:
+						articles[lastRealArticleIndex][-1] += [ " ".join(articles[-1][:-1]) + " ".join(articles[-1][-1]) ]
+						del articles[-1]
+					articles.append([])
+		
+		structuredArticles = []
+		for a in articles:
+			try:
+				a[-1][0] = " ".join(a[3:-1]) + a[-1][0]
+				book, title, art, law, structuredlaw = a[0],a[1],a[2],a[-1],{}
+				if len(a[-1]) > 0:
+					for sublaw in law:
+						n = re.search("^(\w+)\.", sublaw)
+						if n is not None:
+							n = n.group(1)
+							structuredlaw[n.strip(".")] = sublaw[len(n)+1:]
+				else:
+					law = law[0]
+					
+				structuredArticles.append( {"book":book, "title":title,"art":art,"law":law, "structuredlaw":structuredlaw} )
+			except:
+				pass	
+			
+		print json.dumps(structuredArticles, indent=4)
 	
 if __name__ == "__main__":
 	RP = RechtspraakParser()
-	documents = RP.parseJson(RP.jsonFileName)
+	articles = RP.parseWetboek("wbvstrafrecht.txt")
+	#documents = RP.parseJson(RP.jsonFileName)
 	#RP.parseDocumentDict(dict(documents.items()[:10000]))
-	RP.learnArticles(dict(documents.items()[:100]))
+	#RP.learnArticles(dict(documents.items()[:100]))
+	
