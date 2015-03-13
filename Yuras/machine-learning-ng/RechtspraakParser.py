@@ -14,15 +14,14 @@ from Yuras.webapp.models.Document import Document
 
 class RechtspraakParser():
 	def __init__(self):
-		self.rechtspraakFolder = Config().WebAppDirectory+"/../../rechtspraak/ImportIOFormat"
+		self.rechtspraakFolder = Config().WebAppDirectory+"/../../rechtspraak"
 		self.jsonFileName = "10krecords.json"
 		self.delimitor = re.compile("[^a-z]*")
 		
 	def parseJson(self, filename):
 		path = os.path.join(self.rechtspraakFolder,filename)
 		documents = json.load(open(path))
-		return documents
-		
+		return documents		
 
 	def learnArticles(self, documents):
 		# This regex matches everything after the initial article number.
@@ -158,10 +157,27 @@ class RechtspraakParser():
 			
 		for url in urls:
 			print url
+			
+	def parseRechtspraak(self, filename):
+		documents = self.parseJson(filename)
+		for _id, document in documents.items():
+			try:
+				contents = document["contents"]["results"]["uitspraak"]
+			except KeyError:
+				continue
+			d = {"documentid":_id,
+				 "_encrypt":False,
+				 "contents": "#" + document["Titel"] + "\n" + "\n".join(contents),
+				 "category": ", ".join(document["Rechtsgebieden"]),
+				 "title": document["Titel"],
+				 "published": document["Publicatiedatum"]
+				}
+			print json.dumps(d)
 	
 if __name__ == "__main__":
 	RP = RechtspraakParser()
-	articles = RP.parseWetboek(sys.argv[1])
+	#articles = RP.parseWetboek(sys.argv[1])
+	RP.parseRechtspraak(sys.argv[1])
 	#articles = RP.downloadWetboeken()
 	#documents = RP.parseJson(RP.jsonFileName)
 	#RP.parseDocumentDict(dict(documents.items()[:1000]))
