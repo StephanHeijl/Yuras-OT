@@ -254,7 +254,7 @@ td.price small {
 	height: 150px;
 	background: #99c8e0;
 	border-radius: 7px;
-	margin-top: 5px;
+	margin: 10px auto 0 auto;
 	position: relative;
 	cursor: pointer;
 	overflow: hidden;
@@ -392,7 +392,7 @@ td.price small {
 
 .document-highlight-container {
 	background: #eee;
-	height: 0px;
+	max-height: 0px;
 	border-top: 3px solid #1abc9c;
 	position: relative;
 	margin-top: 30px;
@@ -402,7 +402,7 @@ td.price small {
 
 .document-highlight-container.visible {
 	opacity: 1;
-	height: 240px;
+	max-height: 600px;
 }
 
 .document-highlight-container .row {

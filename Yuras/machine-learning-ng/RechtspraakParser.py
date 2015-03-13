@@ -1,4 +1,4 @@
-import json, os, pprint, numpy, re, math, operator, collections
+import json, os, pprint, numpy, re, math, operator, collections, requests, sys
 from Yuras.common.Config import Config
 
 from sklearn.multiclass import OneVsRestClassifier,OneVsOneClassifier
@@ -23,107 +23,7 @@ class RechtspraakParser():
 		documents = json.load(open(path))
 		return documents
 		
-	def parseDocumentDict(self, documents):
-		results = []
-		ids = []
-		
-		trainingChunk = int(len(documents)*0.9)
-		
-		trainingDocuments = dict(documents.items()[:trainingChunk])
-		testingDocuments = dict(documents.items()[trainingChunk:])
-		
-		categories = self.getDocumentIndicatorWords(trainingDocuments,n=3)
-		
-		for _id in categories.keys()[:]:
-			document = trainingDocuments[_id]
-			contents = self.getDocumentContents(document)
-			if contents is not None:
-				results.append( contents )
-				ids.append(_id)
-			else:
-				del categories[_id]
-			
-		vectorizer = TfidfVectorizer()
-		X = vectorizer.fit_transform(results)
-		Y = categories.values()
-		
-		#Y = MultiLabelBinarizer().fit_transform(Y)
-				
-		classifier = LinearSVC()
-		classifier.fit(X,Y)
-		
-		for _id,document in testingDocuments.items():
-			contents = self.getDocumentContents(document)
-			if contents is None:
-				continue
-			v = vectorizer.transform([contents])
-			p = classifier.predict(v)[0]
-			
-			overlap = set(p).intersection(set( self.delimitor.split(contents.lower()) ))
-			if len(p) == 0:
-				continue
-				
-			print _id, len(p), len(overlap), overlap				
-			if len(overlap) > 0:
-				print "\t",overlap
-			else:
-				print "\t",p
 
-	def getDocumentContents(self, document):
-		try:
-			return " ".join( document["contents"]["results"][0]["uitspraak"] )
-		except:
-			return None
-		
-	def getDocumentIndicatorWords(self,documents, n=5):
-		indicators = {}
-		words = set()
-		stopwords = Document.getStopwords()
-		
-		for _id,document in documents.items():
-			indicators[_id] = {}
-			try: 
-				indicators[_id]["content"] = self.delimitor.split(
-					document["contents"]["results"][0]["inhoudsindicatie"].lower()
-				)
-			except:
-				del indicators[_id]
-				continue
-				
-			for term in indicators[_id]["content"][:]:
-				if term in stopwords:
-					indicators[_id]["content"].remove(term)
-				
-			indicators[_id]["term_frequencies"] = {}
-				
-			for word in indicators[_id]["content"]:
-				words.add(word)
-				indicators[_id]["term_frequencies"][word] = indicators[_id]["content"].count(word)
-				
-		words = list(words)
-		indlen = len(indicators)
-		idfs = {}
-		for word in words:
-			df = 0
-			for doc in indicators.values():
-				if word in doc["content"]:
-					df+=1
-			idf = 1+ math.log(indlen/df)
-			idfs[word] = idf
-			
-		categories = {}
-		for _id,document in indicators.items():
-			tfidfs = {}
-			for term, freq in indicators[_id]["term_frequencies"].items():
-				tfidfs[term] = freq*idfs[term]
-			
-			categories[_id] = []
-			for t,s in sorted(tfidfs.items(), key=lambda t: t[1], reverse=True)[:n]:
-				#print "\t %s - %s" % (t,round(s,2))
-				categories[_id].append(t)
-				
-		return categories
-	
 	def learnArticles(self, documents):
 		# This regex matches everything after the initial article number.
 		articleRegex = re.compile(r"([Aa]rtikel(en)?|art\.) ((\d+|[IVX]+)([:\.]\d+)?([a-z]+)?( en |, ?)?)+ ?(([etdvzan][ewic][a-z]+?((d|st)e[^a-z]))?(lid|paragraaf|volzin)( \d+)?([, ])*)*((van|het|de|Wet|wet) )*( ?(([A-Z]([A-Z]{1,4}|[a-z]{1,2}))[^\w]) ?(\d{4})?|([\w\-]+ ?)+ ?(\d{4})?)")	
@@ -156,6 +56,12 @@ class RechtspraakParser():
 				except:
 					pass
 				
+	def listGet(self, l, idx, default):
+		try:
+			return l[idx]
+		except IndexError:
+			return default
+				
 	def parseWetboek(self, filename):
 		f = open(filename)
 		
@@ -166,48 +72,98 @@ class RechtspraakParser():
 			if line == "\n":
 				continue
 			if line.startswith("**"):
-				articles[-1].append(line.strip("* \n"))
-				currentArticleIndex = len(articles)-1
-			else:
-				if len(articles[currentArticleIndex]) == 0:
+				if re.match("\*\*([\w°])+(\.)",line):
+					line = line.replace("*"," ")
+				else:
+					articles[-1].append(line.strip("* \n"))
+					currentArticleIndex = len(articles)-1
 					continue
-				if not isinstance(articles[currentArticleIndex][-1], list):
-					articles[currentArticleIndex].append([])	
-				articles[currentArticleIndex][-1].append(line.strip(" \n"))
+
+			if len(articles[currentArticleIndex]) == 0:
+				continue
 				
-				if len(articles[currentArticleIndex]) >= 3:
-					lastRealArticleIndex = currentArticleIndex
-				
-				if len(articles[-1]) > 0:
-					if len(articles[-1]) < 3 and lastRealArticleIndex >= 0:
-						articles[lastRealArticleIndex][-1] += [ " ".join(articles[-1][:-1]) + " ".join(articles[-1][-1]) ]
-						del articles[-1]
-					articles.append([])
+			if not isinstance(articles[currentArticleIndex][-1], list):
+				articles[currentArticleIndex].append([])
+			articles[currentArticleIndex][-1].append(line.strip(" \n"))
+
+			if len(articles[currentArticleIndex]) >= 3:
+				lastRealArticleIndex = currentArticleIndex
+
+			if len(articles[-1]) > 0:
+				if len(articles[-1]) < 3 and lastRealArticleIndex >= 0:
+					articles[lastRealArticleIndex][-1] += [ " ".join(articles[-1][:-1]) + " ".join(articles[-1][-1]) ]
+					del articles[-1]
+				articles.append([])
 		
 		structuredArticles = []
+		chapterRegex = re.compile("hoofdstuk", flags=re.IGNORECASE)
+		articleRegex = re.compile("art(ikel|\.)", flags=re.IGNORECASE)
+		paragraphRegex = re.compile("paragraaf|§", flags=re.IGNORECASE)
+		bookRegex = re.compile("boek", flags=re.IGNORECASE)
+		documentTitle = articles[0][0]
+		
 		for a in articles:
+			prevN = None
 			try:
-				a[-1][0] = " ".join(a[3:-1]) + a[-1][0]
-				book, title, art, law, structuredlaw = a[0],a[1],a[2],a[-1],{}
-				if len(a[-1]) > 0:
-					for sublaw in law:
-						n = re.search("^(\w+)\.", sublaw)
-						if n is not None:
-							n = n.group(1)
-							structuredlaw[n.strip(".")] = sublaw[len(n)+1:]
-				else:
-					law = law[0]
-					
-				structuredArticles.append( {"book":book, "title":title,"art":art,"law":law, "structuredlaw":structuredlaw} )
+				law, structuredlaw = a[-1],{}
 			except:
-				pass	
+				continue
+				
+			book = self.listGet([ i for i in a[:-1] if bookRegex.search(i) is not None ], 0, documentTitle)
+			paragraph = self.listGet([ i for i in a[:-1] if paragraphRegex.search(i) is not None ], 0, None)
+			art = self.listGet([ i for i in a[:-1] if articleRegex.search(i) is not None ], 0, None)
+			chapter = self.listGet([ i for i in a[:-1] if chapterRegex.search(i) is not None ], 0, None)
+				
+			if len(a[-1]) > 0:
+				for i,sublaw in enumerate(law):
+					n = re.search("^([\w ]{0,40})(\.|:)", sublaw)
+
+					if n is not None:
+						n = n.group(1)
+						sublaw = sublaw[len(n)+1:]
+						slaw = structuredlaw
+						
+						if re.match("\d",n):
+							prevN = n
+						else:
+							if prevN is not None:
+								#n = prevN.strip(".")+"."+n.strip(".")
+								if not isinstance( structuredlaw[prevN], dict):
+									structuredlaw[prevN] = {"":structuredlaw[prevN]}
+								slaw = structuredlaw[prevN]								
+
+						slaw[n.strip(".")] = sublaw.decode('ascii', errors="ignore").strip(" ")
+					elif i == 0:
+						structuredlaw[""] = sublaw.decode('ascii', errors="ignore").strip(" ")
+
+			else:
+				try:
+					law = law[0]
+				except:
+					continue
+
+			title = ", ".join([ e for e in [book, chapter, art, paragraph] if e is not None])
+			contents = "#"+ title + "\n\n" + "\n".join(law)
+			structuredArticles.append( {"book":book, "chapter":chapter,"art":art,"contents": contents, "paragraph":paragraph, "structuredlaw":structuredlaw, "title":title, "_encrypt":False} )
 			
 		print json.dumps(structuredArticles, indent=4)
+		
+	def downloadWetboeken(self):
+		url = "http://epub.overheid.nl/default.aspx"
+		epubUrl = re.compile("href=\"(/epub/[\w \/_\.]+)\"")
+		urls = []
+		for letter in list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"):
+			r = requests.post(url, params={"zoekletter":letter})
+			urls += epubUrl.findall(r.text)
+			
+		for url in urls:
+			print url
 	
 if __name__ == "__main__":
 	RP = RechtspraakParser()
-	articles = RP.parseWetboek("wbvstrafrecht.txt")
+	articles = RP.parseWetboek(sys.argv[1])
+	#articles = RP.downloadWetboeken()
 	#documents = RP.parseJson(RP.jsonFileName)
-	#RP.parseDocumentDict(dict(documents.items()[:10000]))
+	#RP.parseDocumentDict(dict(documents.items()[:1000]))
 	#RP.learnArticles(dict(documents.items()[:100]))
 	

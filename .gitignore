@@ -42,3 +42,6 @@ env/
 output*/
 *.pyc
 rechtspraak/*.json
+epubs/
+wiki/
+structuredlaw/

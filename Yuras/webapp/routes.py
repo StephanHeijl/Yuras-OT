@@ -375,7 +375,7 @@ def do_documentSearch(query, category=None, skip=0, limit=10):
 	
 	stopwords = Document.getStopwords()
 	
-	pattern = "" + ("|".join(re.split("[^\w]+",query))) + ""
+	pattern = "" + ("|".join([w for w in re.split("[^\w]+",query) if len(w)>2])) + ""
 	markedWords = re.compile(pattern, flags=re.IGNORECASE)
 	for result in results:
 		result.markedContents = []
