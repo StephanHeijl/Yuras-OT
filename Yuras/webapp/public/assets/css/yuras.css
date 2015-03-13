@@ -367,11 +367,6 @@ td.price small {
 	background-size: cover;
 }
 
-.file-icon:hover {
-	transition: opacity 0.3s;
-	opacity: 0.9;
-}
-
 .file-icon:hover .file-icon-image {
 	transition: transform 0.3s;
 	transform: scale(1.1);
