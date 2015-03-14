@@ -143,7 +143,7 @@ class RechtspraakParser():
 
 			title = ", ".join([ e for e in [book, chapter, art, paragraph] if e is not None])
 			contents = "#"+ title + "\n\n" + "\n".join(law)
-			structuredArticles.append( {"book":book, "chapter":chapter,"art":art,"contents": contents, "paragraph":paragraph, "structuredlaw":structuredlaw, "title":title, "_encrypt":False} )
+			structuredArticles.append( {"book":book, "chapter":chapter,"art":art,"contents": contents, "paragraph":paragraph, "structuredlaw":structuredlaw, "title":title, "_encrypt":False, "document_type":"lawbook"} )
 			
 		print json.dumps(structuredArticles, indent=4)
 		
@@ -170,7 +170,8 @@ class RechtspraakParser():
 				 "contents": "#" + document["Titel"] + "\n" + "\n".join(contents),
 				 "category": ", ".join(document["Rechtsgebieden"]),
 				 "title": document["Titel"],
-				 "published": document["Publicatiedatum"]
+				 "published": document["Publicatiedatum"],
+				 "document_type":"jurisprudence"
 				}
 			print json.dumps(d)
 	

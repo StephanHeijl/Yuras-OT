@@ -236,10 +236,18 @@ td.price small {
 	overflow-x: hidden;
 }
 
+.documents-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
 .document-item {
 	text-align: center;
 	word-wrap: break-word;
-	hyphens: auto;
+	width: 130px;
+	padding: 5px;
+	margin-bottom: 20px;
 	font-size: 0.85em;
 }
 
@@ -258,6 +266,7 @@ td.price small {
 	position: relative;
 	cursor: pointer;
 	overflow: hidden;
+	zoom: 1;
 }
 
 .file-icon-fold {
@@ -385,14 +394,27 @@ td.price small {
 	top: -5px;
 }
 
+.highlight-placeholder {
+	background:red;
+	max-height: 0;
+	width: 100%;
+	transition: all 0.3s;
+}
+
+.highlight-placeholder {
+	max-height: 600px;
+}
+
 .document-highlight-container {
 	background: #eee;
 	max-height: 0px;
 	border-top: 3px solid #1abc9c;
-	position: relative;
+	position: absolute;
 	margin-top: 30px;
 	opacity:0;
 	transition: all 0.3s;
+	width: 100%;
+	left: 0;
 }
 
 .document-highlight-container.visible {
