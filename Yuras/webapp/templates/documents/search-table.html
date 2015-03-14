@@ -1,17 +1,9 @@
 {% for document in documents %}
-<tr>
-	<td>
-		<a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a>
-		<div class="document-summary">
-			{% for mc in document.markedContents %}
-			...{{mc|safe}}...
-			{%endfor%}
-		</div>
-	</td>
-	<td>{{ document.author }}</td>
-	<td>
-		<a href="/documents/{{ document._id }}/delete" class="delete-document" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
-		<a href="/documents/{{ document._id }}/download/docx" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-download-alt"></span></a>
-	</td>
-</tr>
+<div class="document-item">
+	<div class="file-icon">
+		<div class="file-icon-fold"></div>
+		<div class="file-icon-fold-cover"></div>
+	</div>
+	<span class="document-title">{{ document.title[:75] }}{% if document.title|length > 75 %}...{% endif %}</span>
+</div>
 {% endfor %}

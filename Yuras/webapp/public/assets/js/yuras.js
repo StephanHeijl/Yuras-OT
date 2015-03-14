@@ -219,34 +219,51 @@ $(function () {
 			$(".display-title").show()
 		})
 	});
-	
-	$(".document-item").each( function() {
-		$(this).data("absoluteTop",$(this).offset().top + $(this).height())
-		$(this).data("absoluteHeight",$(this).height())
+
+
+	setDocumentItemProperties = function () {
+		$(".document-item").each(function () {
+			$(this).data("absoluteTop", $(this).offset().top + $(this).height())
+			$(this).data("absoluteHeight", $(this).height())
+		})
+	}
+	setDocumentItemProperties()
+
+// Handle document clicking in the search and documents pages
+$(".document-item").click(function () {
+	highlightContainer = $(".document-highlight-container")
+	$(".document-highlight-container").not(highlightContainer).removeClass("visible")
+	highlightContainer.find(".document-title").text($(this).find(".document-title").text())
+	highlightContainer.addClass("visible")
+
+	pointer = highlightContainer.find(".document-highlight-pointer-container")
+	pointer.css({
+		"left": $(this).offset().left + ($(this).width() / 2) - 22
 	})
-	
-	// Handle document clicking in the search and documents pages
-	$(".document-item").click(function () {
-		highlightContainer = $(".document-highlight-container")
-		$(".document-highlight-container").not(highlightContainer).removeClass("visible")
-		highlightContainer.find(".document-title").text( $(this).find(".document-title").text() )
-		highlightContainer.addClass("visible")
-		
-		pointer = highlightContainer.find(".document-highlight-pointer-container")
-		pointer.css({"left": $(this).offset().left + ($(this).width()/2) - 22 })
-		
-		perline = Math.floor( 1/ ($(this).outerWidth()/$(this).parent().width()) )
-		row = Math.floor( $(this).index() / perline)
-		lastindex = ((row+1)*perline)
-		
-		highlightContainer.css({"top": $(this).data("absoluteTop") + (row*5)})
-		
-		if( lastindex !== highlightContainer.data("lastindex")) {
-			$(".document-item").height("").animate({"margin-bottom":"20px"})	
-			$(this).animate({"margin-bottom": highlightContainer.outerHeight() + 50})
+
+	perline = Math.floor(1 / ($(this).outerWidth() / $(this).parent().width()))
+	row = Math.floor($(this).index() / perline)
+	lastindex = ((row + 1) * perline)
+
+	highlightContainer.css({
+		"top": $(this).data("absoluteTop") + (row * 5)
+	})
+
+	if (lastindex !== highlightContainer.data("lastindex")) {
+		$(".document-item").height("").animate({
+			"margin-bottom": "20px"
+		})
+		h = highlightContainer.outerHeight()
+		if (h < 10) {
+			h = $(this).height();
 		}
-		
-		highlightContainer.data("lastindex", lastindex)		
-	});
+		console.log(h)
+		$(this).animate({
+			"margin-bottom": h + 50
+		})
+	}
+
+	highlightContainer.data("lastindex", lastindex)
+});
 
 });
