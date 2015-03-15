@@ -159,19 +159,39 @@ class RechtspraakParser():
 			print url
 			
 	def parseRechtspraak(self, filename):
+		"""
+		Used in conjuction with
+		$ for file in rechtspraak/*.json; do echo "$file" | cut -d "/" -f 2- | xargs python -m Yuras.machine-learning-ng.RechtspraakParser | mongoimport --db "Yuras1" -c documents ; done
+		
+		"""
+		
 		documents = self.parseJson(filename)
 		for _id, document in documents.items():
 			try:
 				contents = document["contents"]["results"]["uitspraak"]
-			except KeyError:
+				case_id = document["contents"]["results"]["zaaknummer"]
+			except KeyError as e:
+				print e
 				continue
+				
+			content_indication,procedures = None,None
+			try:
+				content_indication = document["contents"]["results"]["inhoudsindicatie"]
+				procedures = document["proceduresoorten"]
+			except:
+				pass
+				
 			d = {"documentid":_id,
 				 "_encrypt":False,
 				 "contents": "#" + document["Titel"] + "\n" + "\n".join(contents),
 				 "category": ", ".join(document["Rechtsgebieden"]),
 				 "title": document["Titel"],
 				 "published": document["Publicatiedatum"],
-				 "document_type":"jurisprudence"
+				 "document_type":"jurisprudence",
+				 "source":document["Titel"].split(",")[0],
+				 "procedures": procedures,
+				 "case_id": case_id,
+				 "content_indication": content_indication
 				}
 			print json.dumps(d)
 	

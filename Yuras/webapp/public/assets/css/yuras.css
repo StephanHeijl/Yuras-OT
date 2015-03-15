@@ -395,7 +395,7 @@ td.price small {
 }
 
 .highlight-placeholder {
-	background:red;
+	background: red;
 	max-height: 0;
 	width: 100%;
 	transition: all 0.3s;
@@ -411,7 +411,7 @@ td.price small {
 	border-top: 3px solid #1abc9c;
 	position: absolute;
 	margin-top: 30px;
-	opacity:0;
+	opacity: 0;
 	transition: all 0.3s;
 	width: 100%;
 	left: 0;
@@ -462,6 +462,7 @@ td.price small {
 .document-highlight p {
 	text-align: justify;
 }
+
 .document-highlight-button {
 	background: white;
 	border: 3px solid #999;
@@ -469,10 +470,20 @@ td.price small {
 	margin-left: 10px;
 	float: right;
 	width: 64px;
-	height:64px;
+	height: 64px;
 	border-radius: 32px;
-	cursor:pointer;
+	cursor: pointer;
 }
-.document-highlight-button:hover{
+
+.document-highlight-button:hover {
 	border-color: #1abc9c;
+	color: #1abc9c;
+}
+
+.document-highlight-button .glyphicon {
+	width: 100%;
+	height: 100%;
+	line-height: 58px;
+	font-size: 18pt;
+	text-align: center;
 }

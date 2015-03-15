@@ -42,10 +42,14 @@
 	<div class="row">
 		<div class="col-md-9 documents-wrapper">
 			{% for document in documents %}
-			<div class="document-item">
+			<div class="document-item" draggable="true" data-type="{{document.document_type}}">
 				<div class="file-icon">
 					<div class="file-icon-fold"></div>
 					<div class="file-icon-fold-cover"></div>
+					
+					{% if document.document_type == "jurisprudence" %}
+					<div class="file-icon-image gavel"></div>
+					{% endif %}
 				</div>
 				<span class="document-title">{{ document.title[:75] }}{% if document.title|length > 75 %}...{% endif %}</span>
 			</div>
@@ -70,9 +74,9 @@
 				</p>
 			</div>
 			<div class="col-md-12">
-				<div class="document-highlight-button"></div>
-				<div class="document-highlight-button"></div>
-				<div class="document-highlight-button"></div>
+				<div class="document-highlight-button"><span class="glyphicon glyphicon-book"></span></div>
+				<div class="document-highlight-button"><span class="glyphicon glyphicon-bookmark"></span></div>
+				<div class="document-highlight-button"><span class="glyphicon glyphicon-eye-open"></span></div>
 			</div>
 		</div>
 

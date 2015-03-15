@@ -367,7 +367,7 @@ def fullTFIDFRun():
 def do_documentSearch(query, category=None, skip=0, limit=24):
 	results = Document().matchObjects(
 		{"$text": { "$search": query.lower(), "$language":"dutch"}},
-		fields = {"score": { "$meta": "textScore" },"title":1,"contents":1 },
+		fields = {"score": { "$meta": "textScore" },"title":1,"contents":1,"document_type":1 },
 		skip = skip,
 		limit = limit,
 		sort = {"score": { "$meta": "textScore" } }.items()
