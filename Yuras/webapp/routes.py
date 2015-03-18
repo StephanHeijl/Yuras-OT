@@ -24,6 +24,7 @@ from Yuras.webapp.models.Case import Case
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+from elasticsearch import Elasticsearch
 from Crypto import Random
 
 from u2flib_server.jsapi import DeviceRegistration
@@ -365,13 +366,20 @@ def fullTFIDFRun():
 	return json.dumps({"success":"true"})
 
 def do_documentSearch(query, category=None, skip=0, limit=24):
-	results = Document().matchObjects(
-		{"$text": { "$search": query.lower(), "$language":"dutch"}},
-		fields = {"score": { "$meta": "textScore" },"title":1,"contents":1,"document_type":1 },
-		skip = skip,
-		limit = limit,
-		sort = {"score": { "$meta": "textScore" } }.items()
-	)
+	es = Elasticsearch()
+
+	res = es.search(index="document_contents", size=24, body={"query": {
+    "match" : {
+        "_all" : query
+    }
+}})
+	
+	results = []
+	for r in res['hits']['hits']:
+		d = Document()
+		for k,v in r['_source'].items():
+			setattr(d, k, v)
+		results.append(d)
 	
 	stopwords = Document.getStopwords()
 	
@@ -407,7 +415,7 @@ def documentQuickSearch():
 	return Document().quickSearch(keywords)
 
 @app.route("/documents/search")
-@login.login_required
+#@login.login_required
 def documentSearch():
 	query = request.args.get("keywords", "")
 	if isinstance(query, list):

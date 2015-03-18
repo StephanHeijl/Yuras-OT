@@ -19,7 +19,6 @@ class Document(StoredObject):
 		self.modifiedDate = None
 		self.contents = ""
 		self.tags = {}
-		self.annotations = []
 		self.category = None
 		self.wordcount = {}
 		
@@ -394,10 +393,13 @@ class Document(StoredObject):
 				d = documentClass()
 				d.title = title
 				d.category = key
-				d.contents = Pandoc().convert("html","markdown_github", document)[:32000]
+				d.contents = Pandoc().convert("html","markdown_github", document)
 				d.author = "Yuras"
 				if getattr(d,"_encrypt",True):
 					d.countWords()
+				
+				del d.wordcount
+				del d.tags
 				d.vanillaSave()
 
 			categorized[key].append(document)

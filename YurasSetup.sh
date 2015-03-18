@@ -13,10 +13,14 @@ export PATH=$PATH:~/.cabal/bin
 # Add TokuMX directories
 sudo mkdir /data
 sudo mkdir /data/db
-sudo chown -R vagrant /data 
+mkdir /data/db/rs0
+mkdir /data/db/rs1
+sudo chown -R mongodb /data
 
 # Start MongoDB database
 sudo service mongodb stop
+sudo service mongod stop
+
 sudo bash startReplicaSet.sh
 sleep 5
 mongo localhost:27017 --eval "database='Yuras1'" setupDatabase.js
@@ -27,6 +31,8 @@ sudo dpkg -i elasticsearch-1.4.2.deb
 
 sudo /usr/share/elasticsearch/bin/plugin --install com.github.richardwilly98.elasticsearch/elasticsearch-river-mongodb/2.0.6
 sudo /usr/share/elasticsearch/bin/plugin --install mobz/elasticsearch-head
+
+sudo service elasticsearch restart
 
 # Configure index on document_contents
 curl -XPUT '127.0.0.1:9200/_river/mongodb/_meta' '{"type":"mongodb","mongodb":{"db":"Yuras1","collection":"documents"},"index":{"name":"document_contents","type":"document"}}'
