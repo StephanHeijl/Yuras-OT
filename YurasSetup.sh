@@ -29,12 +29,16 @@ echo manual | sudo tee /etc/init/mongodb.override
 # Start the replicaset for elasticsearch.
 sudo bash startReplicaSet.sh
 sleep 5
+
+# Initiate replicaset
+echo ''{ \\\"_id\\\" : \\\"rs0\\\", \\\"members\\\" : [ {\\\"_id\\\" : 0, \\\"host\\\" : \\\"$HOSTNAME:27017\\\", \\\"priority\\\" : 1 }, {\\\"_id\\\" : 1, \\\"host\\\" : \\\"$HOSTNAME:27018\\\", \\\"priority\\\" : 0.5 } ] }'' | xargs -i mongo --eval "rs.initiate({})"
+
 mongo localhost:27017 --eval "database='Yuras1'" setupDatabase.js
 
 # Install ElasticSearch
 wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.2.deb
 sudo dpkg -i elasticsearch-1.4.2.deb
-
+rm https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.2.deb
 sleep 5
 
 # Install elasticsearch River plugin for MongoDB and Head Frontend
