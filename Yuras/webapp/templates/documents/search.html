@@ -42,7 +42,10 @@
 	<div class="row">
 		<div class="col-md-9 documents-wrapper">
 			{% for document in documents %}
-			<div class="document-item" draggable="true" data-type="{{document.document_type}}">
+			<div class="document-item" draggable="true" data-type="{{document.document_type}}" data-id="{{ document._id }}">
+				<div class="document-summary">
+					{{ document.contents[:500] }}{% if document.contents|length > 500 %}...{% endif %}
+				</div>
 				<div class="file-icon">
 					<div class="file-icon-fold"></div>
 					<div class="file-icon-fold-cover"></div>
@@ -74,9 +77,9 @@
 				</p>
 			</div>
 			<div class="col-md-12">
-				<div class="document-highlight-button"><span class="glyphicon glyphicon-book"></span></div>
-				<div class="document-highlight-button"><span class="glyphicon glyphicon-bookmark"></span></div>
-				<div class="document-highlight-button"><span class="glyphicon glyphicon-eye-open"></span></div>
+				<a class="document-highlight-button add-to-case"><span class="glyphicon glyphicon-book"></span></a>
+				<a class="document-highlight-button add-bookmark"><span class="glyphicon glyphicon-bookmark"></span></a>
+				<a class="document-highlight-button view-document"><span class="glyphicon glyphicon-eye-open"></span></a>
 			</div>
 		</div>
 

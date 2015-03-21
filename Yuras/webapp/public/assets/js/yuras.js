@@ -264,6 +264,8 @@ $(".document-item").click(function () {
 	}
 
 	highlightContainer.data("lastindex", lastindex)
+	highlightContainer.find(".view-document").attr("href", "/documents/"+$(this).data("id"))
+	highlightContainer.find("p").text($(this).find(".document-summary").text())
 });
 
 });

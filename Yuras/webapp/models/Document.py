@@ -395,11 +395,10 @@ class Document(StoredObject):
 				d.category = key
 				d.contents = Pandoc().convert("html","markdown_github", document)
 				d.author = "Yuras"
+				d.document_type = "jurisprudence"
 				if getattr(d,"_encrypt",True):
 					d.countWords()
 				
-				del d.wordcount
-				del d.tags
 				d.vanillaSave()
 
 			categorized[key].append(document)

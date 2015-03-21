@@ -254,6 +254,10 @@ td.price small {
 .document-item:hover {
 	color: #337ab7;
 }
+
+.document-summary {
+	display: none;
+}
 /* File icon */
 
 .file-icon {

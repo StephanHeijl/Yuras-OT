@@ -294,7 +294,7 @@ def documentDownload(id, filetype):
 	return document.download(filetype, login.current_user)
 
 @app.route("/documents/<id>/related")
-@login.login_required
+#@login.login_required
 def documentRelated(id):
 	try:
 		document = Document().matchObjects({"_id": id}, fields={"_id":True, "contents":True, "tags":True})[0]
@@ -369,10 +369,10 @@ def do_documentSearch(query, category=None, skip=0, limit=24):
 	es = Elasticsearch()
 
 	res = es.search(index="document_contents", size=24, body={"query": {
-    "match" : {
-        "_all" : query
-    }
-}})
+		"match" : {
+			"_all" : query
+		}
+	}})
 	
 	results = []
 	for r in res['hits']['hits']:
