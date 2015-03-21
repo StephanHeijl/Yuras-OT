@@ -15,6 +15,7 @@ from flask.ext import login
 from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
 from Yuras.common.Config import Config
+from Yuras.common.QueryEngine import QueryEngine, SpellingEngine, ThesaurusEngine
 
 from Yuras.webapp.models.PublicDocument import PublicDocument as Document
 from Yuras.webapp.models.Annotation import Annotation
@@ -367,10 +368,10 @@ def fullTFIDFRun():
 
 def do_documentSearch(query, category=None, skip=0, limit=24):
 	es = Elasticsearch()
-
+	
 	res = es.search(index="document_contents", size=24, body={"query": {
-		"match" : {
-			"_all" : query
+		"query_string" : {
+			"query" : query
 		}
 	}})
 	
@@ -421,7 +422,11 @@ def documentSearch():
 	if isinstance(query, list):
 		query = query[0]
 	category = request.args.get("category", None)
-	results = do_documentSearch(query,category=category if len(category)>0 else None)
+	
+	qe = QueryEngine()
+	
+	extendedQuery = qe.convert(query)
+	results = do_documentSearch(extendedQuery,category=category if len(category)>0 else None)
 
 	categories = Category().matchObjects({})
 	return render_template("documents/search.html",
@@ -430,6 +435,7 @@ def documentSearch():
 						   categories=categories,
 						   documents=results,
 						   keywords=query,
+						   extendedQuery=extendedQuery,
 						   active="documents")
 
 @app.route("/documents/search/table/<amount>/<page>")

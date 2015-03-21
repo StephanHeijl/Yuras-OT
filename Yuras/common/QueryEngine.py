@@ -175,29 +175,43 @@ class MongoQueryEngine():
 			
 ###############################################################################
 			
-class QueryEngine():
-	""" Converts text queries it to MongoDB match queries or a ElasticSearch Queries. """
+class QueryEngine(Singleton):
+	""" Converts text queries to extended text queries, including spell checking and synonym checking. """
 	def __init__(self):
 		self.__query = None
+		if self.instantiated:
+			return
+		
 		self.__field = "contents"
 		self.SpellingEngine = None
 		self.ThesaurusEngine = None
+		self.instantiated = True
 	
 	def convert(self, query):
 		self.__query = query
-		self.__spellCheck()
-		self.__synonymCheck()
+		if self.SpellingEngine is not None:
+			self.__spellCheck()
+		if self.ThesaurusEngine is not None:
+			self.__synonymCheck()
+		return self.__query
 		
 	def __spellCheck(self):			
 		query = self.__query
 		words = query.split(" ")
-		spellchecked = " ".join([self.SpellingEngine.correct(word) for word in words])
+		spellchecked = " ".join([self.SpellingEngine.correct(word.strip("() *[]:")) if word not in ["AND","OR","(",")"] else word for word in words ])
 		self.__query = spellchecked
 		
 	def __synonymCheck(self):
 		query = self.__query
 		words = query.split(" ")
-		synonyms = " ".join([ "(%s)" % "|".join([word] + self.ThesaurusEngine.getSynonyms(word)) for word in words])
+		synonyms = []
+		for word in words:
+			if word.lower() in ["and","or","(",")"]:
+				synonyms.append(word.upper())
+				continue
+			synonyms.append("(%s)" % " OR ".join([word+"^2"] + self.ThesaurusEngine.getSynonyms(word.strip("() *[]:"))))
+		
+		synonyms = " ".join(synonyms)
 		self.__query = synonyms
 	
 	def __convertToMongo(self):
@@ -236,10 +250,6 @@ def teardown_func():
 @with_setup(setup_func, teardown_func)
 def test_qe_init():
 	assert isinstance(qe, QueryEngine)
-	
-@with_setup(setup_func, teardown_func)
-def test_qe_convert():
-	assert True
 	
 @with_setup(setup_func, teardown_func)
 def test_qe_convertToMongo():	
@@ -304,10 +314,26 @@ def test_qe_synonymcheck():
 	
 	qe._QueryEngine__query = "hoge raad"
 	qe._QueryEngine__synonymCheck()
-	assert qe._QueryEngine__query == "(hoge) (raad|raadgeving|advies|adviesraad)"
+	print qe._QueryEngine__query
+	assert qe._QueryEngine__query == "(hoge^2) (raad^2 OR raadgeving OR advies OR adviesraad)"
 	
 	qe._QueryEngine__query = "sector kanton rechtbank maastricht"
 	qe._QueryEngine__synonymCheck()
-	assert qe._QueryEngine__query == "(sector|deel) (kanton) (rechtbank|hof|gerecht|toonbank|balie|gerechtshof|tribunaal) (maastricht)"
+	print qe._QueryEngine__query
+	assert qe._QueryEngine__query == "(sector^2 OR deel) (kanton^2) (rechtbank^2 OR hof OR gerecht OR toonbank OR balie OR gerechtshof OR tribunaal) (maastricht^2)"
 
+	
+@with_setup(setup_func, teardown_func)
+def test_qe_convert():
+	te = ThesaurusEngine()
+	with open("thesaurus.txt") as thesaurusFile:
+		thesaurus = thesaurusFile.read()
+	te.parseOpentaalThesaurus(thesaurus)
+	qe.ThesaurusEngine = te
+	
+	se = SpellingEngine()
+	se.model = se.trainWithDatabaseDocuments(limit=25)
+	qe.SpellingEngine = se
+	
+	assert qe.convert("sector kanton regtbank mastricht") == "(sector^2 OR deel) (kanton^2) (rechtbank^2 OR hof OR gerecht OR toonbank OR balie OR gerechtshof OR tribunaal) (maastricht^2)"
 	

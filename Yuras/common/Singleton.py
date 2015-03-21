@@ -6,8 +6,8 @@
 """
 
 class Singleton(object):
-	""" The base singleton class for Olympus. """
-	
+	""" The base singleton class for Yuras, ported directly from Olympus """
+	instantiated = False
 	_instance = None
 	def __new__(cls, *args, **kwargs):
 		""" This returns the existing instance of the class every time an attempt is made to instantiate it. """

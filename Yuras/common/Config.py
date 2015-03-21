@@ -114,9 +114,9 @@ class Config(Singleton):
 
 def test_Config():
 	c = Config()
-	assert c.__dict__["username"] == c.username
-	assert c.username == "default" or c.username == "guardstore"
-
+	assert c.__dict__["MongoServer"] == c.MongoServer
+	assert c.MongoServer == "localhost"
+	
 def test_addAttribute():
 	c = Config()
 	c.addAttribute("a", "b")

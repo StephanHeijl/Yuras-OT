@@ -7,6 +7,7 @@ from flask.ext.compress import Compress
 
 from flask import Flask, render_template, abort, Response, request, redirect, url_for
 from Yuras.webapp.routes import app
+from Yuras.common.QueryEngine import *
 
 class Server(threading.Thread):
 	def __init__(self):	
@@ -15,11 +16,17 @@ class Server(threading.Thread):
 		
 		args = vars( self.argparser.parse_args() )
 		
+		self.TRAIN_QE = args.get("train_queryengine", True) in [True, None, "True", "yes", "y"]
+		self.TRAIN_QE_SIZE = args.get("train_queryengine_size", 100)
+		if self.TRAIN_QE_SIZE is None:
+			self.TRAIN_QE_SIZE = 100
 		self.PORT = args.get("port", 5000)
 		self.CONFIG = args.get("config", None)
 		super(Server, self).__init__()		
 		
 	def parseArguments(self):
+		self.argparser.add_argument("--train-queryengine", type=str, help="Whether or not to train the QueryEngine's SpellingEngine with documents from the database. Defaults to True.", required=False)
+		self.argparser.add_argument("--train-queryengine-size", type=int, help="The number of documents the QueryEngine is trained with. Larger amounts of documents result in better spelling correction, but longer startup time. Defaults to 100.", required=False)
 		self.argparser.add_argument("--config", type=str, help="The config file to load.", required=False)
 		self.argparser.add_argument("--port", type=int, help="The port to launch this server on.", default=5000, required=False)
 	
@@ -67,6 +74,25 @@ class Server(threading.Thread):
 			except Exception as e:
 				print e
 				self.PORT +=1
+				
+	def trainQueryEngine(self):
+		qe = QueryEngine()
+	
+		if qe.SpellingEngine is None and self.TRAIN_QE:
+			print "Training SpellingEngine with up to %s documents." % self.TRAIN_QE_SIZE
+			se = SpellingEngine()
+			se.model = se.trainWithDatabaseDocuments(limit=self.TRAIN_QE_SIZE)
+			qe.SpellingEngine = se
+		else:
+			print "Not training SpellingEngine."
+
+		if qe.ThesaurusEngine is None:
+			print "Training ThesaurusEngine."
+			te = ThesaurusEngine()
+			with open(os.path.join( Config().WebAppDirectory, "..","..", "thesaurus.txt")) as thesaurusFile:
+				thesaurus = thesaurusFile.read()
+			te.parseOpentaalThesaurus(thesaurus)
+			qe.ThesaurusEngine = te
 
 	def startLocal(self):
 		print ("Starting Yuras Tornado HTTP Server (LOCAL)")
@@ -91,7 +117,8 @@ class Server(threading.Thread):
 				self.PORT +=1
 		
 	def run(self):
-		#self.startLocal()
+		self.trainQueryEngine()
+		#self.startLocal()		
 		self.startCompressed()
 	
 if __name__ == "__main__":

@@ -1302,6 +1302,7 @@ auteurs;schrijvers
 auteurschap;epistel;geschreven;pennen
 auteurschap;epistel;pennen;schrijven
 auteurschap;geschreven;schrijven
+auteursrecht;copyright
 authentiek;oorspronkelijk
 auto;automaat
 auto;wagen

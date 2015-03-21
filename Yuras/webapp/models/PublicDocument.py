@@ -27,7 +27,6 @@ Its type is still Document, allowing it to be picked up by Document searches.
 				"stop_words" : Document.getStopwords(),
 				"ids": [str(self._id)],
 				"exclude":True
-						
 			}
 		}})
 		

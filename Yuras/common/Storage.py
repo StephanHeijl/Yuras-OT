@@ -8,7 +8,7 @@ from Yuras.common.Config import Config
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
-import datetime, base64, importlib
+import datetime, base64, importlib, pprint
 
 # Crypto imports
 from Crypto.Cipher import _AES
@@ -69,6 +69,7 @@ class Storage(Singleton):
 				
 			self.paddingChar = "{"	
 			self.cipher = AES.new(Config().encryptionKey, AES.MODE_CBC, self.iv)
+		self.instantiated = True
 		
 	def reconnect(self):
 		""" Executes the initialization function again. This will reconnect the instance to the server. """
@@ -143,7 +144,7 @@ class Storage(Singleton):
 			objString = base64.b64encode( str(obj)  )
 		except:
 			objString = base64.b64encode( obj.encode('utf-8') )
-		
+					
 		blockSize = AES.block_size
 		
 		fullString = objString + self.paddingChar + str(objType)
@@ -154,7 +155,7 @@ class Storage(Singleton):
 		""" Undoes the padding and type concatenation from `Storage.__padObject`.
 		
 :param fullString: The padded string.
-:returns: The unpadded object in its original form, if possible.		
+:returns: The unpadded object in its original form, if possible.
 		"""		
 		
 		split = str.split
@@ -181,7 +182,7 @@ class Storage(Singleton):
 		if type_ == "NoneType":
 			return None
 		elif type_ == "bool":
-			return type_ == "True"
+			return value == "True"
 		elif type_ == "datetime.datetime":
 			try:
 				return datetime.datetime.strptime(value,'%Y-%m-%d %H:%M:%S.%f')
@@ -313,6 +314,7 @@ class Storage(Singleton):
 		
 		:param document: A dictionary that will be stored as a document. Its contents can include strings, numbers and several types of native objects, like `datetime`.
 		"""
+		
 		if self.__currentDatabase == None:
 			raise ValueError, "There was no database selected"
 			
@@ -381,13 +383,11 @@ class Storage(Singleton):
 					
 		# Auto fix id requests
 		if "_id" in match and (isinstance(match["_id"], str) or isinstance(match["_id"], unicode)):
-			match["_id"] = ObjectId(match["_id"])			
+			match["_id"] = ObjectId(match["_id"])
 			
 		if self.__encryptDocuments and _encrypted:
 			match = self.__encryptDocument(match)
-			
-		print match
-						
+									
 		if fields == {}:
 			documents = self.__currentCollection.find(match, skip=skip)
 		else:
@@ -398,8 +398,7 @@ class Storage(Singleton):
 			
 		if sort is not None:
 			documents = documents.sort(sort)
-			print sort
-		
+					
 		if self.__encryptDocuments and _encrypted:
 			decrypted = []
 			for d in documents:
@@ -420,6 +419,8 @@ class Storage(Singleton):
 def test_Storage(encryptDocuments=False):
 	storage1 = Storage(encryptDocuments=True)
 	storage2 = Storage(encryptDocuments=False)
+	print storage1.instantiated
+	print storage2.instantiated
 	assert storage1 == storage2, "Storage is not a singleton"
 	
 def test_getHost():
@@ -499,15 +500,19 @@ def test_dropDatabase():
 
 def test_padObject():
 	storage = Storage()
-	assert storage._Storage__padObject("A") == "A{<type 'str'>{{"
-	assert storage._Storage__padObject(1) == "1{<type 'int'>{{"
-	assert storage._Storage__padObject(1.0) == "1.0{<type 'float'>{{{{{{{{{{{{{{"
+	assert storage._Storage__padObject("A") == "QQ=={<type 'str'>{{{{{{{{{{{{{{{"
+	assert storage._Storage__padObject(1) == "MQ=={<type 'int'>{{{{{{{{{{{{{{{"
+	assert storage._Storage__padObject(1.0) == "MS4w{<type 'float'>{{{{{{{{{{{{{"
+	assert storage._Storage__padObject(True) == "VHJ1ZQ=={<type 'bool'>{{{{{{{{{{"
+	assert storage._Storage__padObject(False) == "RmFsc2U={<type 'bool'>{{{{{{{{{{"
 
 def test_unpadString():
 	storage = Storage()
-	assert storage._Storage__unpadString("A{<type 'str'>{{") == "A"
-	assert storage._Storage__unpadString("1{<type 'int'>{{") == 1
-	assert storage._Storage__unpadString("1.0{<type 'float'>{{{{{{{{{{{{{{") == 1.0
+	assert storage._Storage__unpadString("QQ=={<type 'str'>{{{{{{{{{{{{{{{") == "A"
+	assert storage._Storage__unpadString("MQ=={<type 'int'>{{{{{{{{{{{{{{{") == 1
+	assert storage._Storage__unpadString("MS4w{<type 'float'>{{{{{{{{{{{{{") == 1.0
+	assert storage._Storage__unpadString("VHJ1ZQ=={<type 'bool'>{{{{{{{{{{") == True
+	assert storage._Storage__unpadString("RmFsc2U={<type 'bool'>{{{{{{{{{{") == False
 
 def test_Encrypted_insertDocument():
 	storage = Storage()
@@ -524,15 +529,20 @@ def test_Encrypted_getDocuments():
 def test_Encrypted_saveDocument():
 	storage = Storage()
 	storage.getDatabase("test_Encrypted_database")
+	storage.getDatabase("test_Encrypted_database")
 	storage.getCollection("test_Encrypted_collection")
 	
-	doc = {"name":"test_Encrypted_document_save", "version":1, "list-test":[1,2,3,4,5,"six"]}
+	doc = {"name":u"test_Encrypted_document_save", "version":1, "list-test":[1,2,3,4,5,"six"], "_encrypt":True}
 	storage.insertDocument(doc)
-	ndoc = storage.getDocuments({"name":"test_Encrypted_document_save"})[0]
+	ndoc = storage.getDocuments({"name":u"test_Encrypted_document_save"})[0]
 	ndoc["version"] = 2
 	storage.saveDocument(ndoc)
-	assert len(storage.getDocuments({"name":"test_Encrypted_document_save"})) == 1, "Document was duplicated."
-	assert storage.getDocuments({"name":"test_Encrypted_document_save"})[0]["version"] == 2, "Document was not saved properly"
+	
+	search = storage.getDocuments({"name":u"test_Encrypted_document_save"})
+	
+	assert len(search) > 0, "Document was not found"		
+	assert len(search) == 1 or isinstance(search, dict), "Document was duplicated."
+	assert search[0]["version"] == 2, "Document was not saved properly"
 	
 def test_Encrypted_removeDocuments():
 	storage = Storage()
