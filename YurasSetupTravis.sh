@@ -8,8 +8,8 @@ mkdir data/db/rs0
 mkdir data/db/rs1
 
 # Stop MongoDB database
-sudo service mongodb stop
-sudo service mongod stop
+service mongodb stop
+service mongod stop
 
 # Start the replicaset for elasticsearch.
 export LC_ALL=C
@@ -24,3 +24,5 @@ mongo localhost:27017 --eval "database='Yuras1'" setupDatabase.js
 
 # Install Python requirements
 find -name "requirements.txt" | xargs -i sudo pip install -r {}
+pip install numpy
+pip install scipy
