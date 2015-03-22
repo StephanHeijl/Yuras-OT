@@ -10,6 +10,7 @@ class Case(StoredObject):
 		self.title = "Case"
 		self.documents = []
 		self.user = None
+		self._encrypt = True
 		
 		super(Case, self).__init__(collection = "cases")
 		
@@ -54,6 +55,7 @@ class Case(StoredObject):
 			return False
 
 	def getDocuments(self):
+		print self.documents
 		match = {"_id": {"$in":[ ObjectId(d["id"]) for d in self.documents] }}
 		documents = Document().matchObjects( match )
 		return documents

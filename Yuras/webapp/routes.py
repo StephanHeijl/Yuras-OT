@@ -15,7 +15,6 @@ from flask.ext import login
 from Yuras.common.TemplateTools import TemplateTools
 from Yuras.common.Pandoc import Pandoc
 from Yuras.common.Config import Config
-from Yuras.common.QueryEngine import QueryEngine, SpellingEngine, ThesaurusEngine
 
 from Yuras.webapp.models.PublicDocument import PublicDocument as Document
 from Yuras.webapp.models.Annotation import Annotation
@@ -25,7 +24,6 @@ from Yuras.webapp.models.Case import Case
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from elasticsearch import Elasticsearch
 from Crypto import Random
 
 from u2flib_server.jsapi import DeviceRegistration
@@ -366,48 +364,6 @@ def fullTFIDFRun():
 	
 	return json.dumps({"success":"true"})
 
-def do_documentSearch(query, category=None, skip=0, limit=24):
-	es = Elasticsearch()
-	
-	res = es.search(index="document_contents", size=24, body={"query": {
-		"query_string" : {
-			"query" : query
-		}
-	}})
-	
-	results = []
-	for r in res['hits']['hits']:
-		d = Document()
-		for k,v in r['_source'].items():
-			setattr(d, k, v)
-		results.append(d)
-	
-	stopwords = Document.getStopwords()
-	
-	pattern = "" + ("|".join([w for w in re.split("[^\w]+",query) if len(w)>2])) + ""
-	markedWords = re.compile(pattern, flags=re.IGNORECASE)
-	for result in results:
-		result.markedContents = []
-		for word in query.split(" "):
-			if word in stopwords:
-				continue
-			surroundLength = 20
-			try:
-				wordIndex = result.contents.lower().index(word)
-			except:
-				continue
-			
-			start = wordIndex - surroundLength
-			if start < 0:
-				start = 0
-			end = wordIndex + len(word) + surroundLength
-			surroundingText = result.contents[start:end]
-			markedString = markedWords.sub('<span class="marked">\g<0></span>', surroundingText) 
-			
-			if len(markedString) > 1:
-				result.markedContents.append( markedString )
-	
-	return results
 
 @app.route("/documents/qsearch")
 @login.login_required
@@ -423,10 +379,7 @@ def documentSearch():
 		query = query[0]
 	category = request.args.get("category", None)
 	
-	qe = QueryEngine()
-	
-	extendedQuery = qe.convert(query)
-	results = do_documentSearch(extendedQuery,category=category if len(category)>0 else None)
+	results, extendedQuery = Document.search(query)
 
 	categories = Category().matchObjects({})
 	return render_template("documents/search.html",
@@ -463,45 +416,12 @@ def documentsUpload():
 	if request.method == "GET":
 		return render_template("documents/upload.html", active="documents", categories=categories, name="Upload document", error=None)
 	else:
-		filetypes = {
-			"docx":"docx",
-			"txt":"plain",
-			"pdf":"plain"
-		}
-		
-		f = request.files["file"]
 		data = dict(request.form)
-		filename = f.filename
-		extension = filename.split(".")[-1]
-		if extension not in filetypes.keys():
-			error = "Not an allowed format."
-			return returnUploadError(error,categories)
+		title = data["title"][0]
+		author = login.current_user.username
+		category = data["category"][0]
 		
-		document = Document()
-		document.title = data["title"][0]
-		content = f.stream.read()
-		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", content, filetype=extension )
-		document.category = data["category"][0]
-		document.author = login.current_user.username
-		
-		# Category detection
-		if document.category == "detect":
-			classifier = pickle.load( open(os.path.join( Config().WebAppDirectory, "..","..", "Classifier.cpic"), "rb") )
-			vectorizer = pickle.load( open(os.path.join( Config().WebAppDirectory, "..","..", "Vectorizer.cpic"), "rb") )
-			stopwords = Document.getStopwords()
-			
-			plainContents = Pandoc().convert("markdown_github","plain",document.contents).lower()
-			for stopword in stopwords:
-				plainContents = plainContents.replace(stopword, "")
-				
-			matrix = vectorizer.transform([plainContents])
-			print matrix
-			print "Classifying"
-			document.category = classifier.predict( matrix )[0]
-		
-		document.countWords()
-		document.vanillaSave()
-		print "Document saved", document._id
+		document,error = Document.upload(title, author, category, request.files["file"], documentClass=Document)
 
 		if error is None:
 			return redirect("/documents/"+str(document._id))
@@ -564,6 +484,9 @@ def caseEdit(id):
 		case = Case().getObjectsByKey("_id", id)[0]
 	except Exception as e:
 		return abort(404)
+	
+	print dir(case)
+	print case.documents
 	
 	documents = case.getDocuments()
 	tags = defaultdict(int)

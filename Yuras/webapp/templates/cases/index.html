@@ -24,7 +24,7 @@
 					<tr>
 						<td><a href="/cases/{{ case._id }}/edit">{{ case.title }}</a></td>
 						<td>{{ case.documents|length }}</td>
-						<td>{{ case._created.strftime("%d-%m-%Y %H:%M:%S") }}</td>
+						<td>{{ case._created }}</td>
 						<td>
 							<a href="/cases/{{ case._id }}/delete" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
 						</td>

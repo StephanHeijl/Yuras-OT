@@ -1,8 +1,9 @@
-import json, pprint
+import json, pprint, re
 
 from Yuras.webapp.models.Document import Document
 
 from elasticsearch import Elasticsearch
+from Yuras.common.QueryEngine import QueryEngine, SpellingEngine, ThesaurusEngine
 
 class PublicDocument(Document):
 	"""
@@ -16,6 +17,53 @@ Its type is still Document, allowing it to be picked up by Document searches.
 		self._encrypt = False
 		self._type = "Document"
 		return super(PublicDocument, self).__init__(*args, **kwargs)
+	
+	@staticmethod
+	def search(query, category=None, skip=0, limit=24):
+		qe = QueryEngine()
+		query = extendedQuery = qe.convert(query)		
+		
+		es = Elasticsearch()
+
+		res = es.search(index="document_contents", size=24, body={"query": {
+			"query_string" : {
+				"query" : query
+			}
+		}})
+
+		results = []
+		for r in res['hits']['hits']:
+			d = Document()
+			for k,v in r['_source'].items():
+				setattr(d, k, v)
+			results.append(d)
+
+		stopwords = Document.getStopwords()
+
+		pattern = "" + ("|".join([w for w in re.split("[^\w]+",query) if len(w)>2])) + ""
+		markedWords = re.compile(pattern, flags=re.IGNORECASE)
+		for result in results:
+			result.markedContents = []
+			for word in query.split(" "):
+				if word in stopwords:
+					continue
+				surroundLength = 20
+				try:
+					wordIndex = result.contents.lower().index(word)
+				except:
+					continue
+
+				start = wordIndex - surroundLength
+				if start < 0:
+					start = 0
+				end = wordIndex + len(word) + surroundLength
+				surroundingText = result.contents[start:end]
+				markedString = markedWords.sub('<span class="marked">\g<0></span>', surroundingText) 
+
+				if len(markedString) > 1:
+					result.markedContents.append( markedString )
+
+		return results, query
 	
 	def getRelatedDocumentsByTags(self, tags=None, asJSON=True, exclude=None):
 		""" Overwrite the getRelatedDocumentsByTags method and use the ElasticSearch methods. """

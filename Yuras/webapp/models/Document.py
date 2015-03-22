@@ -164,7 +164,21 @@ class Document(StoredObject):
 		super(Document, self).save()
 		return True
 	
-	def quickSearch(self, words):
+	@staticmethod
+	def search(query):
+		matchedObjects = {}
+		
+		for word in words:
+			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<self.scryptHashFactor))
+			matchedObjects["tags."+key] = { "$exists": True }
+		
+		results = self.matchObjects(matchedObjects, fields={"_id":True,"title":True})
+		for result in results:
+			result.markedWords = "No highlighting available for secured documents."
+		return results,query
+	
+	@staticmethod
+	def quickSearch(words):
 		matchedObjects = {}
 		
 		for word in words:
@@ -404,3 +418,50 @@ class Document(StoredObject):
 			categorized[key].append(document)
 			print title, "saved", dCounter, "/", dTotal
 			dCounter += 1
+			
+	@staticmethod
+	def upload(title, author, category, data, documentClass=None):
+		if documentClass is None:
+			documentClass = Document
+		
+		error = None
+		filetypes = {
+			"docx":"docx",
+			"txt":"plain",
+			"pdf":"plain"
+		}
+		
+		f = data
+		filename = f.filename
+		extension = filename.split(".")[-1]
+		if extension not in filetypes.keys():
+			error = "Not an allowed format."
+			return None,error
+		
+		document = Document()
+		document.title = title
+		content = f.stream.read()
+		document.contents = Pandoc().convert( filetypes[extension], "markdown_github", content, filetype=extension )
+		document.category = category
+		document.author = author
+		
+		# Category detection
+		if document.category == "detect":
+			classifier = pickle.load( open(os.path.join( Config().WebAppDirectory, "..","..", "Classifier.cpic"), "rb") )
+			vectorizer = pickle.load( open(os.path.join( Config().WebAppDirectory, "..","..", "Vectorizer.cpic"), "rb") )
+			stopwords = Document.getStopwords()
+			
+			plainContents = Pandoc().convert("markdown_github","plain",document.contents).lower()
+			for stopword in stopwords:
+				plainContents = plainContents.replace(stopword, "")
+				
+			matrix = vectorizer.transform([plainContents])
+			print matrix
+			print "Classifying"
+			document.category = classifier.predict( matrix )[0]
+		
+		#document.countWords()
+		document.vanillaSave()
+		print "Document saved", document._id
+		
+		return document, error

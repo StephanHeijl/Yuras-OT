@@ -5,7 +5,7 @@ This module was originally programmed for Olympus, but can now be used as a comp
 from abc import ABCMeta, abstractmethod
 from Yuras.common.Storage import Storage
 from Yuras.common.Config import Config
-import random, time, datetime, copy
+import random, time, datetime, copy,pprint
 
 class StoredObject():
 	""" This is a StoredObject, the base class of anything that is to be stored in our database.
@@ -29,6 +29,7 @@ class StoredObject():
 		self.name = name
 		self._created = datetime.datetime.now()
 		self._type = self.__class__.__name__
+		self._encrypt = True
 	
 	def setDatabase(self,database):
 		"""Sets the database for this object."""
@@ -132,22 +133,24 @@ class StoredObject():
 		storage.getCollection(collection)
 		
 		# Always try to add the _encrypt key, to ensure unencrypted documents won't have an attempted decryption
-		if 0 not in fields.values() and False not in fields.values():
+		if 0 not in fields.values() and False not in fields.values() and len(fields) > 0:
 			fields["_encrypt"] = True
-			
+						
 		if getattr(self, "_encrypt", True) and Config().encryptDocuments:		
 			sortDecrypted = True
 			documents = storage.getDocuments(match, limit, skip, fields, sort=None)
 		else:
 			sortDecrypted = False
 			documents = storage.getDocuments(match, limit, skip, fields, sort=sort, _encrypted=False)
+			
+		print documents
 		
 		if sort is not None and sortDecrypted:
 			documents.sort(key=lambda d: self.__multi_get(d, sort, default=""), reverse=reverse)
 		else:
 			if reverse:
 				documents.reverse()
-		
+				
 		objects = [ self.loadFromRawData( data ) for data in documents ]
 		
 		return objects
@@ -231,9 +234,10 @@ class StoredObject():
 		:param objectTwo: The second object
 		:param path: The root of the merger.
 		:rtype: A dictionary of merged values.
-		"""
-		a = copy.deepcopy(objectOne.__dict__)
-		b = copy.deepcopy(objectTwo.__dict__)
+		"""		
+		
+		a = copy.deepcopy(dict([(k,v) for k,v in objectOne.__dict__.items() if not k.startswith("_StoredObject__")]))
+		b = copy.deepcopy(dict([(k,v) for k,v in objectTwo.__dict__.items() if not k.startswith("_StoredObject__")]))
 		
 		attributes = self.merge(a,b,path)
 		return attributes
@@ -293,6 +297,7 @@ def test_createTestObject():
 	t = TestObject()
 	t.random = r
 	t.save()
+	assert t.random == r
 
 def test_findTestObject():
 	t = TestObject().getObjectsByKey("random",r)

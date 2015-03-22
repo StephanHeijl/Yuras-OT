@@ -8,6 +8,8 @@ from Crypto import Random
 from Yuras.common.Config import Config
 
 class User(StoredObject):
+	_encrypt = True
+	
 	def __init__(self):
 		self.username = ""
 		
