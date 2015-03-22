@@ -1,7 +1,6 @@
 # Install Pandoc
-sudo cabal update
 sleep 3
-sudo cabal install pandoc
+cabal install pandoc
 
 # Add pandoc dir to path
 export PATH=$PATH:~/.cabal/bin
