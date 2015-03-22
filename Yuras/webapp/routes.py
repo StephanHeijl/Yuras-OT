@@ -721,7 +721,6 @@ with open(os.path.join(assetsFolder, "words.txt")) as wordsFile:
 	wordList = [ w.strip("\r ") for w in wordsFile.read().split("\n") if (len(w) > 4 and len(w) < 8) ]
 
 @app.route("/users/get-random-words/<n>")
-@login.login_required
 def getRandomWords(n):
 	return json.dumps(random.sample(wordList,int(n)))
 
@@ -816,20 +815,39 @@ def userVerify(id):
 	
 
 # INSTALLING
-@app.route("/install")
+@app.route("/install/")
 def installYuras():
 	if len(User().matchObjects({})) > 0:
 		return abort(500)
 
-	user = User()
-	user.save()
+	return render_template("install/index.html", name="Install Yuras")
 
-	username = u"accountone"
-	password = unicode(" ".join(random.sample(wordList,4)))
+@app.route("/install/<page>", methods=["POST"])
+def installYurasPage(page):
+	return render_template("install/page_%s.html" % page, name="Install Yuras", data=dict(request.form))
+
+@app.route("/install/final", methods=["GET", "POST"])
+def installYurasFinal():
+	#data = dict(request.form)
+	
+	data = {
+		"username":["Stephan"],
+		"email":["Stephan@yuras.nl"],
+		"password":["get rekt son lol"],
+	}
+	
+	user = User()
+
+	username = unicode(data.get("username")[0].lower())
+	password = unicode(data.get("password")[0].lower())
+	email = unicode(data.get("email")[0].lower())
 
 	user.setPassword(password)
 	user.username = username
+	user.email = email
+	user.firstname = username
 
 	user.save()
-
-	return json.dumps([username, password])
+	
+	return render_template("install/final.html", name="You are done installing Yuras!")
+	

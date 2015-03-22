@@ -142,9 +142,7 @@ class StoredObject():
 		else:
 			sortDecrypted = False
 			documents = storage.getDocuments(match, limit, skip, fields, sort=sort, _encrypted=False)
-			
-		print documents
-		
+					
 		if sort is not None and sortDecrypted:
 			documents.sort(key=lambda d: self.__multi_get(d, sort, default=""), reverse=reverse)
 		else:

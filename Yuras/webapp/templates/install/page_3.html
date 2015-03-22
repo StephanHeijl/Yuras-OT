@@ -1,0 +1,33 @@
+{% extends "layout/minimal.html" %} 
+{% block index %}
+{{ deferJS("/assets/js/install.js", 1) }}
+{{ deferJS("/assets/js/validator.min.js", 2) }}
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-lg-6 col-md-offset-3">
+				<h1>Nice and secure. <br/> <small>We're almost done.</small> </h1>
+				<p> As a final question, we would like your email address. We'll use this to validate your account. 
+					You will not receive any unsollicited mail or newsletters from us. 
+					Your email address will not be sold or handed over to third parties.
+				</p>
+				
+				<form action="/install/final" role="form" data-toggle="validator" method="post">
+					<input type="email" name="email" placeholder="{{ data.get("name", ["Anonymous"])[0] }}@example.com" class="form-control input-lg" required=required />
+					
+					&nbsp;
+				
+					<input type="text" class="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+					<input type="password" class="hidden" name="password" value="{{ data.get("password-one",[""])[0] }} {{ data.get("password-two",[""])[0] }} {{ data.get("password-three",[""])[0] }} {{ data.get("password-four",[""])[0] }}"/>
+					<input type="hidden" class="hidden" name="name" value="{{ data.get("name", ["Anonymous"])[0] }}"/>
+					<p>
+						<input type="submit" class="btn btn-lg btn-success pull-right" value="Finish up! &raquo;" />
+					</p>
+				</form>
+			</div>
+
+		</div>
+
+	</div>
+{% endblock %}

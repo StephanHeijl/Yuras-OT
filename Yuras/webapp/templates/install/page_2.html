@@ -1,0 +1,44 @@
+{% extends "layout/minimal.html" %} 
+{% block index %}
+{{ deferJS("/assets/js/install.js", 1) }}
+{{ deferJS("/assets/js/validator.min.js", 2) }}
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-lg-6 col-md-offset-3">
+				<h1> Awesome {{data.get("name", ["Anonymous"])[0] }}! <br/> <small>Let's get you started.</small> </h1>
+				<p>In order for you to securely log in, we'll generate a password for you. This password consists of four words, separated by spaces.</p>
+				<p>Click on the "Different words" button to get new words. When you are satisfied with the password, store it in a safe place and click "I want this password" to continue.</p>
+				
+				<form action="/install/3" role="form" data-toggle="validator" method="post">
+					<div class="row generate-password">
+						<div class="col-lg-3">
+							<input input="text" name="password-one" class="form-control input-lg" readonly required  style="text-align:center;"/>
+						</div> 
+						<div class="col-lg-3">
+							<input input="text" name="password-two" class="form-control input-lg" readonly required style="text-align:center;"/>
+						</div> 
+						<div class="col-lg-3">
+							<input input="text" name="password-three" class="form-control input-lg" readonly required style="text-align:center;"/>
+						</div> 
+						<div class="col-lg-3">
+							<input input="text" name="password-four" class="form-control input-lg" readonly required style="text-align:center;"/>
+						</div> 
+					</div>
+					
+					&nbsp;
+				
+					<input type="hidden" class="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+					<input type="hidden" class="hidden" name="name" value="{{ data.get("name", ["Anonymous"])[0] }}"/>
+					<p>
+						<button type="button" class="btn btn-lg btn-default generate-new-password"><span class="glyphicon glyphicon-repeat"></span> Different words</button>
+						<input type="submit" class="btn btn-lg btn-success pull-right" value="I want this password &raquo;" />
+					</p>
+				</form>
+			</div>
+
+		</div>
+
+	</div>
+{% endblock %}

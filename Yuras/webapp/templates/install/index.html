@@ -1,0 +1,27 @@
+{% extends "layout/minimal.html" %} 
+{% block index %}
+{{ deferJS("/assets/js/install.js", 1) }}
+{{ deferJS("/assets/js/validator.min.js", 2) }}
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-lg-6 col-md-offset-3">
+				<h1> Welcome to <img src="/assets/img/logo-32.png"/><strong>Yuras</strong> <br/> <small>Installation procedure.</small> </h1>
+				<p>This guide will walk you through your first visit to Yuras and allow you to create the first user.</p>
+				<p>First off, what is your name?</p>
+				<form action="/install/2" role="form" data-toggle="validator" method="post">
+					<input type="text" name="name" class="form-control input-lg" required=required />
+					&nbsp;
+					<!-- CSRF token -->
+					<input type="hidden" class="hidden" name="_csrf_token" value="{{ csrf_token() }}"/>
+					<p>
+						<input type="submit" class="btn btn-lg btn-success pull-right" value="Next &raquo;" />
+					</p>
+				</form>
+			</div>
+
+		</div>
+
+	</div>
+{% endblock %}

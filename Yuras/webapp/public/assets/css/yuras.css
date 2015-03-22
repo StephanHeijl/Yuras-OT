@@ -25,8 +25,12 @@ h1 {
 	letter-spacing: -1px;
 }
 
-.row {
+.container > .row:first-child {
 	margin-top: 50px;
+}
+
+.row {
+	margin-top: 20px;
 }
 
 .usp-callout {

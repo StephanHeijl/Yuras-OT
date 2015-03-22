@@ -1,0 +1,28 @@
+{% extends "layout/minimal.html" %} 
+{% block index %}
+{{ deferJS("/assets/js/install.js", 1) }}
+{{ deferJS("/assets/js/validator.min.js", 2) }}
+	<div class="container">
+		
+		<div class="row">
+			
+			<div class="col-lg-6 col-md-offset-3">
+				<h1>We're finished! <br/> <small>Installation was a success.</small> </h1>
+				<div class="alert alert-info">
+					If you use a password manager like <a href="https://lastpass.com/">LastPass</a> or <a href="http://keepass.info/">KeePass</a>,
+					it may have prompted you to save the password for this domain. <strong>We recommend you do this!</strong>
+				</div>
+				<div class="alert alert-warning">This installation can only be run <strong>once</strong>. If you need any further assistance, please contact Yuras.</div>
+				
+				<p>Yuras is now fully at your disposal. Click the button below to go to login screen.</p>
+				
+				
+				<form method="get" action="/login">
+					<input type="submit" class="btn btn-lg btn-success pull-right" value="Go to login &raquo;" />
+				</form>
+			</div>
+
+		</div>
+
+	</div>
+{% endblock %}

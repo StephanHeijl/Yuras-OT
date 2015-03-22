@@ -1,0 +1,15 @@
+.btn, .form-control {
+	border-radius: 2px;
+}
+
+.btn-success, .btn-success.disabled, .btn-success:active, .btn-success:focus {
+	background: #1abc9c;
+	border-color: #16A287;
+}
+.btn-success:hover, .btn-success.disabled:hover, .btn-success:focus:hover {
+	background: #16A287;
+	border-color: #083C32;
+}
+.form-control:focus {
+	border-color: #1abc9c;
+}
