@@ -1,6 +1,6 @@
 from __future__ import division
 
-import os, re, base64, urllib2, json, time, random, chardet, scrypt, collections, math, pprint, random
+import os, re, base64, urllib2, json, time, random, scrypt, collections, math, pprint, random
 import multiprocessing, traceback, sys
 
 import cPickle as pickle

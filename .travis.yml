@@ -1,17 +1,9 @@
 language: python
 python:
-  - "2.6"
   - "2.7"
 sudo: false
-virtualenv:
-  system_site_packages: true
 addons:
   apt_packages:
-    - haskell-platform 
-    - libssl-dev 
-    - libffi-dev 
-    - openssl
-    - openjdk-7-jre
     - swig 
   
 # command to install dependencies
