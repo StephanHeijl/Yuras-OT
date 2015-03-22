@@ -24,5 +24,3 @@ mongo localhost:27017 --eval "database='Yuras1'" setupDatabase.js
 
 # Install Python requirements
 find -name "requirements.txt" | xargs -i sudo pip install -r {}
-pip install numpy
-pip install scipy

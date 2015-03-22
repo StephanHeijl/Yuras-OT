@@ -6,6 +6,8 @@ services:
   - elasticsearch
   - mongodb
 sudo: false
+virtualenv:
+  system_site_packages: true
 addons:
   apt_packages:
     - haskell-platform 
