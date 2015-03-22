@@ -7,10 +7,6 @@ mkdir data/db
 mkdir data/db/rs0
 mkdir data/db/rs1
 
-# Stop MongoDB database
-service mongodb stop
-service mongod stop
-
 # Start the replicaset for elasticsearch.
 export LC_ALL=C
 mongod --port 27017 --dbpath data/db/rs0 --replSet rs0 --fork --syslog
@@ -23,4 +19,4 @@ echo ''{ \\\"_id\\\" : \\\"rs0\\\", \\\"members\\\" : [ {\\\"_id\\\" : 0, \\\"ho
 mongo localhost:27017 --eval "database='Yuras1'" setupDatabase.js
 
 # Install Python requirements
-find -name "requirements.txt" | xargs -i sudo pip install -r {}
+find -name "requirements.txt" | xargs -i pip install -r {}
