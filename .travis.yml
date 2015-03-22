@@ -16,3 +16,4 @@ addons:
   
 # command to install dependencies
 install: "bash ./YurasSetupTravis.sh"
+script: "find -name '*.py' | xargs -i nosetests {}"
