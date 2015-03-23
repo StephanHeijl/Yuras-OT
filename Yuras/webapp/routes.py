@@ -1,10 +1,10 @@
 from __future__ import division
 
 import os, re, base64, urllib2, json, time, random, scrypt, collections, math, pprint, random
-import multiprocessing, traceback, sys
+import multiprocessing, traceback, sys, feedparser
 
 import cPickle as pickle
-from functools import wraps
+from functools import wraps, lru_c
 from collections import defaultdict
 
 from bson.objectid import ObjectId
@@ -151,7 +151,15 @@ def index():
 		{},
 		limit=10,
 		fields={"title":True, "author":True, "secure":True})
-	news = ["First mockup released"]
+	
+	# Parse blog feed
+	blogRssUrl = "http://blog.yuras.nl/rss/"
+	blogFeed = feedparser.parse(blogRssUrl)
+	
+	news = {}
+	for entry in blogFeed.entries:
+		news[entry.link] = entry.title
+	
 	return render_template("homepage/index.html", name="Dashboard", users=users, documents=documents, news=news, active="dashboard")
 
 @app.route("/assets/<assettype>/<path:filename>")

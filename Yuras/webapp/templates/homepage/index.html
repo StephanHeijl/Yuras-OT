@@ -26,9 +26,9 @@
 			<div class="col-lg-4">
 				<h2>Yuras News</h2>
 				<table class="table table-striped">
-					{% for article in news %} 
+					{% for url,title in news.items() %} 
 				
-					<tr><td>{{ article }}</td></tr>
+					<tr><td><a href="{{ url }}">{{ title }}</a></td></tr>
 					
 					{% endfor %}
 				</table>
