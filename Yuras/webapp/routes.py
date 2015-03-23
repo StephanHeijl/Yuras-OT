@@ -4,7 +4,7 @@ import os, re, base64, urllib2, json, time, random, scrypt, collections, math, p
 import multiprocessing, traceback, sys, feedparser
 
 import cPickle as pickle
-from functools import wraps, lru_c
+from functools import wraps
 from collections import defaultdict
 
 from bson.objectid import ObjectId
