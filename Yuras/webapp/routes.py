@@ -250,6 +250,8 @@ def documentViewer(id):
 	categories = Category().matchObjects({})
 	annotations.sort(key=lambda a: a.location[0])
 	document.contents = Pandoc().convert("markdown_github", "html", document.contents)
+	
+	document.highlightArticles()
 
 	return render_template("documents/viewer.html", name="Document", document=document, cases=cases, annotations=annotations, categories=categories)
 

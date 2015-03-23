@@ -164,6 +164,9 @@ $(function () {
 	s = Snap("#annotation-connector");
 
 	$("body").on("click", ".marked", function () {
+		if($(this).hasClass("article")) {
+			return;	
+		}
 		moveAnnotationConnector($(this));
 		scrollToSelectedAnnotation($(this))
 		selectedAnnotation = $(this);

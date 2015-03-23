@@ -112,11 +112,15 @@ a {
 }
 .marked {
 	background: #1abc9c;
-	transform: translate(-5px, 0px);
 	padding: 0.1em;
 	line-height: 1.4em;
 	color: white;
 }
+
+.marked.article {
+	background: #337ab7;
+}
+
 /* Annotation styling */
 
 .category-container {

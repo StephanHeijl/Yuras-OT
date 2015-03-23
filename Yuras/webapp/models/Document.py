@@ -21,6 +21,7 @@ class Document(StoredObject):
 		self.tags = {}
 		self.category = None
 		self.wordcount = {}
+		self.articles = None
 		
 		self.accessible = True
 		if getattr(self,"_encrypt",True):
@@ -68,6 +69,13 @@ class Document(StoredObject):
 		super(Document, self).save()
 		
 		return filteredResults
+	
+	def highlightArticles(self):
+		if self.articles is None:
+			self.getArticlesFromContent()
+			
+		for article in self.articles:
+			self.contents = self.contents.replace(article, " <div class='marked article'>"+article+"</div> ")
 	
 	def plainWordCount(self, filterStopwords=True):
 		plainContents = Pandoc().convert("markdown_github", "plain", self.contents.lower())
