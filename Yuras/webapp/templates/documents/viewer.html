@@ -3,7 +3,7 @@
 <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
 	<div class="navbar-header">
 		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-			<span class="sr-only">Toggle navigation</span>
+			<span class="sr-only">{{ _("Toggle navigation") }}</span>
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
@@ -43,34 +43,34 @@
 			-->
 
 			<li class="dropdown">
-				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Download as... <span class="caret"></span></a>
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{{ _("Download as") }} <span class="caret"></span></a>
 				<ul class="dropdown-menu" role="menu">
-					<li><a href="{{ document._id }}/download/docx">Word Document</a>
+					<li><a href="{{ document._id }}/download/docx">{{ _("Word Document") }}</a>
 					</li>
 					<li><a href="{{ document._id }}/download/pdf">PDF</a>
 					</li>
-					<li><a href="{{ document._id }}/download/txt">Plain text</a>
+					<li><a href="{{ document._id }}/download/txt">{{ _("Plain text") }}</a>
 					</li>
 				</ul>
 			</li>
 
 			<li>
-				<a href="#" id="analyze-document" data-csrf={{ csrf_token() }}><span class="glyphicon glyphicon-eye-open"></span> Analyze document</a>
+				<a href="#" id="analyze-document" data-csrf={{ csrf_token() }}><span class="glyphicon glyphicon-eye-open"></span> {{ _("Analyze document") }}</a>
 			</li>
 
 			<li>
-				<a href="#" id="get-related" data-csrf={{ csrf_token() }} data-toggle="modal" data-target="#relatedModal"><span class="glyphicon glyphicon-search"></span> Get related documents</a>
+				<a href="#" id="get-related" data-csrf={{ csrf_token() }} data-toggle="modal" data-target="#relatedModal"><span class="glyphicon glyphicon-search"></span> {{ _("Get related documents") }}</a>
 			</li>
 			
 			<li lass="related-document-add">
-				<a href="#"><div class="glyphicon glyphicon-plus"></div> Add to latest case</a>
+				<a href="#"><div class="glyphicon glyphicon-plus"></div> {{ _("Add to latest case") }}</a>
 			</li>
 
 		</ul>
 
 		<ul class="nav navbar-nav pull-right">
 			<li>
-				<a href="/documents" id="back"><span class="glyphicon glyphicon-chevron-left"></span> Back</a>
+				<a href="/documents" id="back"><span class="glyphicon glyphicon-chevron-left"></span> {{ _("Back") }}</a>
 			</li>
 		</ul>
 	</div>
@@ -81,7 +81,7 @@
 	<div class="annotation-wrapper-padding">
 		<div class="category-container">
 			<div class="category-dropdown btn btn-lg btn-default dropdown-toggle" data-toggle="dropdown" data-value="">
-				<span id="category">{{ document.category if document.category is not none and document.category is not undefined else "Category" }}</span>
+				<span id="category">{{ document.category if document.category is not none and document.category is not undefined else _("Category") }}</span>
 				<span class="caret"></span>
 			</div>
 			<ul class="dropdown-menu" role="menu">
@@ -92,7 +92,7 @@
 				{% endfor %}
 				<li class="divider"></li>
 				<li role="presentation">
-					<a role="menuitem" tabindex="-1" href="#" id="create-new-category">New category</a>
+					<a role="menuitem" tabindex="-1" href="#" id="create-new-category">{{ _("New category") }}</a>
 				</li>
 			</ul>
 
@@ -101,7 +101,7 @@
 		<br/>
 
 		<div class="input-group input-group-lg">
-			<input type="text" class="form-control" placeholder="Search">
+			<input type="text" class="form-control" placeholder="{{ _("Search") }}">
 			<span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
 		</div>
 
@@ -136,7 +136,7 @@
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
 					</button>
-					<span class="modal-title" id="relatedModalLabel">Related documents</span> {% if cases|length > 0 %}
+					<span class="modal-title" id="relatedModalLabel">{{ _("Related documents") }}</span> {% if cases|length > 0 %}
 					<div class="dropdown pull-right" style="margin-right: 20px; margin-top: -5px;">
 						<div class="case-dropdown btn btn-default dropdown-toggle" data-toggle="dropdown" data-value="">
 							<span id="chosen-case" data-case-id="{{ cases[-1]._id }}">{{ cases[-1].title }}</span>
@@ -163,7 +163,7 @@
 							{% endif %}
 
 							<div class="glyphicon glyphicon-file"></div>
-							<a href="" class="case-document-title">This is a longer document title</a>
+							<a href="" class="case-document-title"></a>
 						</div>
 						<img class="related-loader" src="/assets/img/loader.gif">>
 						<div class="row">
@@ -172,8 +172,8 @@
 					</div>
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default">Select all</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">Close and add selected</button>
+					<button type="button" class="btn btn-default">{{ _("Select all") }}</button>
+					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ _("Close and add selected") }}</button>
 				</div>
 			</div>
 		</div>

@@ -10,7 +10,7 @@
 				<h2>
 					<span class="case-title">{{ case.title }}</span>
 					<small><a href="#" title="Edit case title" id="edit-case-title"><div class="glyphicon glyphicon-pencil"></div></a></small></h2>
-				<div class="alert alert-warning add-related-document-warning" style="display:none;"> Please reload the page to see the newly added documents. </div>
+				<div class="alert alert-warning add-related-document-warning" style="display:none;">  {{ _("Please reload the page to see the new documents") }} </div>
 			</div>
 			<div class="edit-title" style="display:none;">
 				<br/>
@@ -20,7 +20,7 @@
 		</div>
 		
 		<div class="col-lg-9">
-			<h3> Currently selected documents </h3>
+			<h3>  {{ _("Currently selected documents") }} </h3>
 			{% for document in case.documents %}
 			<div class="case-document col-md-2" data-id="{{ document.id }}">
 				<div class="glyphicon glyphicon-file"></div>
@@ -31,7 +31,7 @@
 			</div>
 			{% endfor %}
 			
-			<h3>Suggested documents </h3>
+			<h3> {{ _("Suggested documents") }}</h3>
 			{% for document in suggested %}
 			<div class="case-document col-md-2" data-id="{{ document[0] }}" data-score="{{ document[2] }}">
 				<div class="related-document-rating"></div>	
@@ -56,7 +56,7 @@
 						{% set tagClass = 'label-default' %}
 					{%endif%}
 				
-					<span class="label {{tagClass}}" data-occurs="{{tag[1]}}" title="This tag appeared {{tag[1]}} times.">{{tag[0]}}</span> 
+					<span class="label {{tagClass}}" data-occurs="{{tag[1]}}" title=" {{ _("This tag appeared") }} {{tag[1]}} {{ _("times") }}.">{{tag[0]}}</span> 
 				{%endif%} 
 			{% endfor %}
 		</div>

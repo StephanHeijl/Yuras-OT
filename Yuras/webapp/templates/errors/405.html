@@ -5,13 +5,13 @@
 		<div class="row" style="position:relative;">
 			
 			<div class="col-md-6">
-				<h1>This URL can not be accessed in this way.</h1>
+				<h1>{{ _("This URL can not be accessed in this way.") }}</h1>
 				<p> 
-					You are trying to access a document or action that requires a random token set by our servers. This is to protect your data
-					from <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">Cross Site Request Forgery</a>.
+					{{ _("You are trying to access a document or action that requires a random token set by our servers. This is to protect your data
+					from") }} <a href="http://en.wikipedia.org/wiki/Cross-site_request_forgery">Cross Site Request Forgery</a>.
 				</p>
 				<p>
-					You can go <a href="javascript:history.back()">back to the previous page</a> or go to your <a href="/dashboard">dashboard</a>.
+					{{ _("You can go") }} <a href="javascript:history.back()">{{ _("back to the previous page") }}</a> {{ _("or go to your") }} <a href="/dashboard">{{ _("dashboard") }}</a>.
 				 </p>
 			</div>
 			<div style="font-size: 200px; color: black; opacity:0.2; position: absolute;right:1%;bottom:-220px;">!</div>

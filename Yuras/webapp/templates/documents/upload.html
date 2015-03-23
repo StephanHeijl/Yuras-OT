@@ -4,7 +4,7 @@
 	<div class="row">
 
 		<div class="col-lg-12">
-			<h2>Upload a document</h2>
+			<h2> {{ _("Upload a document") }}</h2>
 		</div>
 
 		<div class="col-lg-8">
@@ -16,7 +16,7 @@
 			<form class="form-horizontal" enctype="multipart/form-data"  action="" method="post" role="form" data-toggle="validator">
 				<div class="form-group">
 					<input type="hidden" class="category-input" name="category" required/>
-					<label for="title" class="col-sm-2 control-label">Title</label>
+					<label for="title" class="col-sm-2 control-label"> {{ _("Title") }}</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" id="title" placeholder="Title" name="title" required>
 					</div>
@@ -24,16 +24,16 @@
 
 				<div class="form-group">
 
-					<label for="btn" class="col-sm-2 control-label">Category</label>
+					<label for="btn" class="col-sm-2 control-label"> {{ _("Category") }}</label>
 					<div class="col-sm-10">
 						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false">
-								<span class="category-dropdown-text">Pick a category...</span>
+								<span class="category-dropdown-text"> {{ _("Pick a category") }}</span>
 								<span class="caret"></span>
 						</button>
 						<ul class="dropdown-menu" role="menu">
 							<li>
 								<a href="#" class="category-option" data-value="detect">
-									Detect category automatically
+									 {{ _("Detect category automagically") }}
 								</a>
 							</li>
 							<li class="divider"></li>
@@ -50,7 +50,7 @@
 
 				<div class="form-group">
 					<input type="hidden" class="category-input" name="category" required/>
-					<label for="file" class="col-sm-2 control-label">File</label>
+					<label for="file" class="col-sm-2 control-label"> {{ _("File") }}</label>
 					<div class="col-sm-10">
 						<input type="file" class="form-control" id="file" placeholder="File" name="file" required>
 					</div>
@@ -58,7 +58,7 @@
 
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
-						<button type="submit" class="btn btn-lg btn-success">Upload document</button>
+						<button type="submit" class="btn btn-lg btn-success"> {{ _("Upload document") }}</button>
 					</div>
 				</div>
 
@@ -71,9 +71,8 @@
 		<div class="col-lg-4">
 			<div class="panel panel-default">
 				<div class="panel-body">
-					This is the document upload form. You can upload newer Microsoft Word documents, PDFs or plain text.
+					 {{ _("This is the document upload form. You can upload newer Microsoft Word documents, PDFs or plain text.") }}
 				</div>
-
 			</div>
 		</div>
 

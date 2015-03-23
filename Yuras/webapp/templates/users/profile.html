@@ -7,11 +7,11 @@
 	<div class="row">
 
 		<div class="col-lg-12">
-			<h2>Profile page for {{ user.firstname }} </h2>	
+			<h2>{{ _("Profile page for") }} {{ user.firstname }} </h2>	
 			
 			{% if success %}
 			<div class="alert alert-success">
-				Profile save was successful.
+				{{ _("Profile save was succesful") }}
 			</div>
 			{% endif %}
 			
@@ -25,34 +25,34 @@
 		<div class="col-lg-12">
 			<form class="form-horizontal" action="/users/{{ user._id }}/save?back=/users/profile" method="post" role="form" data-toggle="validator">
 				<div class="form-group">
-					<label for="firstname" class="col-sm-2 control-label">First name</label>
+					<label for="firstname" class="col-sm-2 control-label">{{ _("First name") }}</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" id="firstname" placeholder="First name" name="firstname" value="{{ user.firstname }}" required>
 					</div>
 				</div>
 				<div class="form-group">
-					<label for="lastname" class="col-sm-2 control-label">Last name</label>
+					<label for="lastname" class="col-sm-2 control-label">{{ _("Last name") }}</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" id="lastname" placeholder="Last name" name="lastname" value="{{ user.lastname }}" required>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label for="lastname" class="col-sm-2 control-label">Username</label>
+					<label for="lastname" class="col-sm-2 control-label">{{ _("Username") }}</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" id="username" placeholder="Username" name="username" value="{{ user.username }}" required>
 					</div>
 				</div>
 
 				<div class="form-group">
-					<label for="email" class="col-sm-2 control-label">Email</label>
+					<label for="email" class="col-sm-2 control-label">{{ _("Email") }}</label>
 					<div class="col-sm-10">
 						<input type="email" class="form-control" id="email" placeholder="Email" name="email" value="{{ user.email }}" required>
 					</div>
 				</div>
 				
 				<div class="form-group">
-					<label for="password" class="col-sm-2 control-label">Change password</label>
+					<label for="password" class="col-sm-2 control-label">{{ _("Change password") }}</label>
 					<div class="col-sm-10">
 						<input type="text" class="form-control" id="old-password" placeholder="Old password" name="old-password" value="">
 					</div>
@@ -75,7 +75,7 @@
 
 				<div class="form-group">
 					<div class="col-sm-offset-2 col-sm-10">
-						<button type="submit" class="btn btn-lg btn-success">Save changes</button>
+						<button type="submit" class="btn btn-lg btn-success">{{ _("Save changes") }}</button>
 					</div>
 				</div>
 
@@ -88,19 +88,19 @@
 
 		<div class="col-lg-12">
 			<h3>Two-factor authentication</h3>
-			<p>You can use a secondary authentication device, like your mobile phone or a dongle to improve security. </p>
-			<button class="btn btn-default btn-lg" id="enrollU2F" data-user-id="{{ user._id }}"> Click here to enroll your U2F device. </button>
+			<p>{{ _("You can use a secondary authentication device, like your mobile phone or a dongle to improve security.") }}</p>
+			<button class="btn btn-default btn-lg" id="enrollU2F" data-user-id="{{ user._id }}"> {{ _("Click here to enroll your U2F device.") }} </button>
 			<br/><br/>
-			<button class="btn btn-default btn-lg" id="enrollMobile" data-user-id="{{ user._id }}"> Click here to enroll mobile phone. </button>
+			<button class="btn btn-default btn-lg" id="enrollMobile" data-user-id="{{ user._id }}"> {{ _("Click here to enroll mobile phone.") }} </button>
 		</div>
 		
 		
 		<div class="col-lg-12">
-			<h3>Document template</h3>
-			<p> Upload a Microsoft Word document that will be used as the layout for the documents you download. </p>
+			<h3>{{ _("Document template") }}</h3>
+			<p> {{ _("Upload a Microsoft Word document that will be used as the layout for the documents you download.") }} </p>
 			{% if user.referenceDocument %}
 			<div class="alert alert-warning">
-				By uploading a new reference you will be replacing your current template.
+				{{ _("By uploading a new reference you will be replacing your current template.") }}
 			</div>
 				
 			{% endif %}
@@ -108,18 +108,18 @@
 				<input type="file" name="reference">
 				<!-- CSRF token -->
 				<input type="hidden" class="hidden" name="_csrf_token" value={{ csrf_token() }} /> <br/>
-				<button type="submit" class="btn btn-lg btn-success">Upload template</button>
+				<button type="submit" class="btn btn-lg btn-success">{{ _("Upload template") }}</button>
 			</form>
 		</div>
 		
 		<div class="col-lg-12">
-			<h2> Documents by {{ user.firstname }}</h2>
+			<h2> {{ _("Documents by") }} {{ user.firstname }}</h2>
 			<table class="table table-striped">
 				<thead>
 					<tr>
-						<th data-key="title">Title</th>
-						<th data-key="_created">Created</th>
-						<th>Actions</th>
+						<th data-key="title">{{ _("Title") }}</th>
+						<th data-key="_created">{{ _("Created") }}</th>
+						<th>{{ _("Actions") }}</th>
 					</tr>
 				</thead>
 				<tbody>
