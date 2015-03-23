@@ -1,4 +1,7 @@
 from Yuras.common.Singleton import Singleton
+from Yuras.common.Config import Config
+
+import json, os
 
 class TemplateTools(Singleton):
 	""" This class contains a variety of functions that are useful when rendering templates.
@@ -6,6 +9,9 @@ class TemplateTools(Singleton):
 	
 	def __init__(self):
 		self.deferredJavascript = []
+		#if self.instantiated:
+		#	return
+		self.localizationDict = None
 		
 	def deferJS(self, url, position=0):
 		""" Defers loading a script to when the page has loaded, in the order defined by `position`. 
@@ -43,7 +49,7 @@ class TemplateTools(Singleton):
 				dJS.append((url,position))
 				seen.add(url)
 		
-		dJS.sort(key=lambda s: s[1])		
+		dJS.sort(key=lambda s: s[1])
 		
 		html = []
 		for script, pos in dJS:
@@ -53,6 +59,31 @@ class TemplateTools(Singleton):
 			self.deferredJavascript = []
 			
 		return "\n".join(html)
+	
+	def translate(self, key, language="default"):
+		""" Takes a phrase and translates it to a given language based on the internationalization file. """		
+		localizationPath = os.path.join( Config().WebAppDirectory, "../..", "localization.json")
+		if self.localizationDict is None:
+			with open(localizationPath, "r") as ld:
+				self.localizationDict = dict(json.load(ld))
+		
+		if language == "default":
+			language = Config().language
+			
+		if language == "en_US":
+			return key
+				
+		translation = self.localizationDict.get(language, {}).get(key, key+"**")
+		if translation.endswith("**") and language in self.localizationDict:
+			self.localizationDict[language][key+"**"] = "NEEDSTRANSLATION"
+			with open(localizationPath, "w") as ld:
+				json.dump(self.localizationDict, ld, indent=4)	
+		
+		return translation
+	
+	def _(self, *args, **kwargs):
+		""" Translate alias """
+		return self.translate(*args, **kwargs)
 		
 		
 # TESTING #

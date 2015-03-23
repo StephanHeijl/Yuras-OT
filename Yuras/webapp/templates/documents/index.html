@@ -7,16 +7,16 @@
 			<form action="/documents/search" method="get">
 				<input type="hidden" class="category-input" name="category" />
 				<div class="input-group input-group-lg">
-					<input type="text" class="form-control" placeholder="Search documents" name="keywords">
+					<input type="text" class="form-control" placeholder="{{ _("Search documents") }}" name="keywords">
 					<span class="input-group-btn">
 						<!-- Category picker -->
 						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false" type="button">
-							<span class="category-dropdown-text"> Any category</span> <span class="caret"></span>
+							<span class="category-dropdown-text">{{ _("Any category") }}</span> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
 						<li>
 							<a href="#" class="category-option" data-value="">
-									Any category
+								{{ _("Any category") }}
 								</a>
 						</li>
 						<li class="divider"></li>
@@ -31,7 +31,7 @@
 
 					<!-- Search button -->
 					<button class="btn btn-default" type="submit">
-						<span class="glyphicon glyphicon-search"></span> Search
+						<span class="glyphicon glyphicon-search"></span> {{ _("Search") }}
 					</button>
 
 					</span>

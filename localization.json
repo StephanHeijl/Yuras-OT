@@ -1,0 +1,28 @@
+{
+    "nl_NL": {
+        "Authenticate": "Authenticatie", 
+        "Search documents": "Zoeken naar documenten", 
+        "Documents": "Documenten", 
+        "Annotations": "Annotaties", 
+        "Username": "Gebruikersnaam", 
+        "Users": "Gebruikers", 
+        "Actual query": "Daadwerkelijke query", 
+        "Recent documents": "Recente documenten", 
+        "Cases": "Dossiers", 
+        "Password": "Wachtwoord", 
+        "Any category": "Elke categorie", 
+        "Profile": "Profiel", 
+        "Name": "Naam", 
+        "Created": "Gecre\u00ebrd", 
+        "Log in": "Log in", 
+        "news": "nieuws", 
+        "Search": "Zoeken", 
+        "Welcome": "Welkom", 
+        "I don't have an account": "Ik heb geen account", 
+        "Search results for ": "Zoekresultaten voor", 
+        "Active users": "Actieve gebruikers", 
+        "Toggle navigation": "Navigatie tonen/verbergen", 
+        "Dashboard": "Dashboard"
+    }, 
+    "en_US": {}
+}

@@ -4,21 +4,21 @@
 	<div class="row">
 		<div class="col-lg-12">
 
-			<h2>Search results for '{{ keywords.strip(" ") }}'<br/>
-			<small>Actual query: {{ extendedQuery }}</small></h2>
+			<h2>{{ _("Search results for ") }} '{{ keywords.strip(" ") }}'<br/>
+			<small>{{ _("Actual query") }}: {{ extendedQuery }}</small></h2>
 			<form action="/documents/search" method="get">
 				<input type="hidden" class="category-input" name="category" value="{{ category }}" />
 				<div class="input-group input-group-lg">
-					<input type="text" class="form-control" placeholder="Search documents" name="keywords" value="{{ keywords }}">
+					<input type="text" class="form-control" placeholder="{{ _("Search documents") }}" name="keywords" value="{{ keywords }}">
 					<span class="input-group-btn">
 						<!-- Category picker -->
 						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false" type=button>
-							<span class="category-dropdown-text">{{ category if category != "" else "Any category"}}</span> <span class="caret"></span>
+							<span class="category-dropdown-text">{{ category if category != "" else _("Any category") }}</span> <span class="caret"></span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
 						<li>
 							<a href="#" class="category-option" data-value="">
-								Any category
+								{{ _("Any category") }}
 							</a>
 						</li>
 						{% for category in categories %}
@@ -32,7 +32,7 @@
 
 					<!-- Search button -->
 					<button class="btn btn-default" type="submit">
-						<span class="glyphicon glyphicon-search"></span> Search
+						<span class="glyphicon glyphicon-search"></span> {{ _("Search") }}
 					</button>
 
 					</span>
