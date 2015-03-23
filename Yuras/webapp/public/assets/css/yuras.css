@@ -243,7 +243,7 @@ td.price small {
 .documents-wrapper {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
+	justify-content: flex-start;
 }
 
 .document-item {
@@ -262,6 +262,7 @@ td.price small {
 .document-summary {
 	display: none;
 }
+
 /* File icon */
 
 .file-icon {
@@ -400,6 +401,91 @@ td.price small {
 	transition: all 0.3s;
 	right: -5px;
 	top: -5px;
+}
+
+/* Case icon */
+.case-icon {
+	position: relative;
+	cursor: pointer;
+	transform: scale(0.7);
+	transition: transform 0.3s;
+	margin-bottom: 20px;
+
+}
+
+.case-icon-front {
+	position:absolute;
+	z-index: 100;
+	background: #1abc9c;	
+	width: 108px;
+	height: 150px;
+	border-radius: 5px;
+	top:0;
+	transform: skewY(30deg) scale(0.6,1) translate(-36px, 30px);
+}
+
+.case-icon-front:after {
+	position: absolute;
+	width: 10px;
+	height: 30%;
+	content: '';
+	right: -8px;
+	bottom: 0px;
+	background: #1abc9c;
+	border-radius: 0px 3px 3px 0px;	
+}
+
+.case-icon:hover {
+	transform: scale(0.75);
+	transition: transform 0.3s;
+}
+
+.case-icon-back {
+	position:relative;	
+	z-index: 10;
+	background: #16A287;	
+	width: 108px;
+	height: 150px;
+	border-radius: 5px 0px 5px 5px;
+}
+
+.case-icon-back:after {
+	position: absolute;
+	width: 10px;
+	height: 20%;
+	content: '';
+	right: -8px;
+	top: 0px;
+	background: #16A287;
+	border-radius: 0px 3px 3px 0px;	
+}
+
+.case-icon .file-icon {
+	position:absolute;
+	transform: scale(0.8) translate(-11px,-10px);
+	margin: 0;
+}
+
+.case-icon .file-icon:nth-child(1)  .file-icon-fold-cover, .case-icon .file-icon:nth-child(2)  .file-icon-fold-cover {
+	border-color: transparent #16A287 transparent transparent;
+}
+
+.case-icon .file-icon:nth-child(1) {
+	top: 0px;
+	left: 0px;
+	z-index: 50;
+}
+
+.case-icon .file-icon:nth-child(2) {
+	top: 15px;
+	left: 20px;
+	z-index: 60;
+}
+
+.case-icon .file-icon:nth-child(3) {
+	top: 30px;
+	left: 50px;
+	z-index: 70;
 }
 
 .highlight-placeholder {

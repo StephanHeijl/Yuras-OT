@@ -4,36 +4,70 @@
 	<div class="row">
 
 		<div class="col-lg-12">
-			<h2> {{ _("Documents") }}</h2>
-			<a class="btn btn-default" href="/cases/new"><span class="glyphicon glyphicon-folder-open"></span>{{ _("New case") }}</a>
+			<h2> {{ _("Cases") }}</h2>
 		</div>
 
-		<div class="col-lg-12">
-
-			<table class="table table-striped">
-				<thead>
-					<tr>
-						<th>  {{ _("Title") }} </th>
-						<th>  {{ _("Documents") }} </th>
-						<th>  {{ _("Created") }} </th>
-						<th>  {{ _("Actions") }} </th>
-					</tr>
-				</thead>
-				<tbody>
-					{% for case in cases %}
-					<tr>
-						<td><a href="/cases/{{ case._id }}/edit">{{ case.title }}</a></td>
-						<td>{{ case.documents|length }}</td>
-						<td>{{ case._created }}</td>
-						<td>
-							<a href="/cases/{{ case._id }}/delete" data-csrf="{{ csrf_token() }}"><span class="glyphicon glyphicon-trash"></span></a>
-						</td>
-					</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-
+		<div class="col-md-12 documents-wrapper">
+			{% for case in cases %}
+			<div class="document-item" data-type="case" data-id="{{ case._id }}">
+				<div class="document-summary">
+					{{ case.title }}
+				</div>
+				<div class="case-icon" draggable=true>
+					{% if case.documents|length > 0 %}
+					<div class="file-icon">
+						<div class="file-icon-fold"></div>
+						<div class="file-icon-fold-cover"></div>
+					</div>
+					{%endif%}
+					{% if case.documents|length > 1 %}
+					<div class="file-icon">
+						<div class="file-icon-fold"></div>
+						<div class="file-icon-fold-cover"></div>
+					</div>
+					{%endif%}
+					{% if case.documents|length > 2 %}
+					<div class="file-icon">
+						<div class="file-icon-fold"></div>
+						<div class="file-icon-fold-cover"></div>
+						<div class="file-icon-image gavel"></div>
+					</div>
+					{%endif%}
+					
+					<div class="case-icon-back"></div>					
+					<div class="case-icon-front"></div>
+				</div>
+				
+				<span class="document-title">{{ case.title[:75] }}{% if case.title|length > 75 %}...{% endif %}</span>
+			</div>
+			{% endfor %}
 		</div>
+	</div>
+</div>
+<div class="document-highlight-container">
+	<div class="document-highlight-pointer-container">
+		<div class="document-highlight-pointer-border"></div>
+		<div class="document-highlight-pointer-inside"></div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="document-title"></div>
+			</div>
+			<div class="col-md-12">
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sapien enim, pharetra vel aliquam vel, eleifend non urna. Duis suscipit ex eros, quis fermentum urna volutpat dapibus. Sed sollicitudin nisi ac erat blandit, id hendrerit dui blandit. Nam sed facilisis libero. Vivamus eget velit condimentum, laoreet nisl vel, viverra magna. Nullam facilisis rutrum euismod. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer eget eros tincidunt, mattis risus venenatis, venenatis est.
+				</p>
+			</div>
+			<div class="col-md-12">
+				<a class="document-highlight-button delete-case"><span class="glyphicon glyphicon-trash"></span></a>
+				<a class="document-highlight-button view-document"><span class="glyphicon glyphicon-eye-open"></span></a>
+			</div>
+		</div>
+
+
+	</div>
+
 
 	</div>
 
