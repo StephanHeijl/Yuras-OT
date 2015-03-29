@@ -388,6 +388,7 @@ class Document(StoredObject):
 	
 	@staticmethod
 	def generateJurisprudenceDocuments(documentClass=None):
+		print documentClass
 		if documentClass is None:
 			documentClass = Document
 		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
@@ -411,8 +412,11 @@ class Document(StoredObject):
 					c.name = key
 					c.save()
 
-			if len(Document().getObjectsByKey("title", title)) == 0:
+			if len(documentClass().getObjectsByKey("title", title)) == 0:
+				print documentClass
 				d = documentClass()
+				print d
+				print "Encrypting:",d._encrypt
 				d.title = title
 				d.category = key
 				d.contents = Pandoc().convert("html","markdown_github", document)

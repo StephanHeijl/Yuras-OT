@@ -302,8 +302,7 @@ aansporend;stimulerend
 aansporing;houvast;hulp;steun
 aanspraak;recht;rechtsgrond;rechtstitel
 aanspraak;rechtstitel
-aansprakelijk;gehouden
-aansprakelijk;gehouden;verantwoordelijk
+aansprakelijk;verantwoordelijk
 aansprakelijk;toerekeningsvatbaar;verantwoordelijk
 aansprakelijkheid;verantwoordelijkheid
 aanstekelijk;besmettelijk

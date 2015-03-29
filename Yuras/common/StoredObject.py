@@ -29,7 +29,8 @@ class StoredObject():
 		self.name = name
 		self._created = datetime.datetime.now()
 		self._type = self.__class__.__name__
-		self._encrypt = True
+		if not hasattr(self, "_encrypt"):
+			self._encrypt = True
 	
 	def setDatabase(self,database):
 		"""Sets the database for this object."""

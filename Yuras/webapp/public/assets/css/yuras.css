@@ -403,6 +403,21 @@ td.price small {
 	top: -5px;
 }
 
+.file-icon-badge {
+	color: white;
+	position: absolute;
+	right: 5px;
+	bottom: 5px;
+	background: #1abc9c;
+	width: 32px;
+	height: 32px;
+	line-height: 32px;
+	border-radius: 50%;
+	text-align: center;
+	font-weight:bold;
+	
+}
+
 /* Case icon */
 .case-icon {
 	position: relative;

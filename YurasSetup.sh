@@ -11,6 +11,7 @@ sudo cabal install pandoc
 
 # Add pandoc dir to path
 export PATH=$PATH:~/.cabal/bin
+export LC_ALL="C"
 
 # Add MongoDB directories
 sudo mkdir /data
@@ -31,14 +32,14 @@ sudo bash startReplicaSet.sh
 sleep 5
 
 # Initiate replicaset
-echo ''{ \\\"_id\\\" : \\\"rs0\\\", \\\"members\\\" : [ {\\\"_id\\\" : 0, \\\"host\\\" : \\\"$HOSTNAME:27017\\\", \\\"priority\\\" : 1 }, {\\\"_id\\\" : 1, \\\"host\\\" : \\\"$HOSTNAME:27018\\\", \\\"priority\\\" : 0.5 } ] }'' | xargs -i mongo --eval "rs.initiate({})"
+echo ''{ \\\"_id\\\" : \\\"rs0\\\", \\\"members\\\" : [ {\\\"_id\\\" : 0, \\\"host\\\" : \\\"$HOSTNAME:27017\\\", \\\"priority\\\" : 1 } ] }'' | xargs -i mongo --eval "rs.initiate({})"
 
 mongo localhost:27017 --eval "database='Yuras1'" setupDatabase.js
 
 # Install ElasticSearch
 wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.2.deb
 sudo dpkg -i elasticsearch-1.4.2.deb
-rm https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.2.deb
+rm elasticsearch-1.4.2.deb
 sleep 5
 
 # Install elasticsearch River plugin for MongoDB and Head Frontend
@@ -50,7 +51,7 @@ sudo service elasticsearch restart
 sleep 10
 
 # Configure index on document contents
-curl -XPUT '127.0.0.1:9200/_river/mongodb/_meta' '{"type":"mongodb","mongodb":{"db":"Yuras1","collection":"documents"},"index":{"name":"document_contents","type":"document"}}'
+curl -XPUT '127.0.0.1:9200/_river/mongodb/_meta' -d '{"type":"mongodb","mongodb":{"db":"Yuras1","collection":"documents", "options":{"exclude_fields":["wordcount","structuredlaw","_encrypt"]}},"index":{"name":"document","type":"document"}}' -H "Content-Type: application/json"
 
 # Install Python requirements
 

@@ -43,31 +43,31 @@
 	<div class="row">
 		<div class="col-md-9 documents-wrapper">
 			{% for document in documents %}
-			<div class="document-item">
-				<div class="file-icon">
-
-					{% if loop.index % 5 >= 1 %}
-					<div class="file-icon-marker teal-marker"></div>
-					{% endif %} {% if loop.index % 5 >= 2 %}
-					<div class="file-icon-marker red-marker"></div>
-					{% endif %} {% if loop.index % 5 >= 3 %}
-					<div class="file-icon-marker blue-marker"></div>
-					{% endif %}
-
+			<div class="document-item" data-type="{{document.document_type}}" data-id="{{ document._id }}">
+				<div class="document-summary">
+					{{ document.contents[:500] }}{% if document.contents|length > 500 %}...{% endif %}
+				</div>
+				<div class="file-icon" draggable="true">
 					<div class="file-icon-fold"></div>
 					<div class="file-icon-fold-cover"></div>
-
-					{% if loop.index % 7 == 0 %}
+					
+					{% if document.document_type == "jurisprudence" %}
 					<div class="file-icon-image gavel"></div>
-					{% endif %} {% if loop.index % 7 == 2 %}
-					<div class="file-icon-image">
-						<div class="glyphicon glyphicon-star"></div>
-					</div>
 					{% endif %}
+					{% if document.document_type == "law" %}
+					<div class="file-icon-image"><span class="glyphicon glyphicon-star"></span></div>
+					{% endif %}
+					
+					<div class="file-icon-badge">
+						<span class="glyphicon glyphicon-lock"></span>
+					</div>
 				</div>
-				<span class="document-title">{{ document.title }}</span>
+				<span class="document-title">{{ document.title[:75] }}{% if document.title|length > 75 %}...{% endif %}</span>
 			</div>
 			{% endfor %}
+		</div>
+		<div class="col-md-3">
+			Drag here to add to a case.
 		</div>
 	</div>
 
@@ -88,9 +88,9 @@
 				</p>
 			</div>
 			<div class="col-md-12">
-				<div class="document-highlight-button"><span class="glyphicon glyphicon-book"></span></div>
-				<div class="document-highlight-button"><span class="glyphicon glyphicon-bookmark"></span></div>
-				<div class="document-highlight-button"><span class="glyphicon glyphicon-eye-open"></span></div>
+				<a class="document-highlight-button add-to-case"><span class="glyphicon glyphicon-book"></span></a>
+				<a class="document-highlight-button add-bookmark"><span class="glyphicon glyphicon-bookmark"></span></a>
+				<a class="document-highlight-button view-document"><span class="glyphicon glyphicon-eye-open"></span></a>
 			</div>
 		</div>
 

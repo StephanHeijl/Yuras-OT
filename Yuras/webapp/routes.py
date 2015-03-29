@@ -196,7 +196,7 @@ def documentsIndex():
 	documents = Document().matchObjects(
 		{},
 		limit=18,
-		fields={"title":True, "_created":True, "author":True, "secure":True, "_id":True}
+		fields={"title":True, "_created":True, "author":True, "_id":True, "document_type":True}
 		)
 
 	categories = Category().matchObjects({})
@@ -338,7 +338,7 @@ def documentArticles(id):
 @app.route("/documents/add-jurisprudence")
 @login.login_required
 def addJurisprudenceDocuments():
-	Document.generateJurisprudenceDocuments( Document )
+	Document.generateJurisprudenceDocuments( documentClass=Document )
 	
 	return json.dumps({"success":"true"})
 
@@ -836,19 +836,13 @@ def installYuras():
 def installYurasPage(page):
 	return render_template("install/page_%s.html" % page, name="Install Yuras", data=dict(request.form))
 
-@app.route("/install/final", methods=["GET", "POST"])
+@app.route("/install/final", methods=["POST"])
 def installYurasFinal():
-	#data = dict(request.form)
-	
-	data = {
-		"username":["Stephan"],
-		"email":["Stephan@yuras.nl"],
-		"password":["get rekt son lol"],
-	}
+	data = dict(request.form)
 	
 	user = User()
 
-	username = unicode(data.get("username")[0].lower())
+	username = unicode(data.get("name")[0].lower())
 	password = unicode(data.get("password")[0].lower())
 	email = unicode(data.get("email")[0].lower())
 
