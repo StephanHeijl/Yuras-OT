@@ -17,7 +17,6 @@ export LC_ALL="C"
 sudo mkdir /data
 sudo mkdir /data/db
 mkdir /data/db/rs0
-mkdir /data/db/rs1
 sudo chown -R mongodb /data
 
 # Stop MongoDB database

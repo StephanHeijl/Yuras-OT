@@ -14,7 +14,7 @@ mkdir data/db/rs1
 # Start the replicaset for elasticsearch.
 export LC_ALL=C
 mongod --port 27017 --dbpath data/db/rs0 --replSet rs0 --fork --syslog
-mongod --port 27018 --dbpath data/db/rs1 --replSet rs0 --fork --syslog
+
 sleep 5
 
 # Initiate replicaset

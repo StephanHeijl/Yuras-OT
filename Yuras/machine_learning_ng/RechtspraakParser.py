@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import json, os, pprint, numpy, re, math, operator, collections, requests, sys
 from Yuras.common.Config import Config
 
@@ -10,7 +13,7 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
 
-from Yuras.webapp.models.Document import Document
+#from Yuras.webapp.models.Document import Document
 
 class RechtspraakParser():
 	def __init__(self):
@@ -176,7 +179,7 @@ class RechtspraakParser():
 				
 			content_indication,procedures = None,None
 			try:
-				content_indication = document["contents"]["results"]["inhoudsindicatie"]
+				content_indication = document["Tekstfragment"]
 				procedures = document["proceduresoorten"]
 			except:
 				pass
@@ -194,11 +197,141 @@ class RechtspraakParser():
 				 "content_indication": content_indication
 				}
 			print json.dumps(d)
+			
+	def filterRechtspraak(self, filename, tokenizer=None):
+		rechtspraak = json.load(open(filename))
+		abstractive, fragment, unlabeled = [],[],[]
+		if tokenizer is None:
+			tokenizer = string.split
+		
+		for document in rechtspraak.values():
+			title = document["Titel"]
+			try:
+				contents = tokenizer( " ".join( document["contents"]["results"]["uitspraak"] ).lower() )
+			except:
+				continue
+				
+			if None in contents:
+				print "lel"
+				continue
+				
+			# Check of this the document contains a summary
+			try:
+				summary = document["Tekstfragment"].lower()
+			except:
+				unlabeled.append( (0, contents, "") )
+				continue
+			
+			summary = tokenizer(summary)
+			if len(summary) == 0 or (len(summary) == 1 and len(summary[0]) < 20) :
+				unlabeled.append( (0, contents, "") )
+				continue
+			
+			percentageInContents = 0
+			for token in summary:
+				if token in contents:
+					percentageInContents += (100.0/len(summary))
+			
+			if percentageInContents > 50: # More then 97% is probably copied directly from the text.
+				fragment.append( ( percentageInContents, contents, summary ) )
+			else:
+				pass
+				#abstractive.append( ( percentageInContents, contents, summary ) )
+						
+		return abstractive, fragment, unlabeled
+		
+	def filterRechtspraakFolder(self, directory, tokenizer=None, n=100):
+		abstractive, fragment, unlabeled = [],[],[]
+		
+		if tokenizer is None:
+			tokens = re.compile("[^\w]+")
+			tokenizer = tokens.split
+		
+		for f in os.listdir(directory)[:n]:
+			a, frag, u = self.filterRechtspraak(os.path.join(directory, f), tokenizer)
+			#abstractive += a
+			fragment += frag
+			unlabeled += u
+
+		#del abstractive
+		#del unlabeled
+		
+		#self.visualizeFilteredRechtspraakElements(fragment)
+		
+		return abstractive, fragment, unlabeled
+		
+		abstractive.sort(key=lambda a: a[0])
+		fragment.sort(key=lambda a: a[0])
+
+		json.dump(abstractive, open("abstractive.json","w"))
+		json.dump(fragment, open("fragment.json","w"))
+		json.dump(unlabeled, open("unlabeled.json","w"))
+		
+	def visualizeFilteredRechtspraakElements(self, data ):
+		""" This method will produce a histogram showing the percentage of words with a high TFIDF score. """
+		import numpy as np
+		import matplotlib.pyplot as plt
+		
+		documentsContaining = collections.defaultdict(int)
+		for d in data:
+			content = d[1]
+			for word in set(content):
+				documentsContaining[word] += 1	
+				
+		contentHighlyRelevantOccurences, summaryHighlyRelevantOccurences = [],[]
+		for document in data:
+			percentageInContents, contents, summary = document
+			termFrequencies = collections.defaultdict(int)
+			for word in contents:
+				termFrequencies[word]+=1
+				
+			contentsResults = {}
+			for word in set(contents):
+				contentsResults[word] = termFrequencies[word] * math.log(float(len(data))/(documentsContaining[word]+1))
+			
+			summaryResults = {}
+			for word in set(summary):
+				summaryResults[word] = termFrequencies[word] * math.log(float(len(data))/(documentsContaining[word]+1))
+				
+			threshold = 2
+			contentHighlyRelevantOccurences.append( round(len([w for w in contentsResults if contentsResults[w] > threshold])/float(len(content))*2,2)/2 )
+			summaryHighlyRelevantOccurences.append( round(len([w for w in summaryResults if summaryResults[w] > threshold])/float(len(summary))*2,2)/2 )
+			
+		del data	
+		
+		countedContentResults = collections.Counter(contentHighlyRelevantOccurences)
+		countedSummaryResults = collections.Counter(summaryHighlyRelevantOccurences)
+		precision = 200
+		
+		labels = [float(n)/precision for n in range(precision)]
+		
+		ind = np.arange(precision)  # the x locations for the groups
+		barsContents = [countedContentResults.get(l,0) for l in labels]
+		barsSummary = [countedSummaryResults.get(l,0) for l in labels]
+		
+		del countedContentResults
+		del countedSummaryResults
+				
+		fig = plt.figure()
+		ax = fig.add_subplot(111)
+		
+		width = 0.35
+		ax.set_xlim(-width,len(ind)+width)
+		
+		ax.bar(ind, barsContents, width)
+		ax.bar(ind+width, barsSummary,width,color='red')
+		
+		plt.xticks(ind, labels, rotation=45)
+		plt.show()
+				
 	
 if __name__ == "__main__":
 	RP = RechtspraakParser()
 	#articles = RP.parseWetboek(sys.argv[1])
-	RP.parseRechtspraak(sys.argv[1])
+	#RP.parseRechtspraak(sys.argv[1])
+	
+	RP.filterRechtspraakFolder(sys.argv[1])
+		
 	#articles = RP.downloadWetboeken()
 	#documents = RP.parseJson(RP.jsonFileName)
 	#RP.parseDocumentDict(dict(documents.items()[:1000]))
