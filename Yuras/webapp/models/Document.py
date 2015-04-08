@@ -61,11 +61,34 @@ class Document(StoredObject):
 		for result in articleRegex.finditer(self.contents):
 			results.add(result.group(0).strip(",. "))
 			
-		# We also filter out substrings
-		results = list(results)
-		filteredResults = [j for i, j in enumerate(results) if all(j not in k for k in results[i + 1:])]
+		with open(os.path.join( Config().WebAppDirectory, "..", "..", "wetboekencsv.json") as wetboekencsv:
+			wetboeken = [wb.strip(";").split(";") for wb in wetboekencsv.read().split("\n")]
 		
-		self.articles = filteredResults
+		filteredArticles = []
+		filterwords = ["onder", "lid", "alinea"]
+		for result in results:
+			suffix = [g for g in result if g is not None][-2]
+			if True not in [f in suffix for f in filterwords] and suffix not in list("0123456789"):
+				found = False
+				
+				if suffix == "deze wet":
+					articleName = " ".join([result[0], result[3], wetboek[0]])
+					print articleName
+					filteredArticles.append(articleName)
+					continue
+					
+				for wetboek in wetboeken:
+					if found:
+						break
+					for wb in wetboek:
+						if wb in suffix:
+							found = True
+							articleName = " ".join([result[0], str(result[2]), wetboek[0]])
+							print articleName
+							filteredArticles.append(articleName)
+			
+		
+		self.articles = filteredArticles
 		super(Document, self).save()
 		
 		return filteredResults

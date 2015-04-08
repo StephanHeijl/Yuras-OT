@@ -1,12 +1,14 @@
 from Yuras.machine_learning_ng.RechtspraakParser import RechtspraakParser
-import re,sys,pprint,collections,math,itertools
 
+import networkx as nx
 import numpy as np
-from sklearn.kernel_approximation import RBFSampler
-from sklearn.linear_model import SGDClassifier as Classifier
-#from sklearn.naive_bayes import GaussianNB as Classifier
-from sklearn.metrics import matthews_corrcoef,classification_report,confusion_matrix
-from sklearn.cross_validation import KFold
+
+import sys,os,pprint,collections,math,re,json
+ 
+from nltk.tokenize.punkt import PunktSentenceTokenizer
+from nltk.tokenize import word_tokenize
+import nltk.data
+from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
 
 class Summarizer():
 	def __init__(self):
@@ -20,246 +22,188 @@ class Summarizer():
 	
 class SummarizeFragment(Summarizer):
 	def __init__(self):
-		self.model = None
-		self.lidwoordRegex = re.compile("de|het|een")
-		
-	def getPredictionSet(self, data):
-		contentHighlyRelevantOccurences = {}
-		
-		threshold = 2
-		
-		for document in data:
-			p, contents, summary = document
-			termFrequencies = collections.defaultdict(int)
-			
-			for sentence in contents[:]:
-				if len(sentence) < 3:
-					contents.remove(sentence)
-				
-							
-			for sentence in contents:
-				for word in sentence.split():
-					termFrequencies[word]+=1
-					
-			contentsResults = {}
-			for sentence in contents:
-				for word in set(sentence.split()):
-					contentsResults[word] = termFrequencies[word] * math.log(float(len(data))/(self.documentsContaining[word]+1))
-			
-			for sentence in contents:
-				score = 0
-				words = sentence.split()
-				for word in words:
-					if contentsResults[word]>threshold:
-						score += 1
-				senlen = len(words)+1
-				
-				lidwoorden = self.lidwoordRegex.findall(sentence)
-				contentHighlyRelevantOccurences[sentence] = ([float(score), senlen, len(lidwoorden)])
-		
-		return contentHighlyRelevantOccurences
+		self.sentence_tokenizer = PunktSentenceTokenizer()
+		self.documents = []
+		self.scores = collections.defaultdict(float)
+		self.wordDocumentCount = collections.defaultdict(int)
+		self.tagger = nltk.data.load("taggers/alpino_brill_aubt.pickle")
 	
-	def getDataSet(self, data):
-		documentsContaining = collections.defaultdict(int)
-		for d in data:
-			try:
-				content = d[1]
-			except:
-				continue
-			for sentence in content:
-				for word in set(sentence.split()):
-					documentsContaining[word] += 1	
-				
-		contentHighlyRelevantOccurences, summaryHighlyRelevantOccurences = [],[]
-		
-		threshold = 2
-		contentTermFrequencies = collections.defaultdict(int)
-		summaryTermFrequencies = collections.defaultdict(int)
-		
-		for document in data:
-			percentageInContents, contents, summary = document
-			termFrequencies = collections.defaultdict(int)
-			
-			for sentence in contents[:]:
-				if sentence in summary or len(sentence.split()) < 1:
-					contents.remove(sentence)
-							
-			for sentence in contents:
-				for word in sentence.split():
-					termFrequencies[word]+=1
-					contentTermFrequencies[word]+=1
-					
-			for sentence in summary[:]:
-				if len(sentence.split()) == 0:
-					summary.remove(sentence)
-					continue
-				for word in sentence.split():	
-					summaryTermFrequencies[word]+=1
-				
-			contentsResults = {}
-			for sentence in contents:
-				for word in set(sentence.split()):
-					contentsResults[word] = termFrequencies[word] * math.log(float(len(data))/(documentsContaining[word]+1))
-			
-			summaryResults = {}
-			for sentence in summary:
-				for word in set(sentence.split()):
-					summaryResults[word] = termFrequencies[word] * math.log(float(len(data))/(documentsContaining[word]+1))
-			
-			for sentence in contents:
-				score = 0
-				words = sentence.split()
-				for word in words:
-					if contentsResults[word]>threshold:
-						score += 1
-				senlen = len(words)+1
-				
-				lidwoorden = self.lidwoordRegex.findall(sentence)
-				contentHighlyRelevantOccurences.append([float(score), senlen, len(lidwoorden)])
-				
-			for sentence in summary:
-				score = 0
-				words = sentence.split()
-				for word in words:
-					if summaryResults[word]>threshold:
-						score += 1
-				
-				senlen = len(words)+1
-				
-				lidwoorden = self.lidwoordRegex.findall(sentence)
-				summaryHighlyRelevantOccurences.append([float(score), senlen, len(lidwoorden)])
-		
-		#self.calculateTermFrequencyDifferences(contentTermFrequencies, summaryTermFrequencies)
-		#exit()
-			
-		#pprint.pprint(contentHighlyRelevantOccurences[:10])
-		#pprint.pprint(summaryHighlyRelevantOccurences[:10])
-		
-		self.documentsContaining = documentsContaining
-		return contentHighlyRelevantOccurences, summaryHighlyRelevantOccurences
+	def tf(self, word, blob):
+		return blob.words.count(word) / len(blob.words)
 	
-	def calculateTermFrequencyDifferences(self, contentTermFrequencies, summaryTermFrequencies):
-		# Normalize the term frequencies
-		#avgContentFrequency = sum(contentTermFrequencies.values())/float(len(contentTermFrequencies))
-		#avgSummaryFrequency = sum(summaryTermFrequencies.values())/float(len(summaryTermFrequencies))
-		#ratio = avgContentFrequency/avgSummaryFrequency
-		
-		ratio = contentTermFrequencies["de"] / float(summaryTermFrequencies["de"])
-		print ratio
-		
-		tfDifferences = {}
-		
-		for key in contentTermFrequencies.keys():
-			#print contentTermFrequencies[key]/ratio, contentTermFrequencies[key], summaryTermFrequencies[key], (contentTermFrequencies[key]/ratio) - summaryTermFrequencies[key]
-			tfDifferences[key] = (contentTermFrequencies[key]/ratio) - summaryTermFrequencies[key]
+	def n_containing(self, word, bloblist):
+		return sum(1 for blob in bloblist if word in blob)
+	
+	def idf(word, bloblist):
+		return math.log(len(bloblist) / (1 + n_containing(word, bloblist)))
+	
+	def tfidf(word, blob, bloblist):
+		return tf(word, blob) * idf(word, bloblist)
+	
+	def addDocument(self, document):
+		self.documents.append(document)
+		words = word_tokenize(document)
+		for word in list(set(words)):
+			self.wordDocumentCount[word]+=1	
 			
-		print "|".join([w[0] for w in sorted(tfDifferences.items(), key=lambda x: x[1])[-100:]])
+	def getWordScore(self, word, words, location="body"):
+		tf = float(words.count(word)) / len(words)
+		idf = math.log( float(len(self.documents)) / (1 + self.wordDocumentCount[word]) )
 		
+		score = tf*idf*self.getMultiplier(location)		
+		return score
+		
+	def getMultiplier(self, location="body"):
+		# Location can be "body", "title" or "summary"
+		multiplierDict = {
+			"body"		: 1,
+			"title"		: 10,
+			"summary"	: 3
+		}
+		multiplier = multiplierDict.get(location, 1)
+		return multiplier
 	
-	def visualizeOccurences(self, *args):
-		import numpy as np
-		import matplotlib.pyplot as plt
-		from mpl_toolkits.mplot3d import Axes3D
-		x = [o[1]*10 for o in itertools.chain(*args)]
-		y = [o[0]*3 for o in itertools.chain(*args)]
-		z = [o[2]*10 for o in itertools.chain(*args)]
-		colornames = ['blue','red','green','yellow']
-		colors = []
-		for a,arg in enumerate(args):
-			colors += [colornames[a] for c in arg]
+	def getScoresForText(self, text, document, location="body"):
+		tagged = self.tagger.tag(word_tokenize(text))
+		nouns = set()
+		for t in tagged:
+			if t[1] == "noun" and len(t[0])>3:
+				nouns.add(t[0])
 		
-		fig = plt.figure()
-		ax = fig.add_subplot(111, projection='3d')
-		
-		plt.scatter(x, y, zs=z, c=colors)
-		#plt.ylim(0,max(y)+1)
-		#plt.xlim(0,max(x)+1)
-		
-		ax.set_ylim(0,100)
-		ax.set_zlim(0,300)
-		ax.set_xlim(0,1000)
-		plt.show()
-		#plt.savefig("results.png", dpi=1000)
+		words = word_tokenize(document)
+		for noun in nouns:
+			self.scores[noun] += s.getWordScore(noun, words, location=location)
 	
-	def trainSummarizer(self, X, y):
-		#clf = SGDClassifier(n_jobs=-1,n_iter=1, shuffle=True)
-		clf = Classifier()
-		#rbf_feature = RBFSampler(gamma=2000, random_state=1)
-		#X_features = rbf_feature.fit_transform(X)
-		clf.fit(X, y )		
-		self.model = clf
-		#self.rbf_feature = rbf_feature
 	
-	def testSummarizer(self,X_test,y_true ):
-		y_pred = []
-		
-		#X_features = self.rbf_feature.transform(X_test)
-		
-		for x in X_test:
-			prediction = self.model.predict(x)[0]
-			y_pred.append(prediction)
-						
-		mcc = matthews_corrcoef(y_true, y_pred)
-		print classification_report(y_true, y_pred)
-		print confusion_matrix(y_true, y_pred)
-		print mcc
-		return mcc
-	
+wetboekencsv = """algemene wet bestuursrecht;awb
+wet op de ruimtelijke ordening;ruimtelijke ordening;wro
+milieubeheer;wm;
+planvoorschriften;
+woningwet;
+wetboek van strafrecht;wvs;sr;
+verdrag tot bescherming van de rechten van de mens en de fundamentele vrijheden;
+algemene wet inkomensafhankelijke regelingen;awir;
+europees verdrag voor de rechten van de mens;evrm;
+burgelijke rechtsvordering;rechtsvordering;rv
+burgerlijk wetboek;bw;
+arbeid vreemdelingen;
+wegenverkeerswet 1994;wvw;
+vreemdelingenwet 2000;vw 2000;vreemdelingenbesluit 2000;
+geluidhinder;wgh;
+natuurbeschermingswet 1998;nbw 1998;
+habitatrichtlijn;
+beleidsregels boeteoplegging wav 2007;
+algemene wet inzake rijksbelastingen;
+verdrag tot oprichting van de europese gemeenschap;
+wetboek van strafvordering;wvs
+gemeentewet;
+bodembescherming;
+opiumwet;ow;
+wob;wet openbaarheid van bestuur;
+wvo;wet op het voorgezet onderwijs;
+monumentenwet 1988;
+flora- en faunawet;ffw;
+wet algemene bepalingen omgevingsrecht;wabo;
+awr;algemene wet rijksbelasting;
+rijkswet op het nederlanderschap;
+grondwet;gw;
+wapens en munitie;
+ammoniak en veehouderij;wav;
+verontreiniging oppervlaktewateren;
+gemeentelijke basisadministratie persoonsgegevens;
+drank- en horecawet;
+ontgrondingenwet;
+huisvestingswet;
+inkomstenbelasting 1964;
+wvg;wet voorziening gehandicapten;
+verordening ruimte;
+waardering onroerende zaken;
+wgv;wet geurhinder en veehouderij;geurhinder;
+woz;waardering onroerende zaken;
+rwn;rijkswet op het nederlanderschap;
+bhv;bedrijfshulpverlening;
+huursubsidiewet;hsw;
+monumentenwet;
+bouwbesluit;
+wte 1995;wet toezicht effectenverkeer 1995;
+arbowet;arbobesluit;
+reglement rijbewijzen;
+waterwet;ww;waterschapswet;
+besluit milieu-effectrapportage 1994;"""
+
+wetboeken = [wb.strip(";").split(";") for wb in wetboekencsv.split("\n")]
 	
 if __name__ == "__main__":
 	RP = RechtspraakParser()
 	s = SummarizeFragment()
 	
-	sentenceRegex = re.compile("\.\s*(?!\d)")
-	n = 100
-	abstractive, fragments, unlabeled = RP.filterRechtspraakFolder(sys.argv[1], n=n, tokenizer=sentenceRegex.split)
-	contentHighlyRelevantOccurences, summaryHighlyRelevantOccurences = s.getDataSet(fragments)
+	n = 1000
+	abstractive, fragments, unlabeled = RP.filterRechtspraakFolder(sys.argv[1], n=n, tokenizer=lambda x: [x])
 	
-	#print unlabeled
-	unlabeledSet = s.getPredictionSet(unlabeled)
+	articleRegexString = "([Aa]rtikel(en)?|art\.) ((\d+|[IVX]+)([:\.]\d+)?([a-z]+)?( en |, ?)?)+ ?(([etdvzan][ewic][a-z]+?((d|st)e[^a-z]))?(lid|paragraaf|volzin)( \d+)?([, ])*)*((van|het|de|Wet|wet) )*( ?(([A-Z]([A-Z]{1,4}|[a-z]{1,2}))[^\w]) ?(\d{4})?|([\w\-]+ ?)+ ?(\d{4})?)"
+	articleRegex = re.compile(articleRegexString)
 	
-	#s.visualizeOccurences(contentHighlyRelevantOccurences, summaryHighlyRelevantOccurences)
-	#s.visualizeOccurences(contentHighlyRelevantOccurences[:1000], summaryHighlyRelevantOccurences[:1000])
-	#exit()
+	articleCount = collections.defaultdict(int)
 	
-	X = np.asarray( contentHighlyRelevantOccurences + summaryHighlyRelevantOccurences)
-	y = np.asarray(["content" for c in contentHighlyRelevantOccurences] + ["summary" for su in summaryHighlyRelevantOccurences] )
+	for percentage, document, summary, title in fragments:
+		s.addDocument(document[0])
 	
-	kf = KFold(len(X), n_folds=10,shuffle=True)
-	mcc = []
-	for train, test in kf:
-		X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
-		s.trainSummarizer( X_train, y_train )
-		mcc.append( s.testSummarizer( X_test , y_test ) )
-	
-	print sum(mcc) / len(mcc)
-	"""
-	summaries = []
-	contents = []
-	for x in unlabeledSet.values():
-		#print sentence
-		p = s.model.predict(s.rbf_feature.transform(x))
-		if p[0] == "content":
-			contents.append(1)
-		else:
-			summaries.append(1)
+	for percentage, document, summary, title in fragments:				
+		results = set()
+
+		for result in articleRegex.finditer(document[0]):
+			results.add(result.groups())
+
+		categories = collections.defaultdict(int)
+		filterwords = ["onder", "lid", "alinea"]
+		for result in results:
+			suffix = [g for g in result if g is not None][-2]
+			if True not in [f in suffix for f in filterwords] and suffix not in list("0123456789"):
+				found = False
+				
+				if suffix == "deze wet":
+					articleName = " ".join([result[0], result[3], wetboek[0]])
+					try:
+						# Give the law the same category as the previous one, as "deze wet" refers to the previous law.
+						categories[wetboek[0]]+=1
+					except:
+						pass
+					continue
+					
+				for wetboek in wetboeken:
+					if found:
+						break
+					for wb in wetboek:
+						if wb in suffix:
+							found = True
+							categories[wetboek[0]]+=1
+		
+		scategories = sorted(categories.items(), key=lambda x: x[1])
 			
-	print len(summaries),len(contents)
-	#pprint.pprint(summaries)
+		s.scores = collections.defaultdict(float)
+		
+		s.getScoresForText(document[0], document[0], "body")
+		s.getScoresForText(title, document[0], "title")
+		s.getScoresForText(summary[0], document[0], "summary")
+		
+		"""
+		print title
+		try:
+			print scategories[-1][0]
+		except:
+			print "No valid category found."
+		print ", ".join( dict(sorted(s.scores.items(), key=lambda x: x[1])[-10:] ).keys() )
+		"""
+		bestwords = dict(sorted(s.scores.items(), key=lambda x: x[1])[-10:] ).keys()
+		while len(bestwords) < 10:
+			bestwords.append("")
+		
+		if len(scategories) == 0 or scategories[-1][1] < 3:
+			print '"'+"\",\"".join(bestwords+["unknown"])+'"'
+		else:		
+			print '"'+"\",\"".join(bestwords+[scategories[-1][0]])+'"'
+		
+		
+		#exit()
 	
-	s.trainSummarizer( X, y )
-	summaries = []
-	contents = []
-	#X_values = s.rbf_feature.transform(unlabeledSet.values())
-	for sentence,values in unlabeledSet.items():
-		#print sentence
-		p = s.model.predict(s.rbf_feature.transform(values))
-		if p[0] == "content":
-			contents.append(sentence)
-		else:
-			summaries.append(sentence)
-	
-	print len(summaries),len(contents)
-	pprint.pprint(summaries)
-	
-"""
+	#print json.dumps([a for a in sorted(articleCount.items(), key=lambda x: x[1]) if a[1] > 2], indent=4)

@@ -187,18 +187,18 @@ class RechtspraakParser():
 			d = {"documentid":_id,
 				 "_encrypt":False,
 				 "contents": "#" + document["Titel"] + "\n" + "\n".join(contents),
-				 "category": ", ".join(document["Rechtsgebieden"]),
+				 "category": ", ".join(document["Rechtsgebieden"].replace(" ","_")),
 				 "title": document["Titel"],
 				 "published": document["Publicatiedatum"],
 				 "document_type":"jurisprudence",
-				 "source":document["Titel"].split(",")[0],
+				 "source":document["Titel"].split(",")[0].replace(" ","_"),
 				 "procedures": procedures,
 				 "case_id": case_id,
 				 "content_indication": content_indication
 				}
 			print json.dumps(d)
 			
-	def filterRechtspraak(self, filename, tokenizer=None):
+	def filterRechtspraak(self, filename, tokenizer=None, inContentsThreshold=97):
 		rechtspraak = json.load(open(filename))
 		abstractive, fragment, unlabeled = [],[],[]
 		if tokenizer is None:
@@ -219,24 +219,28 @@ class RechtspraakParser():
 			try:
 				summary = document["Tekstfragment"].lower()
 			except:
-				unlabeled.append( (0, contents, "") )
+				unlabeled.append( (0, contents, "", title) )
 				continue
 			
 			summary = tokenizer(summary)
 			if len(summary) == 0 or (len(summary) == 1 and len(summary[0]) < 20) :
-				unlabeled.append( (0, contents, "") )
+				unlabeled.append( (0, contents, "", title) )
 				continue
 			
 			percentageInContents = 0
+			if len(summary) == 1 and len(contents) == 1:
+				if summary[0] in contents[0]:
+					percentageInContents = 100
+					
 			for token in summary:
 				if token in contents:
 					percentageInContents += (100.0/len(summary))
 			
-			if percentageInContents > 50: # More then 97% is probably copied directly from the text.
-				fragment.append( ( percentageInContents, contents, summary ) )
+			if percentageInContents > inContentsThreshold: # More then 97% is probably copied directly from the text.
+				fragment.append( ( percentageInContents, contents, summary, title ) )
 			else:
 				pass
-				#abstractive.append( ( percentageInContents, contents, summary ) )
+				abstractive.append( ( percentageInContents, contents, summary, title ) )
 						
 		return abstractive, fragment, unlabeled
 		
@@ -251,7 +255,7 @@ class RechtspraakParser():
 			a, frag, u = self.filterRechtspraak(os.path.join(directory, f), tokenizer)
 			#abstractive += a
 			fragment += frag
-			unlabeled += u
+			#unlabeled += u
 
 		#del abstractive
 		#del unlabeled
