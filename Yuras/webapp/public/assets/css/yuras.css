@@ -596,3 +596,13 @@ td.price small {
 	font-size: 18pt;
 	text-align: center;
 }
+
+.search-case {
+	width: 100%;
+	text-align:center;
+}
+.search-case .case-icon {
+	transform: scale(0.7) !important;
+	display: inline-block;
+	margin-left: -10px;
+}

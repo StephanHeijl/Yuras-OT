@@ -1,7 +1,7 @@
 from __future__ import division
 
 import os, re, base64, urllib2, json, time, random, scrypt, collections, math, pprint, random
-import multiprocessing, traceback, sys, feedparser
+import multiprocessing, traceback, sys, feedparser, datetime
 
 import cPickle as pickle
 from functools import wraps
@@ -193,14 +193,8 @@ def assets(assettype, filename):
 @app.route("/documents/")
 @login.login_required
 def documentsIndex():
-	documents = Document().matchObjects(
-		{},
-		limit=18,
-		fields={"title":True, "_created":True, "author":True, "_id":True, "document_type":True}
-		)
-
 	categories = Category().matchObjects({})
-	return render_template("documents/index.html", name="Documents overview", documents=documents, categories=categories, active="documents")
+	return render_template("documents/index.html", name="Documents overview", categories=categories, active="documents")
 
 @app.route("/documents/json/<amount>/<page>")
 @login.login_required
@@ -243,6 +237,9 @@ def documentViewer(id):
 	except Exception as e:
 		print e
 		return abort(404)
+	
+	document.accessed = datetime.datetime.now()
+	document.vanillaSave()
 
 	annotations = Annotation().getObjectsByKey("document", id)
 	cases = Case().matchObjects({})
@@ -254,6 +251,31 @@ def documentViewer(id):
 	document.highlightArticles()
 
 	return render_template("documents/viewer.html", name="Document", document=document, cases=cases, annotations=annotations, categories=categories)
+
+@app.route("/laws/<id>")
+@login.login_required
+def lawViewer(id):
+	try:
+		document = Document().getObjectsByKey("_id", id)[0]
+	except Exception as e:
+		print e
+		return abort(404)
+	
+	document.accessed = datetime.datetime.now()
+	document.vanillaSave()
+
+	cases = Case().matchObjects({})
+	
+	categories = Category().matchObjects({})
+	annotations.sort(key=lambda a: a.location[0])
+	document.contents = Pandoc().convert("markdown_github", "html", document.contents)
+	
+	document.highlightArticles()
+
+	return render_template("documents/law.html", name="Law", document=document, cases=cases, annotations=annotations, categories=categories)
+
+
+
 
 @app.route("/documents/<id>/save",methods=["POST"])
 @login.login_required
@@ -389,7 +411,8 @@ def documentSearch():
 		query = query[0]
 	category = request.args.get("category", None)
 	
-	results, extendedQuery = Document.search(query)
+	results, extendedQuery, facets = Document.search(query)
+	cases = Case().matchObjects({})
 
 	categories = Category().matchObjects({})
 	return render_template("documents/search.html",
@@ -399,6 +422,8 @@ def documentSearch():
 						   documents=results,
 						   keywords=query,
 						   extendedQuery=extendedQuery,
+						   facets=facets,
+						   cases=cases,
 						   active="documents")
 
 @app.route("/documents/search/table/<amount>/<page>")
@@ -494,9 +519,6 @@ def caseEdit(id):
 		case = Case().getObjectsByKey("_id", id)[0]
 	except Exception as e:
 		return abort(404)
-	
-	print dir(case)
-	print case.documents
 	
 	documents = case.getDocuments()
 	tags = defaultdict(int)

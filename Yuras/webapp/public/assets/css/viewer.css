@@ -109,7 +109,16 @@ a {
 
 .document-body {
 	outline: 0;
+	font-family: "Amiri";
+	line-height: 1.3em;
+	font-kerning: normal;
+	font-size: 120%;
+	text-align: justify;
 }
+.document h1 {
+	text-align: left;
+}
+
 .marked {
 	background: #1abc9c;
 	padding: 0.1em;
@@ -163,4 +172,37 @@ a {
 	color: white;
 	opacity: 0.9;
 	cursor: pointer;
+}
+
+#relatedModal .modal-dialog {
+	width: 1000px;
+}
+
+#relatedModal .modal-body .row {
+	width: 100%;
+}
+
+.law-wrapper {
+	color: #333;
+	margin-top: 120px;
+}
+
+.law {
+	width: 780px;
+	background: white;
+	text-align: justify;
+	font-family: "Amiri";
+}
+.law-content-padding {
+	padding: 75px;
+}
+.law ul, .law ol {
+	list-style-type: none;
+}
+.law-body > ol {
+	margin: 0;
+	padding: 0;
+}
+.law li {
+	margin-bottom: 1em;
 }

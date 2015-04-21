@@ -29,10 +29,29 @@ class ThesaurusEngine(Singleton):
 			self.thesaurus[word] = list(self.thesaurus[word])
 			
 		self.words = self.thesaurus.keys()
-		return True	
+		return True
+	
+	def __convertToRomanNumerals(self, integer):
+		""" Convert an integer to a Roman numeral. Part of the synonym process. Source: https://www.safaribooksonline.com/library/view/python-cookbook/0596001673/ch03s24.html """
+		if not isinstance(integer, type(1)):
+			raise TypeError, "expected integer, got %s" % type(integer)
+		if not 0 < integer < 4000:
+			raise ValueError, "Argument must be between 1 and 3999"
+		ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
+		nums = ('M',  'CM', 'D', 'CD','C', 'XC','L','XL','X','IX','V','IV','I')
+		result = []
+		for i in range(len(ints)):
+			count = int(integer / ints[i])
+			result.append(nums[i] * count)
+			integer -= ints[i] * count
+		return ''.join(result)
 	
 	def getSynonyms(self, word):
-		return self.thesaurus.get(word, [])
+		try:
+			# Tries to convert every word to a Roman numeral, instantly fails when integer casting fails.
+			return [self.__convertToRomanNumerals(int(word))]
+		except:
+			return self.thesaurus.get(word, [])
 	
 ############################# TEST THESAURUSENGINE ############################
 
@@ -65,3 +84,10 @@ def test_te_getSynonyms():
 	assert sorted(te.getSynonyms("hangwerk")) == sorted(["hangconstructie"])
 	assert sorted(te.getSynonyms("Jezus")) == sorted(["Jezus Christus", "Messias", "Christus"])
 	assert sorted(te.getSynonyms("Christus")) == sorted(["Jezus Christus", "Messias", "Jezus"])
+	
+@with_setup(setup_func, teardown_func)
+def test_te_convertToRomanNumerals():
+	assert te._ThesaurusEngine__convertToRomanNumerals(12) == "XII"
+	assert te._ThesaurusEngine__convertToRomanNumerals(9) == "IX"
+	assert te._ThesaurusEngine__convertToRomanNumerals(50) == "L"
+	assert te._ThesaurusEngine__convertToRomanNumerals(2013) == "MMXIII"

@@ -127,20 +127,12 @@ $(function () {
 		$('.category-dropdown-text').text($(this).text());
 		$('.category-input').val($(this).data('value'));
 	});
-
-	// Handle heatcolor of related rating when they are present on load
-	if ($(".related-document-rating").length > 0) {
-		$(".related-document-rating").heatcolor(
-			function () {
-				$(this).width(12 + (($(this).parent().data("score") - 0.5) * 48))
-				return $(this).parent().data("score");
-			}, {
-				lightness: 0,
-				colorStyle: 'greentored',
-				maxval: 1,
-				minval: 0.5,
-			});
-	}
+	
+	// Handle case selection
+	$('.case-option').click(function () {
+		$('.case-dropdown-text').text($(this).text());
+		$('.case-input').val($(this).data('value'));
+	});
 
 	// Handle adding related document to case 	
 	$("body").on("click", ".related-document-add", function (e) {
@@ -229,43 +221,82 @@ $(function () {
 	}
 	setDocumentItemProperties()
 
-// Handle document clicking in the search and documents pages
-$(".document-item").click(function () {
-	highlightContainer = $(".document-highlight-container")
-	$(".document-highlight-container").not(highlightContainer).removeClass("visible")
-	highlightContainer.find(".document-title").text($(this).find(".document-title").text())
-	highlightContainer.addClass("visible")
+	// Handle document clicking in the search and documents pages
+	$(".document-item").click(function () {
+		highlightContainer = $(".document-highlight-container")
+		$(".document-highlight-container").not(highlightContainer).removeClass("visible")
+		highlightContainer.find(".document-title").text($(this).find(".document-title").text())
+		highlightContainer.addClass("visible")
 
-	pointer = highlightContainer.find(".document-highlight-pointer-container")
-	pointer.css({
-		"left": $(this).offset().left + ($(this).width() / 2) - 22
-	})
-
-	perline = Math.floor(1 / ($(this).outerWidth() / $(this).parent().width()))
-	row = Math.floor($(this).index() / perline)
-	lastindex = ((row + 1) * perline)
-
-	highlightContainer.css({
-		"top": $(this).data("absoluteTop") + (row * 5)
-	})
-
-	if (lastindex !== highlightContainer.data("lastindex")) {
-		$(".document-item").height("").animate({
-			"margin-bottom": "20px"
+		pointer = highlightContainer.find(".document-highlight-pointer-container")
+		pointer.css({
+			"left": $(this).offset().left + ($(this).width() / 2) - 22
 		})
-		h = highlightContainer.outerHeight()
-		if (h < 10) {
-			h = $(this).height();
+
+		perline = Math.floor(1 / ($(this).outerWidth() / $(this).parent().width()))
+		row = Math.floor($(this).index() / perline)
+		lastindex = ((row + 1) * perline)
+
+		highlightContainer.css({
+			"top": $(this).data("absoluteTop") + (row * 5)
+		})
+
+		if (lastindex !== highlightContainer.data("lastindex")) {
+			$(".document-item").height("").animate({
+				"margin-bottom": "20px"
+			})
+			h = highlightContainer.outerHeight()
+			if (h < 10) {
+				h = $(this).height();
+			}
+			console.log(h)
+			$(this).animate({
+				"margin-bottom": h + 50
+			})
 		}
-		console.log(h)
-		$(this).animate({
-			"margin-bottom": h + 50
-		})
-	}
 
-	highlightContainer.data("lastindex", lastindex)
-	highlightContainer.find(".view-document").attr("href", "/documents/"+$(this).data("id"))
-	highlightContainer.find("p").html($(this).find(".document-summary").html())
-});
+		highlightContainer.data("lastindex", lastindex)
+		if ( $(this).data("type") == "jurisprudence" ) {
+			highlightContainer.find(".view-document").attr("href", "/documents/"+$(this).data("id"));
+		} else if ( $(this).data("type") == "case" ) { 
+			highlightContainer.find(".view-document").attr("href", "/cases/"+$(this).data("id")+"/edit");
+		} else if ( $(this).data("type") == "law" ) { 
+			highlightContainer.find(".view-document").attr("href", "/laws/"+$(this).data("id"));
+		}
+		highlightContainer.find("p").html($(this).find(".document-summary").html())
+	});
+	
+	/* Dragging documents */
+	$(".search-case").bind("dragover",function(ev) {
+		ev.preventDefault();
+	});
+	$(".document-item").bind("dragstart",function(e) {
+		ev = e.originalEvent
+		ev.dataTransfer.setData("text", $(ev.currentTarget).data("id"))
+	});
+	$(".search-case").bind("drop",function(e) {
+		e.preventDefault();
+		ev = e.originalEvent
+    	var docid = ev.dataTransfer.getData("text");
+		draggedIcon = $(".document-item[data-id="+docid+"]")
+		draggedIconClone = draggedIcon.find(".file-icon").clone().css("opacity",0)
+		
+    	draggedIcon.animate({"opacity":0.5}, 500);
+		
+		draggedIconClone.insertBefore($(this).find(".case-icon-front"))
+		draggedIconClone.css("opacity",1);
+		setTimeout(function() {
+			draggedIconClone.css("opacity",0);
+		},500);
+		setTimeout(function() {
+			$(".search-case").find(".file-icon").remove();
+		},1000);
+		
+		
+		$(this).find(".glyphicon").animate({"opacity":1}, 500, function() {
+			$(this).animate({"opacity":0}, 500);
+		});
+	});
+	
 
 });

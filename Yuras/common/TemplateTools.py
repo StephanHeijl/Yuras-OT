@@ -84,6 +84,9 @@ class TemplateTools(Singleton):
 	def _(self, *args, **kwargs):
 		""" Translate alias """
 		return self.translate(*args, **kwargs)
+	
+	def is_dict(self, v):
+		return isinstance(v, dict)
 		
 		
 # TESTING #
@@ -98,4 +101,9 @@ def test_renderJS():
 	tt.deferJS("test.js")
 	assert tt.renderJS(False) == "<script src='test.js'></script>"
 	assert tt.renderJS(True) == "<script src='test.js'></script>"
+	
+def test_is_dict():
+	tt = TemplateTools()
+	assert tt.is_dict({})
+	assert not tt.is_dict("")
 	

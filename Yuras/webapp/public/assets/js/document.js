@@ -481,29 +481,17 @@ $(function () {
 				$.each(data, function (d, doc) {
 					icon = documentIcon.clone()
 					icon.find(".case-document-title").text(doc[1]).attr("href", "/documents/" + doc[0])
-					icon.data("score", doc[2])
 					icon.attr("data-id", doc[0])
-					$(".modal-body .row").last().append(icon)
-					if ($(".modal-body .row").last().children().length == 3) {
-						$(".modal-body .container-fluid").append("<div class='row'></div>")
-					}
+					$(".modal-body .row").last().append(icon)					
+					
+					console.log(doc[2], data[0][2], ((doc[2]/data[0][2])*100) / 10)
+					icon.find(".case-document-score").text( Math.round( (doc[2]/data[0][2])*100) / 10 )
 					icon.fadeIn()
-					console.log(icon)
-				})
-
-				$(".related-document-rating").heatcolor(
-					function () {
-						$(this).width(12 + (($(this).parent().data("score") - 0.5) * 48))
-						return $(this).parent().data("score");
-					}, {
-						lightness: 0,
-						colorStyle: 'greentored',
-						maxval: 1,
-						minval: 0.5,
-					});
+					
+				});
+				
 			});
 		}
-
 
 	});
 	

@@ -1229,7 +1229,7 @@ arrogant;hoogmoedig;neerbuigend
 arrogant;ijdel;ingebeeld;zelfingenomen
 arrogantie;eigendunk;hoogmoed;hovaardij;zelfingenomenheid
 arrogantie;zelfingenomenheid
-arrondissement;departement;jurisdictie;rechtsgebied
+arrondissement;departement;jurisdictie;rechtsgebied+
 arrondissement;rechtsgebied
 arsenaal;wapenkamer
 art;kunst
@@ -1237,9 +1237,7 @@ articulatie;mededeling;oordeelvelling;uitspraak
 articulatie;uitspraak
 artieste;kunstenares
 artiesten;kunstenaars
-artikel;item;voorwerp
 artikel;wetsartikel
-artikelen;voorwerpen;waar
 artistiek;doend;uitvoerend;uitvoerenmacht
 artistiek;uitvoerend
 arts;dokter;geneesheer;medicus

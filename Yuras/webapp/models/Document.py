@@ -61,7 +61,7 @@ class Document(StoredObject):
 		for result in articleRegex.finditer(self.contents):
 			results.add(result.group(0).strip(",. "))
 			
-		with open(os.path.join( Config().WebAppDirectory, "..", "..", "wetboekencsv.json") as wetboekencsv:
+		with open(os.path.join( Config().WebAppDirectory, "..","..", "wetboeken.csv") ) as wetboekencsv:
 			wetboeken = [wb.strip(";").split(";") for wb in wetboekencsv.read().split("\n")]
 		
 		filteredArticles = []
@@ -85,13 +85,12 @@ class Document(StoredObject):
 							found = True
 							articleName = " ".join([result[0], str(result[2]), wetboek[0]])
 							print articleName
-							filteredArticles.append(articleName)
-			
+							filteredArticles.append(articleName)			
 		
 		self.articles = filteredArticles
 		super(Document, self).save()
 		
-		return filteredResults
+		return filteredArticles
 	
 	def highlightArticles(self):
 		if self.articles is None:
@@ -197,6 +196,7 @@ class Document(StoredObject):
 	
 	@staticmethod
 	def search(query):
+		""" Returns the results, the query that was used by the QueryEngine and the facets """
 		matchedObjects = {}
 		
 		for word in words:
@@ -206,7 +206,7 @@ class Document(StoredObject):
 		results = self.matchObjects(matchedObjects, fields={"_id":True,"title":True})
 		for result in results:
 			result.markedWords = "No highlighting available for secured documents."
-		return results,query
+		return results,query,{}
 	
 	@staticmethod
 	def quickSearch(words):

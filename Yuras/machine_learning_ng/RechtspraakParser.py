@@ -13,6 +13,8 @@ from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import SGDClassifier
 from sklearn.preprocessing import MultiLabelBinarizer
 
+from xml.dom.minidom import parse, parseString
+
 #from Yuras.webapp.models.Document import Document
 
 class RechtspraakParser():
@@ -161,15 +163,20 @@ class RechtspraakParser():
 		for url in urls:
 			print url
 			
-	def parseRechtspraak(self, filename):
+	def parseRechtspraak(self, filename=None, document=None):
 		"""
 		Used in conjuction with
-		$ for file in rechtspraak/*.json; do echo "$file" | cut -d "/" -f 2- | xargs python -m Yuras.machine-learning-ng.RechtspraakParser | mongoimport --db "Yuras1" -c documents ; done
+		$ for file in rechtspraak/results/*.json; do echo "$file" | cut -d "/" -f 2- | xargs python -m Yuras.machine_learning_ng.RechtspraakParser | mongoimport --db "Yuras1" -c documents ; done
 		
 		"""
+		if filename is not None:
+			documents = self.parseJson(filename)
 		
-		documents = self.parseJson(filename)
+		if document is not None:
+			documents = {document["id"]:document}
+			
 		for _id, document in documents.items():
+			print _id, document.keys()
 			try:
 				contents = document["contents"]["results"]["uitspraak"]
 				case_id = document["contents"]["results"]["zaaknummer"]
@@ -187,7 +194,7 @@ class RechtspraakParser():
 			d = {"documentid":_id,
 				 "_encrypt":False,
 				 "contents": "#" + document["Titel"] + "\n" + "\n".join(contents),
-				 "category": ", ".join(document["Rechtsgebieden"].replace(" ","_")),
+				 "category": ", ".join(document["Rechtsgebieden"]).replace(" ","_"),
 				 "title": document["Titel"],
 				 "published": document["Publicatiedatum"],
 				 "document_type":"jurisprudence",
@@ -197,6 +204,52 @@ class RechtspraakParser():
 				 "content_indication": content_indication
 				}
 			print json.dumps(d)
+			
+			
+	def parseXmlRechtspraak(self, filename):
+		parsedDocument = {}
+		
+		with open(filename) as f:
+			xml = parseString(f.read())
+			
+		try:
+			uitspraak = xml.getElementsByTagName("uitspraak")[0]
+		except:
+			exit()
+
+		parsedDocument["uitspraak"] = []
+		for para in uitspraak.getElementsByTagName("para"):
+			try:
+				parsedDocument["uitspraak"].append(para.firstChild.nodeValue)
+			except:
+				pass
+			
+		parsedDocument["id"] = xml.getElementsByTagName("dcterms:identifier")[0].firstChild.nodeValue
+		
+		try:
+			parsedDocument["Publicatiedatum"] = xml.getElementsByTagName("dcterms:issued")[0].firstChild.nodeValue
+		except:
+			pass
+		try:
+			parsedDocument["Rechtsgebieden"] = xml.getElementsByTagName("dcterms:subject")[0].firstChild.nodeValue
+		except:
+			pass
+		try:
+			parsedDocument["zaaknummer"] = xml.getElementsByTagName("psi:zaaknummer")[0].firstChild.nodeValue
+		except:
+			pass
+		try:
+			parsedDocument["bijzondere_kenmerken"] = xml.getElementsByTagName("dcterms:subject")[0].firstChild.nodeValue
+		except:
+			pass		
+		try:
+			parsedDocument["inhoudsindicatie"] = xml.getElementsByTagName("inhoudsindicatie")[0].firstChild.firstChild.nodeValue
+		except:
+			pass
+		
+		parsedDocument["contents"] = {"results":{"uitspraak": "\n".join(parsedDocument["uitspraak"])}}
+		
+		return parsedDocument
 			
 	def filterRechtspraak(self, filename, tokenizer=None, inContentsThreshold=97):
 		rechtspraak = json.load(open(filename))
@@ -212,7 +265,6 @@ class RechtspraakParser():
 				continue
 				
 			if None in contents:
-				print "lel"
 				continue
 				
 			# Check of this the document contains a summary
@@ -332,9 +384,12 @@ class RechtspraakParser():
 if __name__ == "__main__":
 	RP = RechtspraakParser()
 	#articles = RP.parseWetboek(sys.argv[1])
-	#RP.parseRechtspraak(sys.argv[1])
+	#RP.parseRechtspraak(filename=sys.argv[1])
 	
-	RP.filterRechtspraakFolder(sys.argv[1])
+	xml = RP.parseXmlRechtspraak(sys.argv[1])
+	RP.parseRechtspraak(document=xml)
+	
+	#RP.filterRechtspraakFolder(sys.argv[1])
 		
 	#articles = RP.downloadWetboeken()
 	#documents = RP.parseJson(RP.jsonFileName)

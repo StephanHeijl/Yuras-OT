@@ -1,6 +1,7 @@
 import json, pprint, re
 
 from Yuras.webapp.models.Document import Document
+from Yuras.common.Pandoc import Pandoc
 
 from elasticsearch import Elasticsearch
 from Yuras.common.QueryEngine import QueryEngine, SpellingEngine, ThesaurusEngine
@@ -24,13 +25,30 @@ Its type is still Document, allowing it to be picked up by Document searches.
 		query = extendedQuery = qe.convert(query)		
 		
 		es = Elasticsearch()
-		
+		# Give out extra points in the score for Title inclusion, but rate content occurences higher
+		# This ensures that laws will always come up correctly
 		esQuery = {
 			  "query": {
-				"query_string": {
-				  "query": query
+				"bool": {
+				  "should": [
+					{
+					  "query_string": {
+						"query": query,
+						"boost": 1,
+						"default_field": "title"
+					  }
+					},
+					{
+					  "query_string": {
+						"query": query,
+						"boost":5,
+						"default_field": "_all"
+					  }
+					}
+				  ]
 				}
 			  },
+			
 			  "size": 20,
 			  "highlight": {
 				"fields": {
@@ -44,25 +62,19 @@ Its type is still Document, allowing it to be picked up by Document searches.
 				]
 			  },
 			  "aggs": {
-				"articles": {
+				"Court_Sources": {
 				  "terms": {
-					"field": "document.chapter",
-					"include": "\\d+(\\.?\\d+)?",
-					"size": 20
+					"field": "source"
 				  }
 				},
-				"chapters": {
+				"Document_Types": {
 				  "terms": {
-					"field": "document.chapter",
-					"exclude": "\\w{1,4}|i+|\\d+|hoofdstuk|algeme[en]{2}",
-					"size": 10
+					"field": "document_type"
 				  }
 				},
-				"book": {
-				  "terms": {
-					"field": "document.book",
-					"exclude": "\\w{1,4}|i+|\\d+|wetboek|algeme[en]{2}",
-					"size": 10
+				"Lawbook": {
+				  "significant_terms": {
+					"field": "book"
 				  }
 				}
 			  }
@@ -77,14 +89,15 @@ Its type is still Document, allowing it to be picked up by Document searches.
 			for k,v in r['_source'].items():
 				setattr(d, k, v)
 			d.markedContents = r.get("highlight",{}).get("contents","")
+			if d.markedContents == "":
+				# Fallback summary
+				d.markedContents = [Pandoc().convert("html", "plain", r["_source"].get("contents","No summary") )[:300]+"..."]
 			d.score = round(r.get("_score",0)/res['hits']['max_score'],2)*10
 			results.append(d)
 
-		stopwords = Document.getStopwords()
+		stopwords = Document.getStopwords()		
 
-		
-
-		return results, query
+		return results, query, res['aggregations']
 	
 	def getRelatedDocumentsByTags(self, tags=None, asJSON=True, exclude=None):
 		""" Overwrite the getRelatedDocumentsByTags method and use the ElasticSearch methods. """
