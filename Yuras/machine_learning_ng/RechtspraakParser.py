@@ -22,6 +22,7 @@ class RechtspraakParser():
 		self.rechtspraakFolder = Config().WebAppDirectory+"/../../rechtspraak"
 		self.jsonFileName = "10krecords.json"
 		self.delimitor = re.compile("[^a-z]*")
+		self.articleRegex = re.compile(r"([Aa]rtikel(en)?|art\.) ((\d+|[IVX]+)([:\.]\d+)?([a-z]+)?( en |, ?)?)+ ?(([etdvzan][ewic][a-z]+?((d|st)e[^a-z]))?(lid|paragraaf|volzin)( \d+)?([, ])*)*((van|het|de|Wet|wet) )*( ?(([A-Z]([A-Z]{1,4}|[a-z]{1,2}))[^\w]) ?(\d{4})?|([\w\-]+ ?)+ ?(\d{4})?)")	
 		
 	def parseJson(self, filename):
 		path = os.path.join(self.rechtspraakFolder,filename)
@@ -30,7 +31,6 @@ class RechtspraakParser():
 
 	def learnArticles(self, documents):
 		# This regex matches everything after the initial article number.
-		articleRegex = re.compile(r"([Aa]rtikel(en)?|art\.) ((\d+|[IVX]+)([:\.]\d+)?([a-z]+)?( en |, ?)?)+ ?(([etdvzan][ewic][a-z]+?((d|st)e[^a-z]))?(lid|paragraaf|volzin)( \d+)?([, ])*)*((van|het|de|Wet|wet) )*( ?(([A-Z]([A-Z]{1,4}|[a-z]{1,2}))[^\w]) ?(\d{4})?|([\w\-]+ ?)+ ?(\d{4})?)")	
 		articles = {}
 		
 		for _id,document in documents.items():
@@ -38,7 +38,7 @@ class RechtspraakParser():
 			if contents is None:
 				continue
 				
-			for article in articleRegex.finditer( contents ):
+			for article in self.articleRegex.finditer( contents ):
 				normArticle = article.group(0).strip(",.() ").replace("art.", "artikel").replace("Artikel","artikel")
 				articles[normArticle] = article
 				
@@ -179,7 +179,7 @@ class RechtspraakParser():
 			print _id, document.keys()
 			try:
 				contents = document["contents"]["results"]["uitspraak"]
-				case_id = document["contents"]["results"]["zaaknummer"]
+				case_id = document["zaaknummer"]
 			except KeyError as e:
 				print e
 				continue
@@ -226,30 +226,113 @@ class RechtspraakParser():
 			
 		parsedDocument["id"] = xml.getElementsByTagName("dcterms:identifier")[0].firstChild.nodeValue
 		
-		try:
-			parsedDocument["Publicatiedatum"] = xml.getElementsByTagName("dcterms:issued")[0].firstChild.nodeValue
-		except:
-			pass
-		try:
-			parsedDocument["Rechtsgebieden"] = xml.getElementsByTagName("dcterms:subject")[0].firstChild.nodeValue
-		except:
-			pass
-		try:
-			parsedDocument["zaaknummer"] = xml.getElementsByTagName("psi:zaaknummer")[0].firstChild.nodeValue
-		except:
-			pass
-		try:
-			parsedDocument["bijzondere_kenmerken"] = xml.getElementsByTagName("dcterms:subject")[0].firstChild.nodeValue
-		except:
-			pass		
+		pointsOfInterest = {
+			"Publicatiedatum":"dcterms:issued",
+			"Rechtsgebieden":"dcterms:subject",
+			"Zittingsplaats":"dcterms:spatial",
+			"Publicatiedatum":"dcterms:issued",
+			"Titel":"dcterms:title",
+			"Zaaknummer":"psi:zaaknummer",
+			"Procedure":"psi:procedure"
+		}
+		
+		for key, tagname in pointsOfInterest.items():		
+			try:
+				parsedDocument[key] = xml.getElementsByTagName(tagname)[0].firstChild.nodeValue
+			except:
+				pass
+			
+		parsedDocument["Wetboeken"] = []
+		for reference in xml.getElementsByTagName("dcterms:references"):
+			parsedDocument["Wetboeken"].append(reference.firstChild.nodeValue)
 		try:
 			parsedDocument["inhoudsindicatie"] = xml.getElementsByTagName("inhoudsindicatie")[0].firstChild.firstChild.nodeValue
 		except:
 			pass
 		
-		parsedDocument["contents"] = {"results":{"uitspraak": "\n".join(parsedDocument["uitspraak"])}}
+		sections = xml.getElementsByTagName("section")
+		for section in sections:
+			try:
+				section.attributes["role"].value
+			except:
+				continue
+				
+			sectionContents = []
+			for para in section.getElementsByTagName("para"):
+				try:
+					sectionContents.append(para.firstChild.nodeValue)
+				except:
+					pass
+
+			parsedDocument[section.attributes["role"].value.capitalize()] = "\n".join(sectionContents)
+		
+		
+		#parsedDocument["contents"] = {"results":{"uitspraak": "\n".join(parsedDocument["uitspraak"])}}
+		
+		#print json.dumps(parsedDocument, indent=4)
+		
+		self.generateSummary(parsedDocument)
 		
 		return parsedDocument
+	
+	def getWetboekAbbr(self, wetboeken, articles):
+		possibleAbbreviations = {}
+		letters = list("abcdefghijklmnopqrstuvwxyz")
+		stopwords = ["op","de","het","van","bij","een"]
+		for wetboek in wetboeken:
+			fullAbbreviation = "".join([word[0].lower() for word in wetboek.split(" ")])
+			letterAbbreviation = "".join([word[0].lower() for word in wetboek.split(" ") if word[0].lower() in letters])
+			noStopWordsAbbreviation = "".join([word[0].lower() for word in wetboek.split(" ") if word[0].lower() in letters and word not in stopwords])
+				
+			possibleAbbreviations[fullAbbreviation] = wetboek 
+			possibleAbbreviations[letterAbbreviation] = wetboek 
+			possibleAbbreviations[noStopWordsAbbreviation] = wetboek 
+						
+		for a,article in enumerate(articles):
+			for abbr,wb in possibleAbbreviations.items():
+				if abbr in article.lower():
+					articles[a] = re.sub(" "+abbr+" ?", " "+wb+" ", article, flags=re.IGNORECASE)
+				
+		return articles
+				
+	
+	def generateSummary(self, document):
+		summary = ["Deze rechtzaak is gepubliceerd op %s in de categorie %s." % (document["Publicatiedatum"], document["Rechtsgebieden"])]
+		try:
+			summary.append( "De zittingsplaats was %s." % document["Zittingsplaats"])
+		except:
+			pass
+		
+		try:
+			summary.append( "\n".join(document["Procesverloop"].split("\n")) )
+		except:
+			pass
+		
+		try:
+			summary.append( "\n".join(document["Beslissing"].split("\n")[:-2]) )
+		except:
+			pass
+		
+		articles = self.articleRegex.findall("\n".join(document["uitspraak"]))
+		if len(document["Wetboeken"]) > 0:
+			summary.append("Dit stuk jurisprudentie refereert naar de volgende wetboeken.")
+			for wb in document["Wetboeken"]:
+				summary.append("- %s" % wb)
+		
+		articles = [a.group(0) for a in self.articleRegex.finditer("\n".join(document["uitspraak"]))]
+		
+		articles = self.getWetboekAbbr(document["Wetboeken"], articles)
+		
+		if len(articles) > 0:
+			summary.append("Dit stuk jurisprudentie refereert naar de volgende artikelen.")
+			for article in articles[:3]:
+				summary.append("- %s" % article.strip(",. "))
+			if len(articles) > 3:
+				summary.append("en meer.")
+				
+		
+		print "\n".join(summary)
+		print "\n\n\n\n\n\n"		
 			
 	def filterRechtspraak(self, filename, tokenizer=None, inContentsThreshold=97):
 		rechtspraak = json.load(open(filename))
