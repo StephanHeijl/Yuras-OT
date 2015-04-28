@@ -28,18 +28,6 @@ class SummarizeFragment(Summarizer):
 		self.wordDocumentCount = collections.defaultdict(int)
 		self.tagger = nltk.data.load("taggers/alpino_brill_aubt.pickle")
 	
-	def tf(self, word, blob):
-		return blob.words.count(word) / len(blob.words)
-	
-	def n_containing(self, word, bloblist):
-		return sum(1 for blob in bloblist if word in blob)
-	
-	def idf(word, bloblist):
-		return math.log(len(bloblist) / (1 + n_containing(word, bloblist)))
-	
-	def tfidf(word, blob, bloblist):
-		return tf(word, blob) * idf(word, bloblist)
-	
 	def addDocument(self, document):
 		self.documents.append(document)
 		words = word_tokenize(document)

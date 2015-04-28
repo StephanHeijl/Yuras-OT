@@ -112,7 +112,7 @@ class StoredObject():
 					raise
 		return d
 	
-	def matchObjects(self, match, limit=None, skip=0, fields={}, sort=None, reverse=False):
+	def matchObjects(self, match, limit=None, skip=0, fields=None, sort=None, reverse=False):
 		""" This method allows you to match a StoredOject directly. It allows for more advanced queries.
 		
 		:param match: A query dictionary.
@@ -123,6 +123,9 @@ class StoredObject():
 		:param reverse: Whether or not documents are returned in reverse. False by default.
 		:rtype: All the matching objects stored in the database.
 		"""
+		
+		if fields is None:
+			fields = {}
 		storage = self.__storage
 		database = self._database
 		collection = self._collection

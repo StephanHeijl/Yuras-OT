@@ -28,7 +28,9 @@ class User(StoredObject):
 			passwords = cpw.read().split("\n")
 		return passwords[:n]
 	
-	def matchObjects(self, match, limit=None, skip=0, fields={"referenceDocument":0}, sort=None,reverse=False):
+	def matchObjects(self, match, limit=None, skip=0, fields=None, sort=None,reverse=False):
+		if fields is None:
+			fields = {"referenceDocument":0}
 		# Does not return reference template by default
 		return super(User, self).matchObjects(match,limit,skip,fields,sort,reverse)
 	

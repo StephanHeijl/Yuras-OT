@@ -306,13 +306,11 @@ def documentDelete(id):
 		return abort(404)
 
 	document.remove()
-
+	
 	return json.dumps( {
 			"success":"true",
 			"new_csrf":generate_csrf_token()
 		} );
-
-	return abort(403)
 
 @app.route("/documents/<id>/download/<filetype>")
 @login.login_required
@@ -548,8 +546,6 @@ def caseDelete(id):
 			"new_csrf":generate_csrf_token()
 		} );
 
-	return abort(403)
-
 @app.route("/cases/<id>/add",methods=["POST"])
 @login.login_required
 def caseAddDocument(id):
@@ -618,8 +614,6 @@ def annotationDelete(id):
 			"success":"true",
 			"new_csrf":generate_csrf_token()
 		} );
-
-	return abort(403)
 
 # USERS #
 @app.route("/users/")
@@ -745,8 +739,6 @@ def userDelete(id):
 			"success":"true",
 			"new_csrf":generate_csrf_token()
 		} );
-
-	return abort(403)
 
 # USERS - PASSWORD #
 with open(os.path.join(assetsFolder, "words.txt")) as wordsFile:

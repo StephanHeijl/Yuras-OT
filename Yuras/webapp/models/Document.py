@@ -33,8 +33,10 @@ class Document(StoredObject):
 		
 		super(Document, self).__init__(collection = "documents")
 		
-	def matchObjects(self, match, limit=None, skip=0, fields={"wordcount":0}, sort=None,reverse=False):
+	def matchObjects(self, match, limit=None, skip=0, fields=None, sort=None,reverse=False):
 		# Does not return wordcount by default
+		if fields is None:
+			fields = {"wordcount":0}
 		return super(Document, self).matchObjects(match,limit,skip,fields,sort,reverse)
 	
 	@staticmethod

@@ -364,7 +364,7 @@ class Storage(Singleton):
 		self.__currentCollection.remove(match)
 		return True
 		
-	def getDocuments(self, match, limit=None, skip=0, fields={}, sort=None, _encrypted=True):
+	def getDocuments(self, match, limit=None, skip=0, fields=None, sort=None, _encrypted=True):
 		""" Returns all documents that match the give query, up until `limit` is reached. By default, this will return every single result.
 		Refer to the [MongoDB documentation](http://docs.mongodb.org/manual/tutorial/query-documents) on this subject for more information on queries.
 		This method will also work if documents are encrypted.
@@ -380,6 +380,9 @@ class Storage(Singleton):
 			
 		if self.__currentCollection == None:
 			raise ValueError, "There was no collection selected"
+			
+		if fields is None:
+			fields = {}
 					
 		# Auto fix id requests
 		if "_id" in match and (isinstance(match["_id"], str) or isinstance(match["_id"], unicode)):
