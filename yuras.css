@@ -162,6 +162,12 @@ td.price small {
 	margin-top: 0.5em;
 	transition: all 0.1s;
 	text-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+	cursor:pointer;
+}
+
+.btn-yuras.disabled {
+	background: silver;
+	cursor: not-allowed;
 }
 
 .btn-yuras:hover {
