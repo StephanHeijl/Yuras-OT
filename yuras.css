@@ -152,13 +152,31 @@ td.price small {
 }
 
 .btn-yuras {
-	border-color: #1abc9c;
-	color: #1abc9c;
-	background: white;
-	margin: 0 auto;
+	background: #1abc9c;
+	color: white;
 	text-align: center;
 	width: 100%;
 	font-size: 14pt;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	margin-top: 0.5em;
+	transition: all 0.1s;
+	text-shadow: 0px 0px 0px rgba(0,0,0,0.5);
+}
+
+.btn-yuras:hover {
+	color: rgba(255,255,255,1);
+	padding-top: 0.4em;
+	padding-bottom: 0.6em;
+	text-shadow: 0px 0.1em 0px rgba(0,0,0,0.3);
+	opacity: 0.9;
+}
+
+.btn-yuras:active {
+	color: rgba(255,255,255,0.5);
+	text-shadow: 0px 0px 0px transparent;
+	padding-top: 0.6em;
+	padding-bottom: 0.4em;
 }
 
 .user-story-introduction {
@@ -185,31 +203,6 @@ td.price small {
 	text-align: justify;
 }
 
-.price-sticker {
-	background: white;
-	border-radius: 100%;
-	width: 256px;
-	height: 256px;
-	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
-	margin: 2em auto;
-}
-
-.price-container {
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
-	line-height: 2em;
-}
-
-.price-sticker .large-price {
-	font-size: 44pt;
-	font-family: Georgia, Serif;
-}
-
-.price-sticker .small-note {
-	font-size:75%;
-}
-
 .overview-comparison .glyphicon {
 	font-size: 48px;
 	line-height: 64px;
@@ -234,6 +227,108 @@ td.price small {
 	}
 	.col-md-12 > .feature-screenshot {
 		display:none;
+	}
+}
+
+/* Pricing */
+
+.prices-container {
+	display:block;
+	margin: 2em auto;
+}
+
+.price-level {
+	width: 30%;
+	display: inline-block;
+	background: white;
+	border-radius: 10px;
+	padding: 1em;
+	margin: 0.5em;
+	box-shadow: 5px 5px 2px rgba(0,0,0,0.1);
+	position: relative;
+	overflow:hidden;
+	transition: all 0.2s;
+}
+
+.price-level:hover {
+	transform: translate(-5px, -5px);
+	box-shadow: 10px 10px 5px rgba(0,0,0,0.05);
+}
+
+.price-tier-name {
+	font-size: 24pt;
+	-font-weight: bold; 
+	margin: 0.5em;
+}
+
+.price-tier-amount {
+	font-size: 32pt;
+	font-family: Georgia;
+	padding: 0.5em;
+	font-weight: bold;
+}
+
+.price-tier-description {
+	font-size: 10pt;
+	line-height: 13pt;
+	font-style: italic;
+}
+
+.price-tier-banner {
+	background: #337ab7;
+	color: white;
+	padding: 0.2em 2em;
+	position: absolute;
+	right: -12%;
+	top: -14.5%;
+	font-size: 10pt;
+	border-top: 3px solid #1abc9c;
+	border-bottom: 3px solid #1abc9c;
+	transform: rotate(45deg);
+	transform-origin: 0% 100%;
+}
+
+@media screen and (min-width: 1080px) and (max-width: 1199px) {
+	.price-level {
+		width: 30%;
+	}
+	
+	.price-tier-banner {
+		right: -15%;
+		top: -15%;
+	}
+}
+
+@media screen and (min-width: 992px) and (max-width: 1079px) {
+	.price-level {
+		width: 40%;
+	}
+	
+	.price-tier-banner {
+		right: -12%;
+		top: -16%;
+	}
+}
+
+@media screen and (min-width: 809px) and (max-width: 992px) {
+	.price-level {
+		width: 40%;
+	}
+	
+	.price-tier-banner {
+		right: -14.5%;
+		top: -16%;
+	}
+}
+
+@media screen and (max-width: 810px) {
+	.price-level {
+		width: 100%;
+	}
+	
+	.price-tier-banner {
+		right: -6%;
+		top: -10%;
 	}
 }
 
