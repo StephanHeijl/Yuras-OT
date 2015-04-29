@@ -184,13 +184,6 @@ td.price small {
 	text-align: center;
 }
 
-@media screen and (max-width: 810px) {
-	.user-story-introduction * {
-		font-size: 14pt;
-		line-height: 1.3em;
-	}
-}
-
 .row {
 	margin-top: 50px;
 }
@@ -327,8 +320,8 @@ td.price small {
 	}
 	
 	.price-tier-banner {
-		right: -6%;
-		top: -10%;
+		right: -45px;
+		top: -37px;
 	}
 }
 
