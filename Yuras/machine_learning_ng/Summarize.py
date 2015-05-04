@@ -5,10 +5,10 @@ import numpy as np
 
 import sys,os,pprint,collections,math,re,json
  
-from nltk.tokenize.punkt import PunktSentenceTokenizer
 from nltk.tokenize import word_tokenize
 import nltk.data
-from sklearn.feature_extraction.text import TfidfTransformer, CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
+
 
 class Summarizer():
 	def __init__(self):

@@ -1,21 +1,26 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import json, os, pprint, numpy, re, math, operator, collections, requests, sys
+import json, os, pprint, numpy, re, math, operator, collections, requests, sys,time
 from Yuras.common.Config import Config
 
 from sklearn.multiclass import OneVsRestClassifier,OneVsOneClassifier
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn import metrics
-from sklearn.svm import LinearSVC
-from sklearn.svm import SVC
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
-from sklearn.linear_model import SGDClassifier
-from sklearn.preprocessing import MultiLabelBinarizer
 
 from xml.dom.minidom import parse, parseString
 
+import nltk.data
+
 #from Yuras.webapp.models.Document import Document
+
+def memodict(f):
+    """ Memoization decorator for a function taking a single argument """
+    class memodict(dict):
+        def __missing__(self, key):
+            ret = self[key] = f(key)
+            return ret 
+    return memodict().__getitem__
 
 class RechtspraakParser():
 	def __init__(self):
@@ -176,33 +181,39 @@ class RechtspraakParser():
 			documents = {document["id"]:document}
 			
 		for _id, document in documents.items():
-			print _id, document.keys()
 			try:
 				contents = document["contents"]["results"]["uitspraak"]
-				case_id = document["zaaknummer"]
 			except KeyError as e:
-				print e
 				continue
 				
-			content_indication,procedures = None,None
-			try:
-				content_indication = document["Tekstfragment"]
-				procedures = document["proceduresoorten"]
-			except:
-				pass
-				
-			d = {"documentid":_id,
+			d = {"document_id":_id,
 				 "_encrypt":False,
-				 "contents": "#" + document["Titel"] + "\n" + "\n".join(contents),
-				 "category": ", ".join(document["Rechtsgebieden"]).replace(" ","_"),
+				 "contents": "#" + document["Titel"] + "\n" + contents,
+				 "category": document["Rechtsgebieden"].replace(" ","_"),
 				 "title": document["Titel"],
 				 "published": document["Publicatiedatum"],
 				 "document_type":"jurisprudence",
 				 "source":document["Titel"].split(",")[0].replace(" ","_"),
-				 "procedures": procedures,
-				 "case_id": case_id,
-				 "content_indication": content_indication
 				}
+			
+			english_map = {
+				"Instantie":"judicial_instance",
+				"latitude":"location_lat",
+				"longtitude":"location_lng",
+				"Zittingsplaats":"location",
+				"Zaaknummer":"case_id",
+				"Procedure":"procedurals",
+				"summary":"summary",
+				"Beslissing":"decision",
+				"ProsecutionScore":"prosecution_score"
+			}
+			
+			for source,target in english_map.items():
+				try:
+					d[target] = document[source]
+				except:
+					pass
+			
 			print json.dumps(d)
 			
 			
@@ -231,9 +242,10 @@ class RechtspraakParser():
 			"Rechtsgebieden":"dcterms:subject",
 			"Zittingsplaats":"dcterms:spatial",
 			"Publicatiedatum":"dcterms:issued",
+			"Instantie":"dcterms:creator",
 			"Titel":"dcterms:title",
 			"Zaaknummer":"psi:zaaknummer",
-			"Procedure":"psi:procedure"
+			"Procedure":"psi:procedure",
 		}
 		
 		for key, tagname in pointsOfInterest.items():		
@@ -241,6 +253,14 @@ class RechtspraakParser():
 				parsedDocument[key] = xml.getElementsByTagName(tagname)[0].firstChild.nodeValue
 			except:
 				pass
+			
+		try:
+			coordinates = RechtspraakParser.getLatLong( parsedDocument["Instantie"] )
+			parsedDocument["latitude"] = coordinates["lat"]
+			parsedDocument["longtitude"] = coordinates["lng"]
+		except Exception as e:
+			pass
+			
 			
 		parsedDocument["Wetboeken"] = []
 		for reference in xml.getElementsByTagName("dcterms:references"):
@@ -265,20 +285,26 @@ class RechtspraakParser():
 					pass
 
 			parsedDocument[section.attributes["role"].value.capitalize()] = "\n".join(sectionContents)
+			
+		joinedUitspraak = "\n".join(parsedDocument["uitspraak"])
+		if "Beslissing" not in parsedDocument and "De beslissing" in joinedUitspraak:
+			parsedDocument["Beslissing"] = joinedUitspraak[joinedUitspraak.index("De beslissing"):]
+			
+		if "Beslissing" in parsedDocument:
+			prosecutionScore = self.classifyJudgement(parsedDocument["Beslissing"])
+			if prosecutionScore is not None:
+				parsedDocument["ProsecutionScore"] = int(round(prosecutionScore,2)*100)
 		
+		parsedDocument["contents"] = {"results":{"uitspraak": joinedUitspraak}}
 		
-		#parsedDocument["contents"] = {"results":{"uitspraak": "\n".join(parsedDocument["uitspraak"])}}
-		
-		#print json.dumps(parsedDocument, indent=4)
-		
-		self.generateSummary(parsedDocument)
+		parsedDocument["summary"] = self.generateSummary(parsedDocument)
 		
 		return parsedDocument
 	
 	def getWetboekAbbr(self, wetboeken, articles):
 		possibleAbbreviations = {}
 		letters = list("abcdefghijklmnopqrstuvwxyz")
-		stopwords = ["op","de","het","van","bij","een"]
+		stopwords = ["op","de","het","van","bij","een","voor"]
 		for wetboek in wetboeken:
 			fullAbbreviation = "".join([word[0].lower() for word in wetboek.split(" ")])
 			letterAbbreviation = "".join([word[0].lower() for word in wetboek.split(" ") if word[0].lower() in letters])
@@ -287,17 +313,30 @@ class RechtspraakParser():
 			possibleAbbreviations[fullAbbreviation] = wetboek 
 			possibleAbbreviations[letterAbbreviation] = wetboek 
 			possibleAbbreviations[noStopWordsAbbreviation] = wetboek 
-						
+
 		for a,article in enumerate(articles):
 			for abbr,wb in possibleAbbreviations.items():
 				if abbr in article.lower():
 					articles[a] = re.sub(" "+abbr+" ?", " "+wb+" ", article, flags=re.IGNORECASE)
 				
 		return articles
-				
+			
+	@staticmethod
+	@memodict
+	def getLatLong(place):
+		mapsUrl = "https://maps.googleapis.com/maps/api/geocode/json?address="+place
+		r = requests.get(mapsUrl)
+		try:
+			return r.json()["results"][0]["geometry"]["location"]
+		except:
+			return {"lat":None,"lng":None}
 	
 	def generateSummary(self, document):
 		summary = ["Deze rechtzaak is gepubliceerd op %s in de categorie %s." % (document["Publicatiedatum"], document["Rechtsgebieden"])]
+		try:
+			summary.append( "De instantie was %s." % document["Instantie"])
+		except:
+			pass
 		try:
 			summary.append( "De zittingsplaats was %s." % document["Zittingsplaats"])
 		except:
@@ -309,14 +348,15 @@ class RechtspraakParser():
 			pass
 		
 		try:
-			summary.append( "\n".join(document["Beslissing"].split("\n")[:-2]) )
+			summary.append( "\n".join(document["Beslissing"].split("\n")[:-2]) )			
+			summary.append( "De beslissing van dit proces werd beoordeeld met %s punten voor de vervolging." % document["ProsecutionScore"] )
 		except:
 			pass
 		
 		articles = self.articleRegex.findall("\n".join(document["uitspraak"]))
 		if len(document["Wetboeken"]) > 0:
 			summary.append("Dit stuk jurisprudentie refereert naar de volgende wetboeken.")
-			for wb in document["Wetboeken"]:
+			for wb in list(set(document["Wetboeken"])):
 				summary.append("- %s" % wb)
 		
 		articles = [a.group(0) for a in self.articleRegex.finditer("\n".join(document["uitspraak"]))]
@@ -325,14 +365,117 @@ class RechtspraakParser():
 		
 		if len(articles) > 0:
 			summary.append("Dit stuk jurisprudentie refereert naar de volgende artikelen.")
-			for article in articles[:3]:
+			for article in list(set(articles))[:3]:
 				summary.append("- %s" % article.strip(",. "))
 			if len(articles) > 3:
 				summary.append("en meer.")
 				
+		return "\n".join(summary)
+			
+	def determineDecision(self, document):
+		""" Dit is voor de judgement processor. """
+		try:
+			document["Beslissing"]
+		except:
+			return False
 		
-		print "\n".join(summary)
-		print "\n\n\n\n\n\n"		
+		tagger = nltk.data.load("taggers/alpino_NaiveBayes.pickle")
+		dump = open("decisionData.json.comp","a+")
+		csv = open("decisionData.csv","a+")
+		
+		for line in document["Beslissing"].split("\n"):
+			if len(line.strip()) < 5:
+				continue
+			
+			print line
+			suggested = self.classifyJudgementSentence(line.lower())
+			
+			# Y = Ja, N = Nee, S = Zegt niks, Q = Quit
+			classified_as = raw_input("Duidt deze zin schuldigheid aan? (y/n/s/q) (Press enter to enter suggested: %s) " % suggested)
+			if classified_as == "q":
+				time.sleep(1)
+				exit()
+			if classified_as not in "yns" or len(classified_as)==0:
+				classified_as = suggested			
+
+			taggedDocument = tagger.tag(line.lower().split(" "))
+			decisionData = {"text":taggedDocument,"classified_as":classified_as}
+			dump.write( json.dumps( decisionData ) + "\n")
+			csv.write( '"%s","%s"\n'.encode("ascii", "ignore") % (line.encode("ascii", "ignore"), classified_as) )
+			
+	def classifyJudgementSentence(self, sentence):
+		s = sentence.lower()
+		""" Judgment sentences are can be classified using the following tree:
+			vrij <= 0
+			|   veroordeelt <= 0
+			|   |   verklaart <= 0
+			|   |   |   vernietigt <= 0
+			|   |   |   |   met <= 0
+			|   |   |   |   |   af <= 0: s (409.0/38.0)
+			|   |   |   |   |   af > 0: n (10.0/1.0)
+			|   |   |   |   met > 0
+			|   |   |   |   |   artikel <= 0: s (21.0/2.0)
+			|   |   |   |   |   artikel > 0: y (4.0)
+			|   |   |   vernietigt > 0: n (14.0/4.0)
+			|   |   verklaart > 0
+			|   |   |   gegrond <= 0
+			|   |   |   |   hun <= 0
+			|   |   |   |   |   uitvoerbaar <= 0: y (70.0/13.0)
+			|   |   |   |   |   uitvoerbaar > 0: s (3.0)
+			|   |   |   |   hun > 0: n (2.0)
+			|   |   |   gegrond > 0: n (2.0)
+			|   veroordeelt > 0
+			|   |   benadeelde <= 0: y (31.0/1.0)
+			|   |   benadeelde > 0: s (2.0)
+			vrij > 0: n (28.0/2.0)
+		
+			Returns a float indicating the odds of this sentence indicating succesful prosecution. Will return -1 if this sentence does not indicate any such sentiment.
+		"""
+		
+		if "vrij" in s:
+			return (2./30.)
+		
+		if "veroordeelt" in s:
+			if "benadeelde" in s:
+				return None
+			else:
+				return (31./32.)
+		if "verklaart" in s:
+			if "gegrond" in s:
+				return 0.
+			if "hun" in s:
+				return 0.
+			if "uitvoerbaar" in s:
+				return None
+			return (70./83.)
+		
+		if "vernietigt" in s:
+			return (4./18.)
+		
+		if "met" in s:
+			if "artikel" in s:
+				return 1.
+			return None
+		
+		if "af" in s:
+			return (1./11.)
+		
+		return -1	
+			
+	def classifyJudgement(self, decision):
+		""" This classification is based on a J48 tree, tested with a subset of judgements. """
+		total = 0
+		score = 0
+		for line in decision.split("\n"):
+			s = self.classifyJudgementSentence(line)
+			if s is not None:
+				total+=1
+				score+=s
+		
+		try:
+			return score/total
+		except:
+			return None
 			
 	def filterRechtspraak(self, filename, tokenizer=None, inContentsThreshold=97):
 		rechtspraak = json.load(open(filename))
@@ -469,8 +612,8 @@ if __name__ == "__main__":
 	#articles = RP.parseWetboek(sys.argv[1])
 	#RP.parseRechtspraak(filename=sys.argv[1])
 	
-	xml = RP.parseXmlRechtspraak(sys.argv[1])
-	RP.parseRechtspraak(document=xml)
+	document = RP.parseXmlRechtspraak(sys.argv[1])
+	RP.parseRechtspraak(document=document)
 	
 	#RP.filterRechtspraakFolder(sys.argv[1])
 		
