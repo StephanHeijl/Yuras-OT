@@ -348,8 +348,9 @@ class RechtspraakParser():
 			pass
 		
 		try:
-			summary.append( "\n".join(document["Beslissing"].split("\n")[:-2]) )			
-			summary.append( "De beslissing van dit proces werd beoordeeld met %s punten voor de vervolging." % document["ProsecutionScore"] )
+			summary.append( "\n".join(document["Beslissing"].split("\n")[:-2]) )
+			if document["ProsecutionScore"] > -1:
+				summary.append( "De beslissing van dit proces werd beoordeeld met %s punten voor de vervolging." % document["ProsecutionScore"] )
 		except:
 			pass
 		
