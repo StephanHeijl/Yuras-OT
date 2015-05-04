@@ -1,16 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import json, os, pprint, numpy, re, math, operator, collections, requests, sys,time
+import json, os, pprint, re, math, operator, collections, requests, sys,time
 from Yuras.common.Config import Config
 
-from sklearn.multiclass import OneVsRestClassifier,OneVsOneClassifier
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
-
 from xml.dom.minidom import parse, parseString
-
-import nltk.data
 
 #from Yuras.webapp.models.Document import Document
 
@@ -21,6 +15,23 @@ def memodict(f):
             ret = self[key] = f(key)
             return ret 
     return memodict().__getitem__
+
+def persist_to_file(file_name):
+    def decorator(original_func):
+        try:
+            cache = json.load(open(file_name, 'r'))
+        except (IOError, ValueError):
+            cache = {}
+
+        def new_func(param):
+            if param not in cache:
+                cache[param] = original_func(param)
+                json.dump(cache, open(file_name, 'w'))
+            return cache[param]
+
+        return new_func
+
+    return decorator
 
 class RechtspraakParser():
 	def __init__(self):
@@ -171,7 +182,7 @@ class RechtspraakParser():
 	def parseRechtspraak(self, filename=None, document=None):
 		"""
 		Used in conjuction with
-		$ for file in rechtspraak/results/*.json; do echo "$file" | cut -d "/" -f 2- | xargs python -m Yuras.machine_learning_ng.RechtspraakParser | mongoimport --db "Yuras1" -c documents ; done
+		$ for file in rechtspraak/results/*.json; do echo "$file"; python -m Yuras.machine_learning_ng.RechtspraakParser $file | mongoimport --db "Yuras1" -c documents ; done
 		
 		"""
 		if filename is not None:
@@ -322,7 +333,7 @@ class RechtspraakParser():
 		return articles
 			
 	@staticmethod
-	@memodict
+	@persist_to_file("location.json")
 	def getLatLong(place):
 		mapsUrl = "https://maps.googleapis.com/maps/api/geocode/json?address="+place
 		r = requests.get(mapsUrl)
