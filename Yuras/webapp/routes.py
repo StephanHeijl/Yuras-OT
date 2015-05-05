@@ -150,7 +150,7 @@ def index():
 	documents = Document().matchObjects(
 		{},
 		limit=10,
-		fields={"title":True, "author":True, "secure":True})
+		fields={"title":True, "author":True, "secure":True, "summary":True, "document_type": True})
 	
 	# Parse blog feed
 	blogRssUrl = "http://blog.yuras.nl/rss/"
@@ -553,7 +553,7 @@ def caseAddDocument(id):
 	except Exception as e:
 		return abort(404)
 	
-	return json.dumps( { "success":case.insertDocument( request.form.get("document_id", None ) ),
+	return json.dumps( { "success": case.insertDocument( request.form.get("document_id", None ) ),
 					   	 "new_csrf":generate_csrf_token() } )
 
 

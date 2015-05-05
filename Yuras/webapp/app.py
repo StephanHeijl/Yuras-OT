@@ -22,7 +22,7 @@ class Server(threading.Thread):
 			self.TRAIN_QE_SIZE = 100
 		self.PORT = args.get("port", 5000)
 		self.CONFIG = args.get("config", None)
-		super(Server, self).__init__()		
+		super(Server, self).__init__()
 		
 	def parseArguments(self):
 		self.argparser.add_argument("--train-queryengine", type=str, help="Whether or not to train the QueryEngine's SpellingEngine with documents from the database. Defaults to True.", required=False)
@@ -50,7 +50,7 @@ class Server(threading.Thread):
 		
 		print ("Starting Yuras Tornado HTTP Server")
 		print ("----------------------------------")
-		Config(self.CONFIG) # Initialize the Config before switching to the webapp directory to make sure it gets loaded correctly.
+		print "Using config", self.CONFIG
 
 		self.checkWorkingDirectory()	
 		self.storeWebAppDirectories()	
@@ -97,7 +97,6 @@ class Server(threading.Thread):
 	def startLocal(self):
 		print ("Starting Yuras Tornado HTTP Server (LOCAL)")
 		print ("------------------------------------------")
-		Config(self.CONFIG) # Initialize the Config before switching to the webapp directory to make sure it gets loaded correctly.
 
 		self.checkWorkingDirectory()	
 		self.storeWebAppDirectories()
@@ -117,6 +116,7 @@ class Server(threading.Thread):
 				self.PORT +=1
 		
 	def run(self):
+		Config(self.CONFIG) # Initialize the Config before switching to the webapp directory to make sure it gets loaded correctly.
 		self.trainQueryEngine()
 		#self.startLocal()		
 		self.startCompressed()

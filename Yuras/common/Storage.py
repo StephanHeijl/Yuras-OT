@@ -390,11 +390,11 @@ class Storage(Singleton):
 			
 		if self.__encryptDocuments and _encrypted:
 			match = self.__encryptDocument(match)
-									
+		
 		if fields == {}:
 			documents = self.__currentCollection.find(match, skip=skip)
 		else:
-			documents = self.__currentCollection.find(match, fields=fields, skip=skip)
+			documents = self.__currentCollection.find(match, projection=fields, skip=skip)
 			
 		if limit is not None:
 			documents = documents.limit(limit)

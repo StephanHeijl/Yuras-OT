@@ -2,27 +2,74 @@
 {% block index %}
 {{ deferJS("/assets/js/yuras.js", 1) }}
 	<div class="container">
-
 		<div class="row">
-			<div class="col-lg-8">
-				<h2> {{ _("Recent documents") }} </h2>
-				<table class="table table-striped">
-					<thead>
-						<tr>
-							<th> {{ _("Name") }} </th>
-							<th>  {{ _("Created") }}  </th>
-						</tr>						
-					</thead>
-					<tbody>
-						{% for document in documents %} 
-						<tr>
-							<td><a href="/documents/{{ document._id }}" class="document-link">{{ document.title }}</a></td>
-							<td width="125">{{ document._created.strftime("%d-%m-%Y") }}</td>
-						</tr>					
+		<div class="col-lg-12 documents-search-bar-container">
+			<form action="/documents/search" method="get">
+				<input type="hidden" class="category-input" name="category" />
+				<div class="input-group input-group-lg">
+					<input type="text" class="form-control" placeholder="{{ _("Search documents") }}" name="keywords">
+					<span class="input-group-btn">
+						<!-- Category picker -->
+						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false" type="button">
+							<span class="category-dropdown-text">{{ _("Any category") }}</span> <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+						<li>
+							<a href="#" class="category-option" data-value="">
+								{{ _("Any category") }}
+								</a>
+						</li>
+						<li class="divider"></li>
+						{% for category in categories %}
+						<li>
+							<a href="#" data-value="{{ category.name }}" onclick="$('.category-dropdown-text').text($(this).data('value'));$('.category-input').val($(this).data('value')); ">
+								{{ category.name }}
+								</a>
+						</li>
 						{% endfor %}
-					</tbody>
-				</table>
+					</ul>
+
+					<!-- Search button -->
+					<button class="btn btn-default" type="submit">
+						<span class="glyphicon glyphicon-search"></span> {{ _("Search") }}
+					</button>
+
+					</span>
+				</div>
+			</form>
+		</div>
+	</div>
+		<div class="row">
+			<div class="col-md-8">
+				<h2>{{ _("Documents") }}</h2>
+			<div class="documents-wrapper">
+			{% for document in documents %}
+			<div class="document-item" data-type="{{document.document_type}}" data-id="{{ document._id }}">
+				<div class="document-summary">
+					{{ document.summary|replace("\n","<br/>")|safe }}
+				</div>
+				<div class="file-icon" draggable="true">
+					<div class="file-icon-fold"></div>
+					<div class="file-icon-fold-cover"></div>
+					
+					{% if document.document_type == "jurisprudence" %}
+					<div class="file-icon-image gavel"></div>
+					{% endif %}
+					{% if document.document_type == "law" %}
+					<div class="file-icon-image"><span class="glyphicon glyphicon-star"></span></div>
+					{% endif %}
+					
+					{% if document.score %}
+					<div class="file-icon-badge">
+						{{ document.score }}
+					</div>
+					{% endif %}
+				</div>
+				<span class="document-title">{{ document.title[:75] }}{% if document.title|length > 75 %}...{% endif %}</span>
 			</div>
+			{% endfor %}
+		</div>
+		</div>
 			<div class="col-lg-4">
 				<h2>Yuras {{ _("news") }}</h2>
 				<table class="table table-striped">
@@ -48,4 +95,31 @@
 		</div>
 
 	</div>
+
+<div class="document-highlight-container">
+	<div class="document-highlight-pointer-container">
+		<div class="document-highlight-pointer-border"></div>
+		<div class="document-highlight-pointer-inside"></div>
+	</div>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="document-title"></div>
+			</div>
+			<div class="col-md-12">
+				<p>
+					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sapien enim, pharetra vel aliquam vel, eleifend non urna. Duis suscipit ex eros, quis fermentum urna volutpat dapibus. Sed sollicitudin nisi ac erat blandit, id hendrerit dui blandit. Nam sed facilisis libero. Vivamus eget velit condimentum, laoreet nisl vel, viverra magna. Nullam facilisis rutrum euismod. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer eget eros tincidunt, mattis risus venenatis, venenatis est.
+				</p>
+			</div>
+			<div class="col-md-12">
+				<a class="document-highlight-button close-highlight-container"><span class="glyphicon glyphicon-remove"></span></a>
+				<a class="document-highlight-button add-bookmark"><span class="glyphicon glyphicon-bookmark"></span></a>
+				<a class="document-highlight-button view-document"><span class="glyphicon glyphicon-eye-open"></span></a>
+			</div>
+		</div>
+
+
+	</div>
+
+</div>
 {% endblock %}

@@ -416,6 +416,10 @@ class Document(StoredObject):
 		print documentClass
 		if documentClass is None:
 			documentClass = Document
+			
+			
+		""" This method needs to be changed to use the new mongo sample dump instead of the old jurisprudence.json. """
+		return False
 		jurisprudence = json.load( open(os.path.join( Config().WebAppDirectory, "..", "..", "jurisprudence.json"), "r") )
 		
 		stopwords = Document.getStopwords()

@@ -131,7 +131,14 @@ $(function () {
 	// Handle case selection
 	$('.case-option').click(function () {
 		$('.case-dropdown-text').text($(this).text());
-		$('.case-input').val($(this).data('value'));
+		caseid = $(this).data('value');
+		console.log(caseid);
+		if( caseid != "select" ) {
+			$(".case-icon").removeClass("closed");
+		} else {
+			$(".case-icon").addClass("closed");
+		}
+		$('.case-input').val(caseid);
 	});
 
 	// Handle adding related document to case 	
@@ -224,7 +231,6 @@ $(function () {
 	// Handle document clicking in the search and documents pages
 	$(".document-item").click(function () {
 		highlightContainer = $(".document-highlight-container")
-		$(".document-highlight-container").not(highlightContainer).removeClass("visible")
 		highlightContainer.find(".document-title").text($(this).find(".document-title").text())
 		highlightContainer.addClass("visible")
 
@@ -266,6 +272,15 @@ $(function () {
 		highlightContainer.find("p").html($(this).find(".document-summary").html())
 	});
 	
+	$(".close-highlight-container").on("click", function() {
+		$(this).parents(".document-highlight-container").removeClass("visible").attr("style","");
+		$(".document-item").height("").animate({
+			"margin-bottom": "20px"
+		},function() {
+				
+		});
+	});
+	
 	/* Dragging documents */
 	$(".search-case").bind("dragover",function(ev) {
 		ev.preventDefault();
@@ -276,6 +291,9 @@ $(function () {
 	});
 	$(".search-case").bind("drop",function(e) {
 		e.preventDefault();
+		if( $(this).find(".case-icon").hasClass("closed") ) {
+			return;
+		}
 		ev = e.originalEvent
     	var docid = ev.dataTransfer.getData("text");
 		draggedIcon = $(".document-item[data-id="+docid+"]")
@@ -291,6 +309,11 @@ $(function () {
 		setTimeout(function() {
 			$(".search-case").find(".file-icon").remove();
 		},1000);
+		
+		var caseid = $(".case-input").val()
+		$.post("/cases/"+caseid+"/add", {"document_id":docid}, function(response) {
+			console.log(response);
+		});
 		
 		
 		$(this).find(".glyphicon").animate({"opacity":1}, 500, function() {

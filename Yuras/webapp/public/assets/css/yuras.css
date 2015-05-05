@@ -425,7 +425,17 @@ td.price small {
 	transform: scale(0.7);
 	transition: transform 0.3s;
 	margin-bottom: 20px;
+}
 
+.case-icon.closed .case-icon-front, .case-icon.closed .case-icon-front:after {
+	background-color: #999;
+}
+
+.case-icon.closed .case-icon-back, .case-icon.closed .case-icon-back:after {
+	background-color: #666;
+}
+.case-icon.closed .case-icon-front {
+	transform: none;
 }
 
 .case-icon-front {
@@ -437,6 +447,7 @@ td.price small {
 	border-radius: 5px;
 	top:0;
 	transform: skewY(30deg) scale(0.6,1) translate(-36px, 30px);
+	transition: all 0.5s;
 }
 
 .case-icon-front:after {
@@ -448,6 +459,7 @@ td.price small {
 	bottom: 0px;
 	background: #1abc9c;
 	border-radius: 0px 3px 3px 0px;	
+	transition: all 0.5s;
 }
 
 .case-icon:hover {
@@ -462,6 +474,7 @@ td.price small {
 	width: 108px;
 	height: 150px;
 	border-radius: 5px 0px 5px 5px;
+	transition: all 0.5s;
 }
 
 .case-icon-back:after {
@@ -473,6 +486,7 @@ td.price small {
 	top: 0px;
 	background: #16A287;
 	border-radius: 0px 3px 3px 0px;	
+	transition: all 0.5s;
 }
 
 .case-icon .file-icon {
@@ -529,6 +543,11 @@ td.price small {
 .document-highlight-container.visible {
 	opacity: 1;
 	max-height: 600px;
+}
+
+.document-highlight-container .container .col-md-12:nth-child(2) {
+	overflow-y: auto;
+	max-height: 200px;
 }
 
 .document-highlight-container .row {
@@ -595,6 +614,20 @@ td.price small {
 	line-height: 58px;
 	font-size: 18pt;
 	text-align: center;
+}
+
+.documents-search-bar-container {
+	margin-top: 5vh;
+}
+
+.documents-search-bar-vertical-spacer {
+	margin-top: 28vh;
+}
+
+.documents-search-bar-container h1 {
+	text-align: center;
+	margin-bottom: 0.5em;
+	color: #666;
 }
 
 .search-case {

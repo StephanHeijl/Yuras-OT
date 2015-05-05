@@ -81,3 +81,9 @@ test
 ----
 """
 	assert result == desiredResult
+
+# PERFORM THIS TEST ON IMPORT TO ENSURE PANDOC IS INSTALLED.
+try:
+	test_convert()
+except AssertionError as e:
+	raise Exception, "PANDOC WAS NOT INSTALLED CORRECTLY. THIS MAY CORRUPT THE DATABASE." + e
