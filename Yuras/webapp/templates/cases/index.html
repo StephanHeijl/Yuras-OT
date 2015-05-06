@@ -45,6 +45,20 @@
 				<span class="document-title">{{ case.title[:75] }}{% if case.title|length > 75 %}...{% endif %}</span>
 			</div>
 			{% endfor %}
+			
+			<a class="document-item" data-type="case" href="/cases/new">
+				<div class="case-icon closed" draggable=false>
+					
+					<div class="case-icon-back"></div>					
+					<div class="case-icon-front">
+					<div class="file-icon-image">
+						<div class="glyphicon glyphicon-plus-sign"></div>
+					</div>
+					</div>
+				</div>
+				
+				<span class="document-title">{{ _("New case") }}</span>
+			</a>
 		</div>
 	</div>
 </div>

@@ -507,6 +507,7 @@ def caseCreate():
 	case = Case()
 	case.save()
 	_id = case._id;
+	case.name = "New case"
 	return redirect("/cases/%s/edit" % _id)
 
 @app.route("/cases/<id>/edit")

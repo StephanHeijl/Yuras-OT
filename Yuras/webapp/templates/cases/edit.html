@@ -22,13 +22,27 @@
 		<div class="col-lg-9">
 			<h3>  {{ _("Currently selected documents") }} </h3>
 			{% for document in case.documents %}
-			<div class="case-document col-md-2" data-id="{{ document.id }}">
-				<div class="glyphicon glyphicon-file"></div>
-				<div class="related-document-remove">
-					<div class="glyphicon glyphicon-minus"></div>
-				</div>
-				<span class="case-document-title"><a href="/documents/{{ document.id }}" class="document-link">{{ document.title }}</a></span>
-			</div>
+				
+                <div class="document-item" data-type="{{document.document_type}}" data-id="{{ document._id }}">
+                   
+                    <div class="file-icon" draggable="true">
+                        <div class="file-icon-fold"></div>
+                        <div class="file-icon-fold-cover"></div>
+
+						{% if document.document_type == "jurisprudence" %}
+						
+                        <div class="file-icon-image gavel"></div>
+						{% endif %}
+						{% if document.document_type == "law" %}
+						
+                        <div class="file-icon-image">
+                            <span class="glyphicon glyphicon-star"></span>
+                        </div>
+						{% endif %}
+					
+                    </div>
+                    <span class="document-title">{{ document.title[:75] }}{% if document.title|length > 75 %}...{% endif %}</span>
+                </div>
 			{% endfor %}
 			
 			<h3> {{ _("Suggested documents") }}</h3>

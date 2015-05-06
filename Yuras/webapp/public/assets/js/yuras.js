@@ -230,6 +230,10 @@ $(function () {
 
 	// Handle document clicking in the search and documents pages
 	$(".document-item").click(function () {
+		if( $(this).find(".document-summary").length == 0 ) {
+			return true;
+		}
+		
 		highlightContainer = $(".document-highlight-container")
 		highlightContainer.find(".document-title").text($(this).find(".document-title").text())
 		highlightContainer.addClass("visible")
@@ -311,8 +315,9 @@ $(function () {
 		},1000);
 		
 		var caseid = $(".case-input").val()
-		$.post("/cases/"+caseid+"/add", {"document_id":docid}, function(response) {
-			console.log(response);
+		var csrf_token = $(".csrf").val()
+		$.post("/cases/"+caseid+"/add", {"document_id":docid,"_csrf_token":csrf_token}, function(response) {
+			$(".csrf").val(JSON.parse(response).new_csrf);
 		});
 		
 		
