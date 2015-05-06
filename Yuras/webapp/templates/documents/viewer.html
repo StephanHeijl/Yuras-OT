@@ -53,7 +53,7 @@
 					</li>
 				</ul>
 			</li>
-
+<!--
 			<li>
 				<a href="#" id="analyze-document" data-csrf={{ csrf_token() }}><span class="glyphicon glyphicon-eye-open"></span> {{ _("Analyze document") }}</a>
 			</li>
@@ -65,6 +65,7 @@
 			<li lass="related-document-add">
 				<a href="#"><div class="glyphicon glyphicon-plus"></div> {{ _("Add to latest case") }}</a>
 			</li>
+-->
 
 		</ul>
 
@@ -81,13 +82,13 @@
 	<div class="annotation-wrapper-padding">
 		<div class="category-container">
 			<div class="category-dropdown btn btn-lg btn-default dropdown-toggle" data-toggle="dropdown" data-value="">
-				<span id="category">{{ document.category if document.category is not none and document.category is not undefined else _("Category") }}</span>
+				<span id="category">{{ document.category|replace("_"," ") if document.category is not none and document.category is not undefined else _("Category") }}</span>
 				<span class="caret"></span>
 			</div>
 			<ul class="dropdown-menu" role="menu">
 				{% for category in categories %}
 				<li role="presentation">
-					<a role="menuitem" tabindex="-1" href="#" class="category-menu-option">{{category.name}}</a>
+					<a role="menuitem" tabindex="-1" href="#" class="category-menu-option">{{category.name|replace("_"," ")}}</a>
 				</li>
 				{% endfor %}
 				<li class="divider"></li>

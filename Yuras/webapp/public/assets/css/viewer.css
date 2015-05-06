@@ -1,6 +1,6 @@
 body {
 	background: #eee;
-	font-family: Oxygen, sans-serif;
+	font-family: Open Sans, sans-serif;
 	color: white;
 	line-height: 1.2em;
 	margin: 0;
@@ -16,6 +16,10 @@ a {
 	float: right;
 }
 /* Navbar */
+
+.navbar-brand {
+	-max-width: 200px;
+}
 
 #document-title-input {
 	margin-top: -5px;
@@ -109,10 +113,10 @@ a {
 
 .document-body {
 	outline: 0;
-	font-family: "Amiri";
+	font-family: "Merriweather";
+	font-size: 10pt;
 	line-height: 1.3em;
 	font-kerning: normal;
-	font-size: 120%;
 	text-align: justify;
 }
 .document h1 {
