@@ -21,7 +21,7 @@ for( i=0; i<n; i++) {
 }
 
 for( i=0; i<n; i++ ) {
-	for( e=0; e<3; e++ ) {
+	for( e=0; e<2; e++ ) {
 		s.graph.addEdge({
 			id:("e"+i)+e,
 			source:"n"+i,
@@ -34,5 +34,5 @@ s.refresh();
 s.startForceAtlas2({
 	slowDown:500,
 	linLogMode:true,
-	gravity:0.5
+	gravity:0.3
 })

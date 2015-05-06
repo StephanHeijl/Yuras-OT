@@ -321,5 +321,11 @@ $(function () {
 		});
 	});
 	
+	$(".suggested-term").on("click", function() {
+		input = $("input[name=keywords]");
+		input.val(input.val() + " " + $(this).text().replace(/^\s+|\s+$/g, '') );
+		$(this).animate({"width":0,"opacity":0}, 300, function() { $(this).remove() } );
+	});
+	
 
 });

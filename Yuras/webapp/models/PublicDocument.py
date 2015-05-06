@@ -8,11 +8,12 @@ from Yuras.common.QueryEngine import QueryEngine, SpellingEngine, ThesaurusEngin
 
 class PublicDocument(Document):
 	"""
-This class serves merely as a wrapper for public documents.
-Its contents are never encrypted by the storage engine.
-Its type is still Document, allowing it to be picked up by Document searches.
+	This class serves merely as a wrapper for public documents.
+	Its contents are never encrypted by the storage engine.
+	Its type is still Document, allowing it to be picked up by Document searches.
 
-	This class also replaced the Mongo searches with Elasticsearch searches, which perform way better.	
+	This class also replaced the Mongo searches with Elasticsearch searches, 
+	which perform way better and allow for more complex operations.
 	"""
 	def __init__(self, *args, **kwargs):
 		self._encrypt = False
@@ -76,6 +77,11 @@ Its type is still Document, allowing it to be picked up by Document searches.
 				  "significant_terms": {
 					"field": "book"
 				  }
+				},
+				"__Suggested_Terms": {
+					"significant_terms": {
+						"field": "contents"
+					}
 				}
 			  }
 			}
@@ -91,8 +97,11 @@ Its type is still Document, allowing it to be picked up by Document searches.
 			d.markedContents = r.get("highlight",{}).get("contents","")
 			if d.markedContents == "":
 				# Fallback summary
-				d.markedContents = [Pandoc().convert("html", "plain", r["_source"].get("contents","No summary") )[:300]+"..."]
-			d.score = round(r.get("_score",0)/res['hits']['max_score'],2)*10
+				d.markedContents = [Pandoc().convert("markdown_github", "plain", r["_source"].get("contents","No summary")[:300] )+"..."]
+			else:
+				# Strip loose tags from the end
+				d.markedContents = [re.sub("\<[a-z\\\]+$", "", l) for l in d.markedContents]
+			d.score = round(r.get("_score",0)/res['hits']['max_score'],2)*10 # Gives a score out of 10
 			results.append(d)
 
 		stopwords = Document.getStopwords()		

@@ -630,6 +630,12 @@ td.price small {
 	color: #444;
 }
 
+.suggested-search-terms button {
+	font-size: 10pt;
+	margin-top: 10px;
+	padding: 3px 6px;
+}
+
 .search-case {
 	width: 100%;
 	text-align:center;

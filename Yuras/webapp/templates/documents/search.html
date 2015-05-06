@@ -1,160 +1,185 @@
 {% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }} {{ deferJS("/assets/js/documents-popup.js", 1) }}
+
 <div class="container">
-
-	<div class="row">
-		<div class="col-lg-12">
-
-			<h2>{{ _("Search results for ") }} '{{ keywords.strip(" ") }}'<br/>
-			<small>{{ _("Actual query") }}: {{ extendedQuery }}</small></h2>
-			<form action="/documents/search" method="get">
-				<input type="hidden" class="category-input" name="category" value="{{ category }}" />
-				<div class="input-group input-group-lg">
-					<input type="text" class="form-control" placeholder="{{ _("Search documents") }}" name="keywords" value="{{ keywords }}">
-					<span class="input-group-btn">
-						<!-- Category picker -->
-						<button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false" id="dropdownCategory"  type=button>
-							<span class="category-dropdown-text">{{ category if category != "" else _("Any category") }}</span> <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu" role="menu">
-						<li>
-							<a href="#" class="category-option" data-value="">
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>{{ _("Search results for ") }} '{{ keywords.strip(" ") }}'
+                <br/>
+                <small>{{ _("Actual query") }}: {{ extendedQuery }}</small>
+            </h2>
+            <form action="/documents/search" method="get">
+                <input type="hidden" class="category-input" name="category" value="{{ category }}" />
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" placeholder="{{ _("Search documents") }}" name="keywords" value="{{ keywords }}">
+                        <span class="input-group-btn">
+                            <!-- Category picker -->
+                            <button class="btn btn-default category-dropdown" data-toggle="dropdown" aria-expanded="false" id="dropdownCategory"  type=button>
+                                <span class="category-dropdown-text">{{ category if category != "" else _("Any category") }}</span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu" role="menu">
+                                <li>
+                                    <a href="#" class="category-option" data-value="">
 								{{ _("Any category") }}
 							</a>
-						</li>
+                                </li>
 						{% for category in categories %}
-						<li>
-							<a href="#" class="category-option" data-value="{{ category.name }}">
+						
+                                <li>
+                                    <a href="#" class="category-option" data-value="{{ category.name }}">
 								{{ category.name }}
 								</a>
-						</li>
+                                </li>
 						{% endfor %}
-					</ul>
-
-					<!-- Search button -->
-					<button class="btn btn-default" type="submit">
-						<span class="glyphicon glyphicon-search"></span> {{ _("Search") }}
-					</button>
-
-					</span>
-				</div>
-			</form>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-9 documents-wrapper">
-			{% for document in documents %}
-			<div class="document-item" data-type="{{document.document_type}}" data-id="{{ document._id }}">
-				<div class="document-summary">
-					{% if document.markedContents|length > 0 %}
-					{{ "...".join(document.markedContents[:5])|safe }}
-					{% endif %}
-				</div>
-				<div class="file-icon" draggable="true">
-					<div class="file-icon-fold"></div>
-					<div class="file-icon-fold-cover"></div>
 					
-					{% if document.document_type == "jurisprudence" %}
-					<div class="file-icon-image gavel"></div>
-					{% endif %}
-					{% if document.document_type == "law" %}
-					<div class="file-icon-image"><span class="glyphicon glyphicon-star"></span></div>
-					{% endif %}
+                            </ul>
+                            <!-- Search button -->
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search"></span> {{ _("Search") }}
 					
-					{% if document.score %}
-					<div class="file-icon-badge">
-						{{ document.score }}
-					</div>
-					{% endif %}
-				</div>
-				<span class="document-title">{{ document.title[:75] }}{% if document.title|length > 75 %}...{% endif %}</span>
-			</div>
-			{% endfor %}
-		</div>
-		
-		<div class="col-md-3">
-			
-			<!-- Case selector -->
-			<div class="search-case">
-				<div class="case-icon closed" draggable=false>					
-					<div class="case-icon-back"></div>		
-					
-					<div class="case-icon-front">
-					<div class="file-icon-image">
-						<div class="glyphicon glyphicon-plus" style="opacity:0"></div>
-					</div>
-					</div>
-				</div>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+                <div class="suggested-search-terms">
+				{% for term in facets["__Suggested_Terms"]["buckets"] %}
+				{% if term["key"] not in keywords %}
 				
-				<span class="document-title"></span>
-			</div>
+                    <button class="btn btn-success suggested-term" type="button" style="opacity:{{ (term["score"]/facets["__Suggested_Terms"]["buckets"][0]["score"])*2 }}">
+					{{ term["key"] }}
+				</button>
+				{% endif %}
+				{%endfor%}
 			
-			
-			<div class="input-group input-group-lg" style="width:100%;" >
-					<!-- Case picker -->
-					<input type="hidden" class="case-input" name="case" value="{{ category }}" style="width:100%;" />
-					<button class="btn btn-lg btn-default dropdown" data-toggle="dropdown" aria-expanded="false" id="dropdownCase" type=button style="width:100%;">
-						<span class="case-dropdown-text">{{ _("Select a case") }}</span> <span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu" role="menu">
-						<li>
-							<a href="#" class="case-option" data-value="select">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-9 documents-wrapper">
+			{% for document in documents %}
+				
+                <div class="document-item" data-type="{{document.document_type}}" data-id="{{ document._id }}">
+                    <div class="document-summary">
+						{% if document.markedContents|length > 0 %}
+							{{ "...".join(document.markedContents)|safe }}
+						{% endif %}
+					</div>
+                    <div class="file-icon" draggable="true">
+                        <div class="file-icon-fold"></div>
+                        <div class="file-icon-fold-cover"></div>
+
+						{% if document.document_type == "jurisprudence" %}
+						
+                        <div class="file-icon-image gavel"></div>
+						{% endif %}
+						{% if document.document_type == "law" %}
+						
+                        <div class="file-icon-image">
+                            <span class="glyphicon glyphicon-star"></span>
+                        </div>
+						{% endif %}
+
+						{% if document.score %}
+						
+                        <div class="file-icon-badge">
+							{{ document.score }}
+						</div>
+						{% endif %}
+					
+                    </div>
+                    <span class="document-title">{{ document.title[:75] }}{% if document.title|length > 75 %}...{% endif %}</span>
+                </div>
+			{% endfor %}
+		
+            </div>
+            <div class="col-md-3">
+                <!-- Case selector -->
+                <div class="search-case">
+                    <div class="case-icon closed" draggable=false>
+                        <div class="case-icon-back"></div>
+                        <div class="case-icon-front">
+                            <div class="file-icon-image">
+                                <div class="glyphicon glyphicon-plus" style="opacity:0"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="document-title"></span>
+                </div>
+                <div class="input-group input-group-lg" style="width:100%;" >
+                    <!-- Case picker -->
+                    <input type="hidden" class="case-input" name="case" value="{{ category }}" style="width:100%;" />
+                    <button class="btn btn-lg btn-default dropdown" data-toggle="dropdown" aria-expanded="false" id="dropdownCase" type=button style="width:100%;">
+                        <span class="case-dropdown-text">{{ _("Select a case") }}</span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li>
+                            <a href="#" class="case-option" data-value="select">
 								{{ _("Select a case") }}
 							</a>
-						</li>
+                        </li>
 						{% for case in cases %}
-						<li>
-							<a href="#" class="case-option" data-value="{{ case._id }}">
+						
+                        <li>
+                            <a href="#" class="case-option" data-value="{{ case._id }}">
 								{{ case.title }}
 								</a>
-						</li>
+                        </li>
 						{% endfor %}
-					</ul>
-			</div>
-			
-			<div class="facets">
+					
+                    </ul>
+                </div>
+                <div class="facets">
 				{% for facet,values in facets.items() %}
-					<h3>{{ _(facet) }}</h3>
-					{% for bucket in values["buckets"] %}
-						{% if bucket["key"][-1] != "_" and bucket["key"]|length > 1 %}
-							 <div class="checkbox">
-								<input type="checkbox" id="checkbox_{{bucket['key']}}" value="{{bucket['key']}}">
-								<label for="checkbox_{{bucket['key']}}">
-									{{bucket['key']|replace("_"," ")|title}} ({{bucket['doc_count']}})
-								</label>
-							  </div>
-						{% endif %}
-					{% endfor %}
+					{% if values["buckets"]|length > 0 and  facet[0:2] != "__" %}
+						
+                    <h3>{{ _(facet) }}</h3>
+						{% for bucket in values["buckets"] %}
+							{% if bucket["key"][-1] != "_" and bucket["key"]|length > 1 %}
+								 
+                    <div class="checkbox">
+                        <input type="checkbox" id="checkbox_{{bucket['key']}}" value="{{bucket['key']}}">
+                            <label for="checkbox_{{bucket['key']}}">
+										{{bucket['key']|replace("_"," ")|title}} ({{bucket['doc_count']}})
+									</label>
+                        </div>
+							{% endif %}
+						{% endfor %}
+					{% endif %}
 				{% endfor %}
-			</div>
-		</div>
-	</div>
-</div>
-<div class="document-highlight-container">
-	<div class="document-highlight-pointer-container">
-		<div class="document-highlight-pointer-border"></div>
-		<div class="document-highlight-pointer-inside"></div>
-	</div>
-	<div class="container">
-		<div class="row">
-			<div class="col-md-12">
-				<div class="document-title"></div>
-			</div>
-			<div class="col-md-12">
-				<p>
+			
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="document-highlight-container">
+            <div class="document-highlight-pointer-container">
+                <div class="document-highlight-pointer-border"></div>
+                <div class="document-highlight-pointer-inside"></div>
+            </div>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="document-title"></div>
+                    </div>
+                    <div class="col-md-12">
+                        <p>
 					Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sapien enim, pharetra vel aliquam vel, eleifend non urna. Duis suscipit ex eros, quis fermentum urna volutpat dapibus. Sed sollicitudin nisi ac erat blandit, id hendrerit dui blandit. Nam sed facilisis libero. Vivamus eget velit condimentum, laoreet nisl vel, viverra magna. Nullam facilisis rutrum euismod. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer eget eros tincidunt, mattis risus venenatis, venenatis est.
 				</p>
-			</div>
-			<div class="col-md-12">
-				<a class="document-highlight-button close-highlight-container"><span class="glyphicon glyphicon-remove"></span></a>
-				<a class="document-highlight-button add-bookmark"><span class="glyphicon glyphicon-bookmark"></span></a>
-				<a class="document-highlight-button view-document"><span class="glyphicon glyphicon-eye-open"></span></a>
-			</div>
-		</div>
-
-
-	</div>
-
-</div>
-
-</div>
+                    </div>
+                    <div class="col-md-12">
+                        <a class="document-highlight-button close-highlight-container">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                        <a class="document-highlight-button add-bookmark">
+                            <span class="glyphicon glyphicon-bookmark"></span>
+                        </a>
+                        <a class="document-highlight-button view-document">
+                            <span class="glyphicon glyphicon-eye-open"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
