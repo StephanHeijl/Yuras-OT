@@ -1,4 +1,8 @@
-{% extends "layout/master.html" %} {% block index %} {{ deferJS("/assets/js/yuras.js", 1) }} {{ deferJS("/assets/js/documents-popup.js", 1) }}
+{% extends "layout/master.html" %} 
+{% block index %} 
+{% include "layout/graph-background.html" %}
+{{ deferJS("/assets/js/yuras.js", 1) }} 
+{{ deferJS("/assets/js/documents-popup.js", 1) }}
 <div class="container">
 
 	<div class="row"></div>
