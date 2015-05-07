@@ -33,7 +33,6 @@ h1 {
 .jumbo-arrow {
 	left: 0;
 	position: absolute;
-	;
 	color: white;
 	bottom: 2vh;
 	font-size: 20pt;
@@ -219,6 +218,7 @@ td.price small {
 .feature-screenshot {
 	width: 100%;
 	margin-bottom: 1em;
+	border-radius: 2px;
 }
 @media screen and (max-width: 900px) {
 	.overview-comparison {
