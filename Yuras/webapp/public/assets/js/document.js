@@ -584,5 +584,33 @@ $(function () {
 			})
 		});
 	});
+	
+	function collapseText(v,interval) {
+		text = v.text()
+		if(v.height() > 16 && text.length > 0) {
+			text = text.split(" ").slice(0, text.split(" ").length-1).join(" ")
+			v.text( text )
+		} else {
+			clearInterval(interval)
+		}
+	}
+	
+	$(".collapse-article").click(function() {
+		if($(this).hasClass("collapsed") ) {
+		 	$(this).removeClass("collapsed") 
+			v = $(this).parent().children(".value").first()
+			v.text(v.data("full"));
+			$(this).parent().children("ol").slideDown()
+		} else {
+			$(this).addClass("collapsed")
+			v = $(this).parent().children(".value").first()
+			text = v.text()	
+			v.data("full", text)
+			
+			interval = setInterval(function() { collapseText(v,interval) },3)
+			
+			$(this).parent().children("ol").slideUp()
+		}
+	})
 
 });

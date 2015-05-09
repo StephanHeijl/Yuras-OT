@@ -101,6 +101,7 @@ a {
 .document-content-padding {
 	padding: 75px;
 }
+	
 
 @media screen and (max-width:766px) {
 	.document {
@@ -111,7 +112,7 @@ a {
 	}
 }
 
-.document-body {
+.document-body, .law-body {
 	outline: 0;
 	font-family: "Merriweather";
 	font-size: 10pt;
@@ -119,7 +120,8 @@ a {
 	font-kerning: normal;
 	text-align: justify;
 }
-.document h1 {
+
+.document h1, .law h1 {
 	text-align: left;
 }
 
@@ -194,8 +196,29 @@ a {
 .law {
 	width: 780px;
 	background: white;
-	text-align: justify;
-	font-family: "Amiri";
+	margin: 0 auto;
+	box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  	border: 1px solid rgba(0,0,0,0.3);
+  	margin-bottom: 3em;
+}
+
+.law .value {
+	line-height: 1.75em;
+}
+
+.collapse-article {
+	font-size: 80%;
+	transform: rotate(90deg);
+	transition: 0.5s transform;
+	cursor:pointer;
+	opacity: 0.5;
+}
+.collapse-article.collapsed {
+	transform:rotate(0deg);
+}
+
+.law-body {
+	text-align: left;
 }
 .law-content-padding {
 	padding: 75px;

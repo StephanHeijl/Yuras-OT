@@ -44,19 +44,21 @@
 		<div class="law-content">
 			<div class="law-content-padding">
 				<div class="law-body">
+					<h1>{{ document.title }}</h1>
 					<ol class="structuredlaw">
 						{{document.structuredlaw["#"]}}
 						{%- for key, value in document.structuredlaw|dictsort(by='key') recursive %}                       
 						  <li>
 							  {% if key != "#" %}
+							  	<div class="collapse-article glyphicon glyphicon-chevron-right"></div>
 								<strong>{{ key|upper }}.</strong>
 							  {%endif%}
 							{%- if value %}                                                         
 							  {% if is_dict(value) %}
-							  {{ value["#"] }}
-							  <ol>{{ loop(value|dictsort(by='key'))}}</ol>
+							  <span class="value">{{ value["#"] }}</span>
+							  <ol class="value">{{ loop(value|dictsort(by='key'))}}</ol>
 							  {% elif key!="#" %}
-								{{ value }}
+								<span class="value">{{ value }}</span>
 							  {% endif %}
 							{%- endif %}                                                            
 						  </li>                                                                     

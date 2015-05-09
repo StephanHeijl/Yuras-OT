@@ -150,7 +150,8 @@ class PublicDocument(Document):
 				  "fields": [
 					"contents",
 					"title",
-					"summary"
+					"summary",
+					"judicial_instance"
 				  ],
 				  "docs": docs
 				}

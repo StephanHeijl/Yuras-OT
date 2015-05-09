@@ -26,7 +26,7 @@
 				
                 <div class="document-item" data-type="{{document.document_type}}" data-id="{{ document.id }}">
                    <div class="document-summary">
-						{{ document.summary }}
+						{{ document.summary|replace("\n","<br/>")|safe }}
 					</div>
                     <div class="file-icon" draggable="true">
                         <div class="file-icon-fold"></div>
