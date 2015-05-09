@@ -645,3 +645,17 @@ td.price small {
 	display: inline-block;
 	margin-left: -10px;
 }
+
+.documents-wrapper .search-case {
+	width: auto;
+}
+
+.documents-wrapper .search-case .case-icon {
+	transform: scale(0.9) !important;
+	margin-top: 5px;
+	margin-left: 0;
+}
+
+#document-filter-reset {
+	margin-top: 10px;
+}

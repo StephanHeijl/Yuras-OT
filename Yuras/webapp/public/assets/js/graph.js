@@ -6,7 +6,7 @@ s.settings({
 	minNodeSize:2,
 	maxNodeSize:8
 });
-var n = 50;
+var n = 35;
 // Then, let's add some data to display:
 for( i=0; i<n; i++) {
 	s.graph.addNode({
@@ -21,7 +21,7 @@ for( i=0; i<n; i++) {
 }
 
 for( i=0; i<n; i++ ) {
-	for( e=0; e<2; e++ ) {
+	for( e=0; e<3; e++ ) {
 		s.graph.addEdge({
 			id:("e"+i)+e,
 			source:"n"+i,
@@ -36,3 +36,7 @@ s.startForceAtlas2({
 	linLogMode:true,
 	gravity:0.3
 })
+
+setTimeout(function() {
+	s.stopForceAtlas2()
+}, 60000);

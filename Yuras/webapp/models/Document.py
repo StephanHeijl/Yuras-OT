@@ -257,39 +257,8 @@ class Document(StoredObject):
 			key = base64.b64encode(scrypt.hash(str(word), str(Config().database), N=1<<self.scryptHashFactor))
 			idf = math.log(float(documentCount) / (1+wordCountsByKey.get(key,0)))			
 			tfidf[word] = (idf*tf, key)
-		
-	def documentAnalysis(self):
-		if len(self.tags) == 0 or not isinstance(self.tags, dict):
-			self.tfidf()
 			
-		return json.dumps( self.getRelatedDocumentsByIndividualTags(self.tags) )
-	
-	def getRelatedDocumentsByIndividualTags(self, tags):
-		results = {}
-		print tags
-		for key,word in tags.items():
-			related = Document().matchObjects(
-				{"$and": [
-						{"wordcount."+key : { "$exists": True }},
-						{"_id": {"$ne": ObjectId(self._id)}} # A conversion to ObjectId is needed for Mongo/Toku
-					]},
-				fields = {"title":True, "_id":True,"wordcount."+key:True},
-				sort = "wordcount."+key,
-				reverse=True
-			)
-			relatedResults = []
-			for r in related[:3]:
-				relatedResults.append(
-					{
-						"title":r.title,
-						"_id":str(r._id)
-					}
-				)
-			results[word] = relatedResults
-		
-		return results
-			
-	def getRelatedDocumentsByTags(self, tags=None, asJSON=True, exclude=None):
+	def getRelatedDocuments(self, tags=None, asJSON=True, exclude=None):
 		matchTags = []
 		if tags is None:
 			tags = self.tags.keys()

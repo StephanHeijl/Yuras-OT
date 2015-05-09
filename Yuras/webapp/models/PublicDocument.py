@@ -21,9 +21,9 @@ class PublicDocument(Document):
 		return super(PublicDocument, self).__init__(*args, **kwargs)
 	
 	@staticmethod
-	def search(query, category=None, skip=0, limit=24):
+	def search(query, category=None, skip=0, limit=24, filters=None):
 		qe = QueryEngine()
-		query = extendedQuery = qe.convert(query)		
+		query = extendedQuery = qe.convert(query)
 		
 		es = Elasticsearch()
 		# Give out extra points in the score for Title inclusion, but rate content occurences higher
@@ -63,17 +63,17 @@ class PublicDocument(Document):
 				]
 			  },
 			  "aggs": {
-				"Court_Sources": {
+				"judicial_instance": {
 				  "terms": {
-					"field": "source"
+					"field": "judicial_instance"
 				  }
 				},
-				"Document_Types": {
+				"document_type": {
 				  "terms": {
 					"field": "document_type"
 				  }
 				},
-				"Lawbook": {
+				"book": {
 				  "significant_terms": {
 					"field": "book"
 				  }
@@ -85,6 +85,15 @@ class PublicDocument(Document):
 				}
 			  }
 			}
+		
+		if filters is not None:
+			esQuery["query"]["bool"]["must"] = []
+			for k,vs in filters.items():
+				if not isinstance(vs,list):
+					vs = [vs]
+				for v in vs:
+					esQuery["query"]["bool"]["must"] = {"term" : { k : v } }
+				
 		
 		res = es.search(index="document", size=24, body=esQuery)
 		  
@@ -104,15 +113,13 @@ class PublicDocument(Document):
 			d.score = round(r.get("_score",0)/res['hits']['max_score'],2)*10 # Gives a score out of 10
 			results.append(d)
 
-		stopwords = Document.getStopwords()		
-
 		return results, query, res['aggregations']
 	
-	def getRelatedDocumentsByTags(self, tags=None, asJSON=True, exclude=None):
+	def getRelatedDocuments(self, tags=None, asJSON=True, exclude=None):
 		""" Overwrite the getRelatedDocumentsByTags method and use the ElasticSearch methods. """
 		es = Elasticsearch()
 
-		res = es.search(index="document", size=9, body={"query": {
+		res = es.search(index="document", size=10, body={"query": {
 			"more_like_this" : {
 				"like_text" : self.contents,
 				"stop_words" : Document.getStopwords(),
@@ -123,4 +130,44 @@ class PublicDocument(Document):
 		
 		if asJSON:
 			return json.dumps([[ d["_id"], d["_source"]["title"], d["_score"]*3 ] for d in res['hits']['hits']])
+		
+	@staticmethod
+	def getRelatedDocumentsFromSet(ids):
+		if len(ids) == 0:
+			return []
+		es = Elasticsearch()
+		
+		docs = []
+		for _id in ids:
+			docs.append({
+			  "_index": "document",
+			  "_type": "document",
+			  "_id": _id
+			})		
+		
+		body = { "query": {
+				"more_like_this": {
+				  "fields": [
+					"contents",
+					"title",
+					"summary"
+				  ],
+				  "docs": docs
+				}
+			  }
+			}
+		
+		print body
+		res = es.search(index="document", size=6, body=body)
+		
+		results = []
+		for r in res['hits']['hits']:
+			d = {}
+			for k,v in r['_source'].items():
+				d[k] = v
+			d["score"] = round(r.get("_score",0)/res['hits']['max_score'],2)*10 # Gives a score out of 10
+			results.append(d)
+			
+		return results
+		
 		

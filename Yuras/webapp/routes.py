@@ -267,12 +267,11 @@ def lawViewer(id):
 	cases = Case().matchObjects({})
 	
 	categories = Category().matchObjects({})
-	annotations.sort(key=lambda a: a.location[0])
 	document.contents = Pandoc().convert("markdown_github", "html", document.contents)
 	
 	document.highlightArticles()
 
-	return render_template("documents/law.html", name="Law", document=document, cases=cases, annotations=annotations, categories=categories)
+	return render_template("documents/law.html", name="Law", document=document, cases=cases, categories=categories)
 
 
 
@@ -408,7 +407,14 @@ def documentSearch():
 		query = query[0]
 	category = request.args.get("category", None)
 	
-	results, extendedQuery, facets = Document.search(query)
+	facetpicks = dict(request.args)
+	try:
+		del facetpicks["keywords"]
+		del facetpicks["category"]
+	except:
+		pass
+	
+	results, extendedQuery, facets = Document.search(query,filters=facetpicks)
 	cases = Case().matchObjects({})
 
 	categories = Category().matchObjects({})
@@ -420,6 +426,7 @@ def documentSearch():
 						   keywords=query,
 						   extendedQuery=extendedQuery,
 						   facets=facets,
+						   facetpicks=facetpicks,
 						   cases=cases,
 						   active="documents")
 
@@ -526,7 +533,7 @@ def caseEdit(id):
 				tags[tag]+=1
 		
 	suggested = case.getFullCaseRecommendations()
-	return render_template("cases/edit.html", name="Edit case", case=case, suggested=suggested, tags=dict(tags), active="cases")
+	return render_template("cases/edit.html", name="Edit case", case=case, suggested= suggested, tags=dict(tags), active="cases")
 
 @app.route("/cases/<id>/delete",methods=["POST"])
 @login.login_required
@@ -583,7 +590,6 @@ def caseSetTitle(id):
 	
 	return json.dumps( { "success":True,
 					   	 "new_csrf":generate_csrf_token() } )
-
 
 # ANNOTATIONS #
 

@@ -320,7 +320,6 @@ $(function () {
 			$(".csrf").val(JSON.parse(response).new_csrf);
 		});
 		
-		
 		$(this).find(".glyphicon").animate({"opacity":1}, 500, function() {
 			$(this).animate({"opacity":0}, 500);
 		});
@@ -332,5 +331,10 @@ $(function () {
 		$(this).animate({"width":0,"opacity":0}, 300, function() { $(this).remove() } );
 	});
 	
+	$("#document-filter-reset").click(function(e) {
+		e.preventDefault()
+		$("input[type=checkbox]").prop("checked",false);
+		$(this).parents("form").submit();
+	});
 
 });

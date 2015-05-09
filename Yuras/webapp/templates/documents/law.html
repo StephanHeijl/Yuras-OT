@@ -28,18 +28,6 @@
 				</ul>
 			</li>
 
-			<li>
-				<a href="#" id="analyze-document" data-csrf={{ csrf_token() }}><span class="glyphicon glyphicon-eye-open"></span> {{ _("Analyze document") }}</a>
-			</li>
-
-			<li>
-				<a href="#" id="get-related" data-csrf={{ csrf_token() }} data-toggle="modal" data-target="#relatedModal"><span class="glyphicon glyphicon-search"></span> {{ _("Get related documents") }}</a>
-			</li>
-			
-			<li lass="related-document-add">
-				<a href="#"><div class="glyphicon glyphicon-plus"></div> {{ _("Add to latest case") }}</a>
-			</li>
-
 		</ul>
 
 		<ul class="nav navbar-nav pull-right">
@@ -79,75 +67,5 @@
 		</div>
 	</div>
 
-	<!-- Modal -->
-	<div class="modal fade" id="relatedModal" tabindex="-1" role="dialog" aria-labelledby="relatedModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
-					</button>
-					<span class="modal-title" id="relatedModalLabel">{{ _("Related documents") }}</span> 
-					{% if cases|length > 0 %}
-					<div class="dropdown pull-right" style="margin-right: 20px; margin-top: -5px;">
-						<div class="case-dropdown btn btn-default dropdown-toggle" data-toggle="dropdown" data-value="">
-							<span id="chosen-case" data-case-id="{{ cases[-1]._id }}">{{ cases[-1].title }}</span>
-							<span class="caret"></span>
-						</div>
-						<ul class="dropdown-menu" role="menu">
-							{% for case in cases %}
-							<li role="presentation">
-								<a role="menuitem" tabindex="-1" href="#" class="case-menu-option" data-case-id="{{case._id}}">{{case.title}}</a>
-							</li>
-							{% endfor %}
-						</ul>
-					</div>
-					{% endif %}
-				</div>
-				<div class="modal-body">
-					<div class="container-fluid">
-						<div class="case-document" style="display:none;">
-							{% if cases|length > 0 %}
-							<div class="related-document-add">
-								<div class="glyphicon glyphicon-plus"></div>
-							</div>
-							{% endif %}
-							<div class="document-item" data-type="{{document.document_type}}" data-id="{{ document._id }}">
-								<div class="document-summary">
-									{% if document.markedContents|length > 0 %}
-									{{ "...".join(document.markedContents[:5])|safe }}
-									{% endif %}
-								</div>
-								<div class="file-icon" draggable="true">
-									<div class="file-icon-fold"></div>
-									<div class="file-icon-fold-cover"></div>
-
-									{% if document.document_type == "jurisprudence" %}
-									<div class="file-icon-image gavel"></div>
-									{% endif %}
-									{% if document.document_type == "law" %}
-									<div class="file-icon-image"><span class="glyphicon glyphicon-star"></span></div>
-									{% endif %}
-
-									<div class="file-icon-badge case-document-score">
-										{{ document.score }}
-									</div>
-								</div>
-								<span class="case-document-title"></span>
-							</div>
-							
-						</div>
-						<img class="related-loader" src="/assets/img/loader.gif">>
-						<div class="row">
-
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default">{{ _("Select all") }}</button>
-					<button type="button" class="btn btn-primary" data-dismiss="modal">{{ _("Close and add selected") }}</button>
-				</div>
-			</div>
-		</div>
-	</div>
 
 	{% endblock %}

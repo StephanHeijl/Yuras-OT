@@ -1,5 +1,6 @@
 from Yuras.common.StoredObject import StoredObject
 from Yuras.webapp.models.Document import Document
+from Yuras.webapp.models.PublicDocument import PublicDocument
 
 from bson.objectid import ObjectId
 
@@ -30,7 +31,15 @@ class Case(StoredObject):
 			print e
 			return False
 		
-		self.documents.append({"title":document.title, "id":_id})
+		for d in self.documents:
+			if str(d["id"]) == _id:
+				return False
+		
+		self.documents.append({"title":document.title, "id":_id,"encrypted":document._encrypt, "document_type":document.document_type})
+		try:
+			self.documents[-1]["summary"] = document.summary.decode("utf8",errors="ignore")
+		except:
+			self.documents[-1]["summary"] = document.contents[:300].decode("utf8",errors="ignore")+"..."
 		self.save()
 		return True
 	
@@ -61,19 +70,11 @@ class Case(StoredObject):
 		return documents
 		
 	def getFullCaseRecommendations(self,tags = None):
-		if tags is None:
-			documents = self.getDocuments()
-			tags = []
-			for d in documents:
-				tags+=d.tags.keys()
-			
-		tagcount = collections.defaultdict(int)
-		for tag in tags:
-			tagcount[tag]+=1
+		ids = []
+		for document in self.documents:
+			if not document["encrypted"]:
+				ids.append(document["id"])
 		
-		if len(documents)>1:
-			# Remove tags that occur in less than half of the documents
-			tags = [k for k,v in dict(tagcount).items() if v >= len(documents)/4 ]
-		
-		related = Document().getRelatedDocumentsByTags(tags=tags,asJSON=False,exclude=[ObjectId(d["id"]) for d in self.documents])
+		print ids
+		related = PublicDocument.getRelatedDocumentsFromSet(ids)
 		return related

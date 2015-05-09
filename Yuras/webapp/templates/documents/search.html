@@ -20,17 +20,17 @@
                             <ul class="dropdown-menu" role="menu">
                                 <li>
                                     <a href="#" class="category-option" data-value="">
-								{{ _("Any category") }}
-							</a>
+										{{ _("Any category") }}
+									</a>
                                 </li>
-						{% for category in categories %}
+								{% for category in categories %}
 						
                                 <li>
                                     <a href="#" class="category-option" data-value="{{ category.name }}">
-								{{ category.name }}
-								</a>
+										{{ category.name }}
+									</a>
                                 </li>
-						{% endfor %}
+								{% endfor %}
 					
                             </ul>
                             <!-- Search button -->
@@ -43,7 +43,7 @@
                 </form>
                 <div class="suggested-search-terms">
 				{% for term in facets["__Suggested_Terms"]["buckets"] %}
-				{% if term["key"] not in keywords %}
+				{% if term["key"] not in keywords.lower() %}
 				
                     <button class="btn btn-success suggested-term" type="button" style="opacity:{{ (term["score"]/facets["__Suggested_Terms"]["buckets"][0]["score"])*2 }}">
 					{{ term["key"] }}
@@ -129,29 +129,32 @@
 					
                     </ul>
                 </div>
-                <div class="facets">
-				{% for facet,values in facets.items() %}
-					{% if values["buckets"]|length > 0 and  facet[0:2] != "__" %}
-						
-                    <h3>{{ _(facet) }}</h3>
-						{% for bucket in values["buckets"] %}
-							{% if bucket["key"][-1] != "_" and bucket["key"]|length > 1 %}
-								 
-                    <div class="checkbox">
-                        <input type="checkbox" id="checkbox_{{bucket['key']}}" value="{{bucket['key']}}">
-                            <label for="checkbox_{{bucket['key']}}">
-										{{bucket['key']|replace("_"," ")|title}} ({{bucket['doc_count']}})
-									</label>
-                        </div>
+				<form action="/documents/search" method="get">
+					<input type="hidden" class="hidden" name="keywords" value="{{ keywords }}"/>
+					<div class="facets">
+						{% for facet,values in facets.items() %}
+							{% if values["buckets"]|length > 0 and  facet[0:2] != "__" %}
+
+								<h3>{{ _(facet) }}</h3>
+								{% for bucket in values["buckets"] %}
+									{% if bucket["key"][-1] != "_" and bucket["key"]|length > 1 %}
+										<div class="checkbox">
+											<input type="checkbox" id="checkbox_{{bucket['key']}}" name="{{facet}}" value="{{bucket['key']}}" {% if bucket['key'] in facetpicks[facet] %}checked{% endif%}/>
+											<label for="checkbox_{{bucket['key']}}">
+												{{bucket['key']|replace("_"," ")|title}} ({{bucket['doc_count']}})
+											</label>
+										</div>
+									{% endif %}
+								{% endfor %}
 							{% endif %}
-						{% endfor %}
-					{% endif %}
-				{% endfor %}
-			
-                    </div>
-                </div>
-            </div>
-        </div>
+						{% endfor %}			
+					</div>
+                    <button class="btn btn-success btn-lg" style="width:100%;">{{ _("Filter") }}</button>
+                    <button class="btn btn-warning btn-lg" style="width:100%;" id="document-filter-reset">{{ _("Reset") }}</button>
+				</form>
+			</div>
+		</div>
+	</div>
 <input class="csrf hidden" value="{{ csrf_token() }}" type=hidden/>
         <div class="document-highlight-container">
             <div class="document-highlight-pointer-container">
