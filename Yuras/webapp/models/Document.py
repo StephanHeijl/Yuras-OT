@@ -246,7 +246,7 @@ class Document(StoredObject):
 
 			filename = self.title + "." + filetype
 
-			response.headers['Content-Disposition'] = "attachment; filename=%s" % filename
+			response.headers['Content-Disposition'] = "attachment; filename=%s" % filename.replace(",","_")
 			return response
 		else:
 			return abort(405)

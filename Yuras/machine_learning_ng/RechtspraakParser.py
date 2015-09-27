@@ -390,30 +390,64 @@ class RechtspraakParser():
 			document["Beslissing"]
 		except:
 			return False
+			
+		csv = open("decisionData_2.csv","a+")
 		
-		tagger = nltk.data.load("taggers/alpino_NaiveBayes.pickle")
-		dump = open("decisionData.json.comp","a+")
-		csv = open("decisionData.csv","a+")
+		print document["Beslissing"]
+		classified_as = raw_input("Duidt deze zin schuldigheid aan? (y/n/s/q) ")
+		if classified_as == "q":
+			time.sleep(10)
+			exit()
+			
+		if classified_as == "s":
+			exit()
 		
 		for line in document["Beslissing"].split("\n"):
 			if len(line.strip()) < 5:
 				continue
-			
-			print line
-			suggested = self.classifyJudgementSentence(line.lower())
-			
-			# Y = Ja, N = Nee, S = Zegt niks, Q = Quit
-			classified_as = raw_input("Duidt deze zin schuldigheid aan? (y/n/s/q) (Press enter to enter suggested: %s) " % suggested)
-			if classified_as == "q":
-				time.sleep(1)
-				exit()
-			if classified_as not in "yns" or len(classified_as)==0:
-				classified_as = suggested			
-
-			taggedDocument = tagger.tag(line.lower().split(" "))
-			decisionData = {"text":taggedDocument,"classified_as":classified_as}
-			dump.write( json.dumps( decisionData ) + "\n")
 			csv.write( '"%s","%s"\n'.encode("ascii", "ignore") % (line.encode("ascii", "ignore"), classified_as) )
+			
+	def determineNumberType(self, document):
+		csv = open("numberData.csv","a+")
+	
+		for location in document:
+			try:
+				lines = document[location].split("\n")
+			except:
+				continue
+			for line in lines:
+				for context in line.split(". "):
+					if re.search("\d+", context) is None:
+						continue
+					for piece in context.split(" "):
+						if re.search("\d+", piece) is not None:
+							print context
+							print piece
+							print "-"*len(piece)
+							classified_as = raw_input("Wat voor type cijfer is dit? ")
+							if len(classified_as) > 0:
+								csv.write('"%s","%s","%s"\n'.encode("ascii", "ignore") % (context.encode("ascii", "ignore"), classified_as, location) )
+								
+	def determineCrimeSentence(self, document):
+		csv = open("crimeData.csv","a+")
+		with open("misdrijven.txt") as md:
+			crimes = [c for c in md.read().lower().split("\n") if len(c) > 0]
+
+		for location in document:
+			try:
+				lines = document[location].split("\n")
+			except:
+				continue
+			for line in lines:
+				for sentence in line.split(". "):
+					sentence = sentence.replace('"','')
+					noCrimes = True
+					for crime in crimes:
+						if crime in sentence.lower():
+							noCrimes = False
+							csv.write('"%s","%s","%s"\n'.encode("ascii", "ignore") % (sentence.encode("ascii", "ignore"), crime, location) )
+					if noCrimes:
+						csv.write('"%s","%s","%s"\n'.encode("ascii", "ignore") % (sentence.encode("ascii", "ignore"), "None", location) )
 			
 	def classifyJudgementSentence(self, sentence):
 		s = sentence.lower()
@@ -625,7 +659,9 @@ if __name__ == "__main__":
 	#RP.parseRechtspraak(filename=sys.argv[1])
 	
 	document = RP.parseXmlRechtspraak(sys.argv[1])
-	RP.parseRechtspraak(document=document)
+	#RP.parseRechtspraak(document=document)
+	#RP.determineNumberType(document)
+	RP.determineCrimeSentence(document)
 	
 	#RP.filterRechtspraakFolder(sys.argv[1])
 		

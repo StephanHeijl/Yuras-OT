@@ -44,6 +44,25 @@ class Server(threading.Thread):
 		Config().WebAppDirectory = os.path.join(os.getcwd())
 		Config().TemplatesDirectory = os.path.join(os.getcwd(), "templates") 
 		Config().save()
+		
+	def trainQueryEngine(self):
+		qe = QueryEngine()
+	
+		if qe.SpellingEngine is None and self.TRAIN_QE:
+			print "Training SpellingEngine with up to %s documents." % self.TRAIN_QE_SIZE
+			se = SpellingEngine()
+			se.model = se.trainWithDatabaseDocuments(limit=self.TRAIN_QE_SIZE)
+			qe.SpellingEngine = se
+		else:
+			print "Not training SpellingEngine."
+
+		if qe.ThesaurusEngine is None:
+			print "Training ThesaurusEngine."
+			te = ThesaurusEngine()
+			with open(os.path.join( Config().WebAppDirectory, "..","..", "thesaurus.txt")) as thesaurusFile:
+				thesaurus = thesaurusFile.read()
+			te.parseOpentaalThesaurus(thesaurus)
+			qe.ThesaurusEngine = te
 
 	def startCompressed(self):
 		""" This is a version of the server optimized for remote ends. The plaintext data is compressed before it is sent out for better transfer speeds."""
@@ -74,25 +93,6 @@ class Server(threading.Thread):
 			except Exception as e:
 				print e
 				self.PORT +=1
-				
-	def trainQueryEngine(self):
-		qe = QueryEngine()
-	
-		if qe.SpellingEngine is None and self.TRAIN_QE:
-			print "Training SpellingEngine with up to %s documents." % self.TRAIN_QE_SIZE
-			se = SpellingEngine()
-			se.model = se.trainWithDatabaseDocuments(limit=self.TRAIN_QE_SIZE)
-			qe.SpellingEngine = se
-		else:
-			print "Not training SpellingEngine."
-
-		if qe.ThesaurusEngine is None:
-			print "Training ThesaurusEngine."
-			te = ThesaurusEngine()
-			with open(os.path.join( Config().WebAppDirectory, "..","..", "thesaurus.txt")) as thesaurusFile:
-				thesaurus = thesaurusFile.read()
-			te.parseOpentaalThesaurus(thesaurus)
-			qe.ThesaurusEngine = te
 
 	def startLocal(self):
 		print ("Starting Yuras Tornado HTTP Server (LOCAL)")

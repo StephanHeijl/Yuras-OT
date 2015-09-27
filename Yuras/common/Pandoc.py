@@ -44,9 +44,9 @@ class Pandoc():
 			tmpout.close()
 			formatDict["outputpath"] = tmpout.name
 			command = self.fileOutputCommand.format(**formatDict)
-			pdp = subprocess.Popen(command,shell=True,executable='/bin/bash',stdout=subprocess.PIPE)
 			print command
-			print pdp.communicate()
+			pdp = subprocess.Popen(command,shell=True,executable='/bin/bash',stdout=subprocess.PIPE)
+			pdp.communicate()
 			with open(tmpout.name,"rb") as tmpoutFile:
 				result = tmpoutFile.read()
 			os.unlink(tmpout.name)
