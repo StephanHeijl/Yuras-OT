@@ -1,3 +1,5 @@
+sudo apt-get install haskell-platform python-scipy python-numpy libssl-dev openssl swig nginx uwsgi -y
+
 # Install Pandoc
 sleep 3
 cabal install pandoc
