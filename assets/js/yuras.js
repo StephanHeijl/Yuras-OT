@@ -13,3 +13,9 @@ $("a[data-to]").click(function (e) {
 	$(this).parent().addClass("active")
 
 });
+
+$(".feature-screenshot").each(function() {
+        featureLink = $("<a>").attr({"href": $(this).attr("src"),"data-lightbox":"features","data-title":$(this).next().text()});
+        featureLink.insertBefore($(this));
+        $(this).appendTo(featureLink);
+});
