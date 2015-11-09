@@ -1,0 +1,1 @@
+for file in jquery-1.11.0.min.js lightbox.min.js bootstrap.min.js yuras.js; do cat $file; printf "\n";  done > scripts.min.js
