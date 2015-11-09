@@ -19,3 +19,7 @@ $(".feature-screenshot").each(function() {
         featureLink.insertBefore($(this));
         $(this).appendTo(featureLink);
 });
+
+$(function() {
+	$(".preloaded").attr("style", "").removeClass("preloaded");
+});
