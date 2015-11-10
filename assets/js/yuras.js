@@ -15,7 +15,7 @@ $("a[data-to]").click(function (e) {
 });
 
 $(".feature-screenshot").each(function() {
-        featureLink = $("<a>").attr({"href": $(this).attr("src"),"data-lightbox":"features","data-title":$(this).next().text()});
+        featureLink = $("<a>").attr({"href": $(this).attr("src").replace("screenshots_thumbs", "screenshots"),"data-lightbox":"features","data-title":$(this).next().text()});
         featureLink.insertBefore($(this));
         $(this).appendTo(featureLink);
 });
