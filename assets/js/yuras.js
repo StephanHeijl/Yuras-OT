@@ -34,4 +34,8 @@ if( navigator.userAgent !== GhostUserAgent ) {
 	  ga('create', 'UA-61117358-2', 'auto');
 	  ga('send', 'pageview');
 	
+} else {
+	$(function() {
+		$("div[id^=lightbox]").remove();
+	});
 }
