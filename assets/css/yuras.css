@@ -132,6 +132,10 @@ p {
 	margin-top: -6px;
 	transition: opacity 0.3s;
 }
+object.navbar-logo {
+	height: 32px !important;
+	width: 32px !important;
+}
 
 .navbar-logo:hover {
 	opacity: 0.5;
